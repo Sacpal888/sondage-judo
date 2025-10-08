@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=1920, height=1080">
     <title>Overlay - Vote du Public</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -34,6 +36,26 @@
             align-items: center;
             gap: 40px;
             min-width: 700px;
+        }
+        
+        .logo-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo-container img {
+            max-width: 400px;
+            max-height: 120px;
+            width: auto;
+            height: auto;
+            border-radius: 15px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            background: transparent;
+            object-fit: contain;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
         }
         
         .content-row {
@@ -78,9 +100,10 @@
             text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
             letter-spacing: 1px;
             line-height: 1.3;
+            white-space: pre-line;
         }
         
-        /* Configuration panel (masqué en mode overlay) */
+        /* Configuration panel */
         .config-panel {
             position: fixed;
             top: 20px;
@@ -90,7 +113,9 @@
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             z-index: 1000;
-            max-width: 350px;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .config-panel.hidden {
@@ -111,6 +136,7 @@
         }
         
         .config-panel input[type="text"],
+        .config-panel textarea,
         .config-panel input[type="file"] {
             width: 100%;
             padding: 10px;
@@ -118,6 +144,12 @@
             border: 2px solid #ddd;
             border-radius: 6px;
             font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .config-panel textarea {
+            min-height: 80px;
+            resize: vertical;
         }
         
         .config-panel button {
@@ -144,6 +176,14 @@
             background: #c82333;
         }
         
+        .config-panel .refresh-btn {
+            background: #28a745;
+        }
+        
+        .config-panel .refresh-btn:hover {
+            background: #218838;
+        }
+        
         .info-text {
             font-size: 12px;
             color: #666;
@@ -157,6 +197,28 @@
             margin-top: 10px;
             border-radius: 6px;
         }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
     </style>
 </head>
 <body>
@@ -164,28 +226,42 @@
     <div class="config-panel" id="configPanel">
         <h3>⚙️ Configuration Overlay</h3>
         
+        <div id="statusMessage" style="display: none;"></div>
+        
         <label for="urlInput">URL de la page de vote :</label>
         <input type="text" id="urlInput" placeholder="https://sacpa1888.github.io/sondage-judo/sondage.html">
+        
+        <label for="textInput">Texte de l'overlay :</label>
+        <textarea id="textInput" placeholder="le·la joueur·euse&#10;préféré·e du public !">le·la joueur·euse
+préféré·e du public !</textarea>
         
         <label for="trophyInput">Image de la coupe (PNG) :</label>
         <input type="file" id="trophyInput" accept="image/*">
         <img id="trophyPreview" class="preview-trophy" style="display: none;">
         
-        <button onclick="updateOverlay()">✅ Générer l'overlay</button>
+        <button onclick="updateOverlay()">✅ Appliquer les modifications</button>
+        <button class="refresh-btn" onclick="loadLogoFromSupabase()">🔄 Recharger le logo depuis Supabase</button>
         <button class="toggle-btn" onclick="togglePanel()">🙈 Masquer le panel</button>
         
         <div class="info-text">
             💡 <strong>Pour OBS :</strong><br>
             1. Configurez l'overlay<br>
-            2. Masquez le panel<br>
+            2. Masquez le panel (touche H)<br>
             3. Ajoutez comme "Source navigateur"<br>
             4. Taille : 1920x1080<br>
-            5. Cochez "Contrôler l'audio via OBS" OFF
+            5. Décochez "Contrôler l'audio via OBS"<br>
+            <br>
+            📌 <strong>Le logo</strong> se charge automatiquement depuis la page admin !
         </div>
     </div>
     
     <!-- Overlay principal -->
     <div class="overlay-container">
+        <!-- Logo (chargé depuis Supabase) -->
+        <div class="logo-container" id="logoContainer" style="display: none;">
+            <!-- Le logo sera inséré ici -->
+        </div>
+        
         <div class="content-row">
             <!-- QR Code -->
             <div class="qr-container">
@@ -199,7 +275,7 @@
         </div>
         
         <!-- Titre -->
-        <div class="title">
+        <div class="title" id="titleText">
             le·la joueur·euse<br>préféré·e du public !
         </div>
     </div>
@@ -207,14 +283,84 @@
     <script>
         let qrCodeInstance = null;
         let trophyImageData = null;
+        let supabaseClient = null;
         
         // Configuration par défaut
         const defaultUrl = 'https://sacpa1888.github.io/sondage-judo/sondage.html';
+        const defaultText = 'le·la joueur·euse\npréféré·e du public !';
         
-        // Générer le QR code initial
+        // Initialiser Supabase
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    showStatus('⚠️ Configuration Supabase manquante', 'error');
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                showStatus('✅ Connecté à Supabase', 'success');
+                return true;
+            } catch (error) {
+                showStatus('❌ Erreur de connexion Supabase', 'error');
+                return false;
+            }
+        }
+        
+        // Afficher un message de statut
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Charger le logo depuis Supabase
+        async function loadLogoFromSupabase() {
+            if (!supabaseClient) {
+                showStatus('❌ Supabase non initialisé', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('⏳ Chargement du logo...', 'info');
+                
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (logoError) {
+                    showStatus('ℹ️ Aucun logo trouvé dans Supabase', 'info');
+                    document.getElementById('logoContainer').style.display = 'none';
+                    return;
+                }
+                
+                if (logoData && logoData.value) {
+                    const logoContainer = document.getElementById('logoContainer');
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
+                    logoContainer.style.display = 'block';
+                    showStatus('✅ Logo chargé depuis Supabase', 'success');
+                } else {
+                    showStatus('ℹ️ Logo vide dans Supabase', 'info');
+                    document.getElementById('logoContainer').style.display = 'none';
+                }
+            } catch (error) {
+                showStatus('❌ Erreur lors du chargement du logo', 'error');
+                console.error('Erreur:', error);
+            }
+        }
+        
+        // Générer le QR code
         function generateQRCode(url) {
             const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = ''; // Vider le conteneur
+            qrContainer.innerHTML = '';
             
             qrCodeInstance = new QRCode(qrContainer, {
                 text: url,
@@ -243,9 +389,13 @@
         // Mettre à jour l'overlay
         function updateOverlay() {
             const url = document.getElementById('urlInput').value || defaultUrl;
+            const text = document.getElementById('textInput').value || defaultText;
             
             // Régénérer le QR code
             generateQRCode(url);
+            
+            // Mettre à jour le texte
+            document.getElementById('titleText').textContent = text;
             
             // Afficher la coupe si une image est uploadée
             if (trophyImageData) {
@@ -253,7 +403,7 @@
                 document.getElementById('trophyImage').style.display = 'block';
             }
             
-            alert('✅ Overlay mis à jour !');
+            showStatus('✅ Overlay mis à jour !', 'success');
         }
         
         // Masquer/afficher le panel
@@ -262,10 +412,20 @@
             panel.classList.toggle('hidden');
         }
         
-        // Initialiser avec l'URL par défaut
-        window.addEventListener('DOMContentLoaded', () => {
+        // Initialiser au chargement
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Initialiser les valeurs par défaut
             document.getElementById('urlInput').value = defaultUrl;
+            document.getElementById('textInput').value = defaultText;
+            
+            // Générer le QR code
             generateQRCode(defaultUrl);
+            
+            // Initialiser Supabase et charger le logo
+            const initialized = await initSupabase();
+            if (initialized) {
+                await loadLogoFromSupabase();
+            }
         });
         
         // Raccourci clavier pour afficher/masquer le panel (touche H)
