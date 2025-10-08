@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Gestion des Candidats</title>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .section h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .player-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .player-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        #ocrStatus, #statusMessage {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        #ocrStatus.loading, #statusMessage.loading {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        #ocrStatus.success, #statusMessage.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        #ocrStatus.error, #statusMessage.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .logo-preview {
+            margin-top: 15px;
+            max-width: 300px;
+        }
+        
+        .logo-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .config-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .config-notice.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛠️ Administration - Gestion des Candidats</h1>
+        
+        <div id="configNotice" class="config-notice" style="display: none;">
+            ⚠️ Configuration Supabase requise dans config.js
+        </div>
+
+        <div id="statusMessage"></div>
+        
+        <!-- Section Upload Logo -->
+        <div class="section">
+            <h2>📷 Logo du Sondage</h2>
+            <input type="file" id="logoUpload" accept="image/*">
+            <div class="logo-preview" id="logoPreview"></div>
+        </div>
+        
+        <!-- Section Ajout Manuel -->
+        <div class="section">
+            <h2>✍️ Ajout Manuel de Joueurs</h2>
+            <input type="text" id="playerName" placeholder="Nom du joueur">
+            <button onclick="addPlayer()">Ajouter</button>
+        </div>
+        
+        <!-- Section OCR -->
+        <div class="section">
+            <h2>🔍 Détection OCR (Image)</h2>
+            <input type="file" id="ocrImage" accept="image/*">
+            <button onclick="analyzeImage()">Analyser l'image</button>
+            <div id="ocrStatus"></div>
+        </div>
+        
+        <!-- Liste des Joueurs -->
+        <div class="section">
+            <h2>👥 Liste des Candidats (<span id="playerCount">0</span>)</h2>
+            <ul class="player-list" id="playerList"></ul>
+            
+            <div class="export-section">
+                <button onclick="clearAll()" style="background: #dc3545;">🗑️ Tout Effacer</button>
+                <button onclick="refreshData()">🔄 Actualiser</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMPORTANT: Créez un fichier config.js avec vos clés Supabase
+        // const SUPABASE_URL = 'https://votre-projet.supabase.co';
+        // const SUPABASE_ANON_KEY = 'votre-cle-anon';
+        
+        let supabase;
+        let players = [];
+        
+        // Initialiser Supabase
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    document.getElementById('configNotice').style.display = 'block';
+                    document.getElementById('configNotice').className = 'config-notice error';
+                    document.getElementById('configNotice').innerHTML = '❌ Erreur: config.js introuvable. Créez config.js avec vos clés Supabase.';
+                    return false;
+                }
+                
+                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                showStatus('✅ Connecté à Supabase', 'success');
+                return true;
+            } catch (error) {
+                showStatus('❌ Erreur de connexion: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        // Afficher un message de statut
+        function showStatus(message, type = 'loading') {
+            const status = document.getElementById('statusMessage');
+            status.className = type;
+            status.textContent = message;
+            status.style.display = 'block';
+            
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Charger les données depuis Supabase
+        async function loadData() {
+            if (!supabase) return;
+            
+            try {
+                showStatus('⏳ Chargement des données...', 'loading');
+                
+                // Charger les joueurs
+                const { data: playersData, error: playersError } = await supabase
+                    .from('players')
+                    .select('*')
+                    .order('id', { ascending: true });
+                
+                if (playersError) throw playersError;
+                
+                players = playersData || [];
+                updatePlayerList();
+                
+                // Charger le logo
+                const { data: settingsData, error: settingsError } = await supabase
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (settingsData && settingsData.value) {
+                    displayLogo(settingsData.value);
+                }
+                
+                showStatus('✅ Données chargées', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur de chargement: ' + error.message, 'error');
+            }
+        }
+        
+        // Upload du logo
+        document.getElementById('logoUpload').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file || !supabase) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const logoData = event.target.result;
+                
+                try {
+                    showStatus('⏳ Enregistrement du logo...', 'loading');
+                    
+                    // Vérifier si le logo existe déjà
+                    const { data: existing } = await supabase
+                        .from('settings')
+                        .select('*')
+                        .eq('key', 'logo')
+                        .single();
+                    
+                    if (existing) {
+                        // Mettre à jour
+                        const { error } = await supabase
+                            .from('settings')
+                            .update({ value: logoData })
+                            .eq('key', 'logo');
+                        
+                        if (error) throw error;
+                    } else {
+                        // Insérer
+                        const { error } = await supabase
+                            .from('settings')
+                            .insert({ key: 'logo', value: logoData });
+                        
+                        if (error) throw error;
+                    }
+                    
+                    displayLogo(logoData);
+                    showStatus('✅ Logo enregistré', 'success');
+                } catch (error) {
+                    showStatus('❌ Erreur: ' + error.message, 'error');
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        function displayLogo(logoData) {
+            const preview = document.getElementById('logoPreview');
+            if (logoData) {
+                preview.innerHTML = `<img src="${logoData}" alt="Logo">`;
+            }
+        }
+        
+        // Ajouter un joueur manuellement
+        async function addPlayer() {
+            if (!supabase) return;
+            
+            const input = document.getElementById('playerName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+            
+            // Vérifier si le joueur existe déjà
+            if (players.some(p => p.name === name)) {
+                alert('Ce joueur existe déjà !');
+                return;
+            }
+            
+            try {
+                showStatus('⏳ Ajout du joueur...', 'loading');
+                
+                const { data, error } = await supabase
+                    .from('players')
+                    .insert({ name: name })
+                    .select();
+                
+                if (error) throw error;
+                
+                input.value = '';
+                await loadData();
+                showStatus('✅ Joueur ajouté', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        // Analyse OCR de l'image
+        async function analyzeImage() {
+            const fileInput = document.getElementById('ocrImage');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Veuillez sélectionner une image');
+                return;
+            }
+            
+            if (!supabase) return;
+            
+            const status = document.getElementById('ocrStatus');
+            status.className = 'loading';
+            status.textContent = '🔄 Analyse en cours... Cela peut prendre quelques secondes.';
+            
+            try {
+                const result = await Tesseract.recognize(file, 'fra+eng', {
+                    logger: m => console.log(m)
+                });
+                
+                // Extraire les noms
+                const text = result.data.text;
+                const lines = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 2 && line.length < 50);
+                
+                let addedCount = 0;
+                
+                for (const name of lines) {
+                    if (!players.some(p => p.name === name)) {
+                        try {
+                            await supabase
+                                .from('players')
+                                .insert({ name: name });
+                            addedCount++;
+                        } catch (err) {
+                            console.error('Erreur ajout:', name, err);
+                        }
+                    }
+                }
+                
+                await loadData();
+                
+                status.className = 'success';
+                status.textContent = `✅ Analyse terminée ! ${addedCount} nouveau(x) nom(s) ajouté(s).`;
+                
+                fileInput.value = '';
+                
+            } catch (error) {
+                status.className = 'error';
+                status.textContent = '❌ Erreur lors de l\'analyse : ' + error.message;
+            }
+        }
+        
+        // Mettre à jour l'affichage de la liste
+        function updatePlayerList() {
+            const list = document.getElementById('playerList');
+            const count = document.getElementById('playerCount');
+            
+            count.textContent = players.length;
+            
+            if (players.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: #999;">Aucun candidat pour le moment</li>';
+                return;
+            }
+            
+            list.innerHTML = players.map(player => `
+                <li class="player-item">
+                    <span>${player.name}</span>
+                    <button class="delete-btn" onclick="deletePlayer(${player.id})">Supprimer</button>
+                </li>
+            `).join('');
+        }
+        
+        // Supprimer un joueur
+        async function deletePlayer(playerId) {
+            if (!confirm('Supprimer ce joueur ?')) return;
+            if (!supabase) return;
+            
+            try {
+                showStatus('⏳ Suppression...', 'loading');
+                
+                const { error } = await supabase
+                    .from('players')
+                    .delete()
+                    .eq('id', playerId);
+                
+                if (error) throw error;
+                
+                await loadData();
+                showStatus('✅ Joueur supprimé', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        // Tout effacer
+        async function clearAll() {
+            if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
+            if (!supabase) return;
+            
+            try {
+                showStatus('⏳ Suppression en cours...', 'loading');
+                
+                // Supprimer tous les joueurs
+                await supabase.from('players').delete().neq('id', 0);
+                
+                // Supprimer tous les votes
+                await supabase.from('votes').delete().neq('id', 0);
+                
+                // Supprimer le logo
+                await supabase.from('settings').delete().eq('key', 'logo');
+                
+                players = [];
+                updatePlayerList();
+                document.getElementById('logoPreview').innerHTML = '';
+                
+                showStatus('✅ Tout a été effacé', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        // Actualiser les données
+        async function refreshData() {
+            await loadData();
+        }
+        
+        // Initialiser au chargement
+        window.addEventListener('DOMContentLoaded', async () => {
+            const initialized = await initSupabase();
+            if (initialized) {
+                await loadData();
+            }
+        });
+    </script>
+    
+    <!-- Inclure le fichier de configuration -->
+    <script src="config.js"></script>
+</body>
+</html>
