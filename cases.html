@@ -209,6 +209,34 @@
                 <button onclick="refreshData()">🔄 Actualiser</button>
             </div>
         </div>
+        
+        <!-- Section Gestion des Votes -->
+        <div class="section">
+            <h2>⚙️ Paramètres de Vote</h2>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="singleVoteToggle" onchange="toggleSingleVote()" style="width: auto; margin-right: 10px; transform: scale(1.5);">
+                    <span style="font-weight: normal; color: #333;">
+                        <strong>Limiter à 1 vote par personne (IP)</strong><br>
+                        <small style="color: #666;">Décochez pour autoriser les votes multiples (utile pour les tests)</small>
+                    </span>
+                </label>
+                <div id="voteStatusMessage" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+            </div>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <p style="color: #555; margin-bottom: 10px;">
+                    <strong>Votes actuels :</strong> <span id="totalVotesCount" style="color: #667eea; font-size: 1.2em; font-weight: bold;">0</span>
+                </p>
+                <button onclick="resetVotes()" style="background: #ffc107; color: #000;">
+                    🔄 Réinitialiser tous les votes
+                </button>
+                <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                    ⚠️ Cette action supprime tous les votes mais garde les candidats
+                </p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -279,9 +307,134 @@
                     displayLogo(null);
                 }
                 
+                // Charger le paramètre single vote
+                await loadSingleVoteSetting();
+                
+                // Charger le nombre de votes
+                await loadVotesCount();
+                
                 showStatus('✅ Données chargées', 'success');
             } catch (error) {
                 showStatus('❌ Erreur de chargement: ' + error.message, 'error');
+            }
+        }
+        
+        // Charger le nombre total de votes
+        async function loadVotesCount() {
+            try {
+                const { data, error, count } = await supabaseClient
+                    .from('votes')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (error) throw error;
+                
+                document.getElementById('totalVotesCount').textContent = count || 0;
+            } catch (error) {
+                console.error('Erreur chargement nombre de votes:', error);
+                document.getElementById('totalVotesCount').textContent = '?';
+            }
+        }
+        
+        // Charger le paramètre single vote
+        async function loadSingleVoteSetting() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                const checkbox = document.getElementById('singleVoteToggle');
+                
+                if (data && data.value !== null) {
+                    checkbox.checked = data.value === 'true';
+                } else {
+                    // Par défaut, activé
+                    checkbox.checked = true;
+                }
+            } catch (error) {
+                console.error('Erreur chargement paramètre single vote:', error);
+                document.getElementById('singleVoteToggle').checked = true;
+            }
+        }
+        
+        // Toggle single vote
+        async function toggleSingleVote() {
+            const checkbox = document.getElementById('singleVoteToggle');
+            const enabled = checkbox.checked;
+            const statusDiv = document.getElementById('voteStatusMessage');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Enregistrement...';
+                
+                // Vérifier si le paramètre existe
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                if (existing) {
+                    // Mettre à jour
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .update({ value: enabled.toString() })
+                        .eq('key', 'single_vote_enabled');
+                    
+                    if (error) throw error;
+                } else {
+                    // Insérer
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'single_vote_enabled', value: enabled.toString() });
+                    
+                    if (error) throw error;
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = enabled 
+                    ? '✅ Limite activée : 1 vote par IP' 
+                    : '✅ Votes multiples autorisés (mode test)';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
+                
+                // Revenir à l'état précédent
+                checkbox.checked = !enabled;
+            }
+        }
+        
+        // Réinitialiser tous les votes
+        async function resetVotes() {
+            if (!confirm('⚠️ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservés, seuls les votes seront effacés.')) {
+                return;
+            }
+            
+            try {
+                showStatus('⏳ Suppression de tous les votes...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .neq('id', 0); // Supprime tous les enregistrements
+                
+                if (error) throw error;
+                
+                await loadVotesCount();
+                showStatus('✅ Tous les votes ont été supprimés', 'success');
+                
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
         
