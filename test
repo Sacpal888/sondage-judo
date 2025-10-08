@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultats - Coupe virtuelle du public</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(13, 39, 68, 0.95);
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: visible;
+        }
+        
+        /* EFFET "REFLET GLISSANT" - Reflet qui suit le tracé du cadre arrondi */
+        .container::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 20px;
+            padding: 3px;
+            background: 
+                conic-gradient(
+                    from 0deg at 50% 50%,
+                    transparent 0deg,
+                    transparent 70deg,
+                    rgba(212, 175, 55, 0.3) 80deg,
+                    rgba(240, 212, 111, 0.6) 85deg,
+                    rgba(255, 235, 150, 0.9) 88deg,
+                    rgba(255, 245, 200, 1) 90deg,      /* Point le plus brillant */
+                    rgba(255, 235, 150, 0.9) 92deg,
+                    rgba(240, 212, 111, 0.6) 95deg,
+                    rgba(212, 175, 55, 0.3) 100deg,
+                    transparent 110deg,
+                    transparent 360deg
+                );
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: refletGlissant 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Bordure dorée de base */
+        .container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes refletGlissant {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* S'assurer que le contenu reste au-dessus du reflet */
+        .header, .logo-container, .stats, .results-list, .refresh-notice, .loading, .error-message {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        h1 {
+            color: #d4af37;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            color: #f0d46f;
+            font-size: 1.1em;
+        }
+        
+        .logo-container {
+            margin: 30px auto 40px auto;
+            text-align: center;
+            width: 100%;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .logo-container img {
+            max-width: 90%;
+            max-height: 150px;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            display: block;
+            background: transparent;
+            object-fit: contain;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .logo-placeholder {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(26, 47, 74, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #d4af37;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            color: #ffffff;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .player-result {
+            background: rgba(26, 47, 74, 0.6);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .player-result:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            border-color: #f0d46f;
+        }
+        
+        .player-result.first-place {
+            border: 3px solid #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .player-result.first-place .rank-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+        
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .player-name-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .rank-badge {
+            background: linear-gradient(135deg, #d4af37, #f0d46f);
+            color: #0a1828;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .player-name {
+            color: #ffffff;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .player-stats {
+            text-align: right;
+        }
+        
+        .vote-count {
+            color: #f0d46f;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .percentage {
+            color: #d4af37;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .progress-bar-container {
+            background: rgba(10, 24, 40, 0.7);
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f0d46f);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        
+        .progress-bar.first-place {
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        
+        .no-votes {
+            text-align: center;
+            color: #ffffff;
+            padding: 40px;
+            font-size: 1.2em;
+        }
+        
+        .refresh-notice {
+            text-align: center;
+            color: #f0d46f;
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(26, 47, 74, 0.4);
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .auto-refresh {
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            text-align: center;
+            color: #f0d46f;
+            padding: 40px;
+            font-size: 1.2em;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            .player-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .player-stats {
+                text-align: left;
+            }
+            
+            .stat-box {
+                min-width: 100px;
+            }
+            
+            .stat-number {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Résultats du Vote 🏆</h1>
+            <p class="subtitle">Coupe virtuelle du public</p>
+        </div>
+        
+        <!-- Logo affiché en permanence -->
+        <div class="logo-container" id="logoContainer">
+            <!-- Le logo sera inséré ici -->
+        </div>
+        
+        <div id="loadingMessage" class="loading">
+            ⏳ Chargement des résultats...
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalVotes">0</div>
+                    <div class="stat-label">Votes totaux</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalPlayers">0</div>
+                    <div class="stat-label">Candidats</div>
+                </div>
+            </div>
+            
+            <div class="results-list" id="resultsList">
+                <div class="no-votes">
+                    Aucun vote pour le moment...<br>
+                    Soyez le premier à voter ! 🥋
+                </div>
+            </div>
+            
+            <div class="refresh-notice">
+                <span class="auto-refresh">🔄</span> Mise à jour en temps réel
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script>
+        let supabaseClient;
+        let realtimeChannel;
+        
+        // Initialiser Supabase
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    showError('Configuration manquante. Contactez l\'administrateur.');
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Configurer les mises à jour en temps réel
+                setupRealtimeUpdates();
+                
+                return true;
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+                return false;
+            }
+        }
+
+        // Configurer les mises à jour en temps réel
+        function setupRealtimeUpdates() {
+            // Écouter les changements sur la table votes
+            realtimeChannel = supabaseClient
+                .channel('votes-changes')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'votes'
+                    },
+                    (payload) => {
+                        console.log('Changement détecté:', payload);
+                        loadResults();
+                    }
+                )
+                .subscribe();
+
+            // Fallback: actualiser toutes les 5 secondes au cas où
+            setInterval(loadResults, 5000);
+        }
+        
+        async function loadResults() {
+            if (!supabaseClient) return;
+            
+            try {
+                // Charger le logo
+                await loadLogo();
+                
+                // Charger tous les joueurs
+                const { data: playersData, error: playersError } = await supabaseClient
+                    .from('players')
+                    .select('*')
+                    .order('name', { ascending: true });
+                
+                if (playersError) throw playersError;
+                
+                if (!playersData || playersData.length === 0) {
+                    showNoData();
+                    return;
+                }
+                
+                // Charger tous les votes
+                const { data: votesData, error: votesError } = await supabaseClient
+                    .from('votes')
+                    .select('*');
+                
+                if (votesError) throw votesError;
+                
+                // Compter les votes par joueur
+                const voteCounts = {};
+                let totalVotes = 0;
+                
+                if (votesData) {
+                    votesData.forEach(vote => {
+                        voteCounts[vote.player_id] = (voteCounts[vote.player_id] || 0) + 1;
+                        totalVotes++;
+                    });
+                }
+                
+                // Créer le tableau de résultats
+                const results = playersData.map(player => ({
+                    id: player.id,
+                    name: player.name,
+                    votes: voteCounts[player.id] || 0,
+                    percentage: totalVotes > 0 ? ((voteCounts[player.id] || 0) / totalVotes * 100).toFixed(1) : 0
+                }));
+                
+                // Trier par nombre de votes décroissant
+                results.sort((a, b) => b.votes - a.votes);
+                
+                // Mettre à jour l'affichage
+                displayResults(results, totalVotes, playersData.length);
+                
+                // Afficher le contenu principal
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                
+            } catch (error) {
+                showError('Erreur de chargement: ' + error.message);
+            }
+        }
+        
+        // Charger le logo (fonction séparée)
+        async function loadLogo() {
+            try {
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                const logoContainer = document.getElementById('logoContainer');
+                
+                if (logoError) {
+                    console.log('Pas de logo trouvé:', logoError.message);
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configuré)</div>';
+                    return;
+                }
+                
+                if (logoData && logoData.value) {
+                    console.log('Logo chargé, taille:', logoData.value.length, 'caractères');
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
+                } else {
+                    console.log('Logo vide dans la base');
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
+                }
+            } catch (error) {
+                console.error('Erreur chargement logo:', error);
+                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur chargement logo)</div>';
+            }
+        }
+        
+        function displayResults(results, totalVotes, totalPlayers) {
+            // Mettre à jour les statistiques
+            document.getElementById('totalVotes').textContent = totalVotes;
+            document.getElementById('totalPlayers').textContent = totalPlayers;
+            
+            const resultsList = document.getElementById('resultsList');
+            
+            // Si aucun vote
+            if (totalVotes === 0) {
+                resultsList.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋</div>';
+                return;
+            }
+            
+            // Afficher les résultats
+            resultsList.innerHTML = results.map((result, index) => {
+                const isFirst = index === 0 && result.votes > 0;
+                return `
+                    <div class="player-result ${isFirst ? 'first-place' : ''}">
+                        <div class="player-header">
+                            <div class="player-name-container">
+                                <div class="rank-badge">${index + 1}</div>
+                                <div class="player-name">${result.name}</div>
+                            </div>
+                            <div class="player-stats">
+                                <div class="vote-count">${result.votes} vote${result.votes > 1 ? 's' : ''}</div>
+                                <div class="percentage">${result.percentage}%</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar ${isFirst ? 'first-place' : ''}" 
+                                 style="width: ${result.percentage}%">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showNoData() {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('totalVotes').textContent = '0';
+            document.getElementById('totalPlayers').textContent = '0';
+            document.getElementById('resultsList').innerHTML = 
+                '<div class="no-votes">Aucun candidat configuré.<br>Contactez l\'administrateur.</div>';
+        }
+
+        function showError(message) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+        
+        // Initialiser au chargement
+        window.addEventListener('DOMContentLoaded', async () => {
+            const initialized = await initSupabase();
+            if (initialized) {
+                await loadResults();
+            }
+        });
+        
+        // Nettoyer le canal en temps réel lors de la fermeture
+        window.addEventListener('beforeunload', () => {
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+            }
+        });
+    </script>
+</body>
+</html>
