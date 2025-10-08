@@ -26,6 +26,7 @@
         }
         
         .overlay-container {
+            position: relative;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 6px solid #d4af37;
             border-radius: 30px;
@@ -37,6 +38,44 @@
             justify-content: center;
             gap: 40px;
             min-width: 700px;
+            overflow: hidden;
+        }
+        
+        /* Animation du reflet doré qui glisse le long du cadre */
+        .overlay-container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 30px;
+            padding: 6px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                transparent 40%,
+                rgba(255, 215, 0, 0.8) 50%,
+                rgba(255, 235, 100, 0.9) 52%,
+                rgba(255, 215, 0, 0.8) 54%,
+                transparent 60%,
+                transparent 100%
+            );
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            animation: shimmer 6s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
         
         .logo-container {
@@ -82,18 +121,6 @@
         #qrcode img {
             width: 100% !important;
             height: 100% !important;
-        }
-        
-        .trophy-container {
-            text-align: center;
-        }
-        
-        .trophy-container img {
-            width: 280px;
-            height: auto;
-            filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.6));
-            display: block;
-            margin: 0 auto;
         }
         
         .title {
@@ -195,13 +222,6 @@
             line-height: 1.4;
         }
         
-        .preview-trophy {
-            max-width: 100%;
-            max-height: 100px;
-            margin-top: 10px;
-            border-radius: 6px;
-        }
-        
         .status-message {
             padding: 10px;
             border-radius: 6px;
@@ -239,26 +259,20 @@
         <textarea id="textInput" placeholder="le·la joueur·euse&#10;préféré·e du public !">le·la joueur·euse
 préféré·e du public !</textarea>
         
-        <label for="trophyInput">Image de la coupe (PNG - optionnel) :</label>
-        <input type="file" id="trophyInput" accept="image/*">
-        <img id="trophyPreview" class="preview-trophy" style="display: none;">
-        <div style="font-size: 11px; color: #888; margin-top: -10px; margin-bottom: 15px;">
-            Une coupe bleue par défaut est déjà affichée
-        </div>
-        
         <button onclick="updateOverlay()">✅ Appliquer les modifications</button>
         <button class="refresh-btn" onclick="loadLogoFromSupabase()">🔄 Recharger le logo depuis Supabase</button>
         <button class="toggle-btn" onclick="togglePanel()">🙈 Masquer le panel</button>
         
         <div class="info-text">
             💡 <strong>Pour OBS :</strong><br>
-            1. Configurez l'overlay<br>
+            1. Configurez l'URL et le texte<br>
             2. Masquez le panel (touche H)<br>
             3. Ajoutez comme "Source navigateur"<br>
             4. Taille : 1920x1080<br>
             5. Décochez "Contrôler l'audio via OBS"<br>
             <br>
-            📌 <strong>Le logo</strong> se charge automatiquement depuis la page admin !
+            📌 <strong>Le logo</strong> se charge automatiquement depuis la page admin !<br>
+            ✨ <strong>Animation :</strong> Un reflet doré tourne lentement autour du cadre
         </div>
     </div>
     
@@ -275,11 +289,6 @@ préféré·e du public !</textarea>
                 <div id="qrcode"></div>
             </div>
             
-            <!-- Coupe -->
-            <div class="trophy-container">
-                <img id="trophyImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 280'%3E%3Cdefs%3E%3ClinearGradient id='blueGrad' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231e90ff;stop-opacity:1'/%3E%3Cstop offset='50%25' style='stop-color:%230047ab;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%2300008b;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 40 20 L 30 40 C 30 60 40 80 60 90 L 60 200 L 50 200 L 50 220 L 150 220 L 150 200 L 140 200 L 140 90 C 160 80 170 60 170 40 L 160 20 Z' fill='url(%23blueGrad)' stroke='%2300bfff' stroke-width='3'/%3E%3Cellipse cx='100' cy='230' rx='60' ry='15' fill='url(%23blueGrad)' stroke='%2300bfff' stroke-width='2'/%3E%3Cpath d='M 50 30 Q 100 50 150 30' fill='none' stroke='%2300bfff' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M 60 50 Q 100 65 140 50' fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.3'/%3E%3C/svg%3E" alt="Coupe">
-            </div>
-            
             <!-- Titre -->
             <div class="title" id="titleText">
                 le·la joueur·euse<br>préféré·e du public !
@@ -289,7 +298,6 @@ préféré·e du public !</textarea>
 
     <script>
         let qrCodeInstance = null;
-        let trophyImageData = null;
         let supabaseClient = null;
         
         // Configuration par défaut
@@ -379,24 +387,6 @@ préféré·e du public !</textarea>
             });
         }
         
-        // Upload de l'image de la coupe
-        document.getElementById('trophyInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    trophyImageData = event.target.result;
-                    // Afficher dans le preview du panel
-                    document.getElementById('trophyPreview').src = trophyImageData;
-                    document.getElementById('trophyPreview').style.display = 'block';
-                    // Afficher immédiatement dans l'overlay
-                    document.getElementById('trophyImage').src = trophyImageData;
-                    showStatus('✅ Image de la coupe chargée', 'success');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        
         // Mettre à jour l'overlay
         function updateOverlay() {
             const url = document.getElementById('urlInput').value || defaultUrl;
@@ -407,13 +397,6 @@ préféré·e du public !</textarea>
             
             // Mettre à jour le texte
             document.getElementById('titleText').textContent = text;
-            
-            // Afficher la coupe si une image est uploadée (sinon garder la coupe par défaut)
-            if (trophyImageData) {
-                const trophyImg = document.getElementById('trophyImage');
-                trophyImg.src = trophyImageData;
-                trophyImg.style.display = 'block';
-            }
             
             showStatus('✅ Overlay mis à jour !', 'success');
         }
