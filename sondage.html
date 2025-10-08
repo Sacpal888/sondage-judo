@@ -38,6 +38,7 @@
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            position: relative;
         }
         
         .title-container {
@@ -60,16 +61,35 @@
         }
         
         .logo-container {
-            margin: 20px 0;
+            margin: 20px auto;
             text-align: center;
+            width: 100%;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
         }
         
         .logo-container img {
-            max-width: 100%;
+            max-width: 90%;
             max-height: 150px;
+            width: auto;
+            height: auto;
             border-radius: 10px;
             border: 2px solid #d4af37;
             box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            display: block;
+            background: transparent;
+            object-fit: contain;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .logo-placeholder {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
         }
         
         .vote-text {
@@ -231,10 +251,11 @@
                 <h1>Coupe virtuelle du public</h1>
                 <span class="kimono-icon">🥋</span>
             </div>
-            
-            <div class="logo-container" id="logoContainer">
-                <!-- Le logo sera inséré ici -->
-            </div>
+        </div>
+        
+        <!-- Logo TOUJOURS visible, même après le vote -->
+        <div class="logo-container" id="logoContainer">
+            <!-- Le logo sera inséré ici -->
         </div>
         
         <div id="loadingMessage" class="loading">
@@ -337,22 +358,15 @@
                 const voted = await checkIfVoted(userIP);
                 if (voted) {
                     showAlreadyVoted();
+                    // Charger quand même le logo pour l'afficher
+                    await loadLogo();
                     document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     return;
                 }
                 
                 // Charger le logo
-                const { data: logoData, error: logoError } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .eq('key', 'logo')
-                    .single();
-                
-                if (logoData && logoData.value) {
-                    document.getElementById('logoContainer').innerHTML = 
-                        `<img src="${logoData.value}" alt="Logo du tournoi">`;
-                }
+                await loadLogo();
                 
                 // Charger les joueurs
                 const { data: playersData, error: playersError } = await supabaseClient
@@ -381,6 +395,36 @@
                 
             } catch (error) {
                 showError('Erreur de chargement: ' + error.message);
+            }
+        }
+        
+        // Charger le logo (fonction séparée)
+        async function loadLogo() {
+            try {
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                const logoContainer = document.getElementById('logoContainer');
+                
+                if (logoError) {
+                    console.log('Pas de logo trouvé:', logoError.message);
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configuré)</div>';
+                    return;
+                }
+                
+                if (logoData && logoData.value) {
+                    console.log('Logo chargé, taille:', logoData.value.length, 'caractères');
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
+                } else {
+                    console.log('Logo vide dans la base');
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
+                }
+            } catch (error) {
+                console.error('Erreur chargement logo:', error);
+                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur chargement logo)</div>';
             }
         }
         
