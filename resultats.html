@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Résultats - Coupe virtuelle du public</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -291,7 +292,7 @@
     </div>
 
     <script>
-        let supabase;
+        let supabaseClient;
         let realtimeChannel;
         
         // Initialiser Supabase
@@ -302,7 +303,7 @@
                     return false;
                 }
                 
-                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
                 // Configurer les mises à jour en temps réel
                 setupRealtimeUpdates();
@@ -317,7 +318,7 @@
         // Configurer les mises à jour en temps réel
         function setupRealtimeUpdates() {
             // Écouter les changements sur la table votes
-            realtimeChannel = supabase
+            realtimeChannel = supabaseClient
                 .channel('votes-changes')
                 .on(
                     'postgres_changes',
@@ -338,11 +339,11 @@
         }
         
         async function loadResults() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             try {
                 // Charger tous les joueurs
-                const { data: playersData, error: playersError } = await supabase
+                const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
                     .select('*')
                     .order('name', { ascending: true });
@@ -355,7 +356,7 @@
                 }
                 
                 // Charger tous les votes
-                const { data: votesData, error: votesError } = await supabase
+                const { data: votesData, error: votesError } = await supabaseClient
                     .from('votes')
                     .select('*');
                 
@@ -460,12 +461,9 @@
         // Nettoyer le canal en temps réel lors de la fermeture
         window.addEventListener('beforeunload', () => {
             if (realtimeChannel) {
-                supabase.removeChannel(realtimeChannel);
+                supabaseClient.removeChannel(realtimeChannel);
             }
         });
     </script>
-    
-    <!-- Inclure le fichier de configuration -->
-    <script src="config.js"></script>
 </body>
 </html>
