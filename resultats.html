@@ -21,13 +21,76 @@
         }
         
         .container {
+            position: relative;
             max-width: 900px;
             margin: 0 auto;
             background: rgba(13, 39, 68, 0.95);
-            border: 3px solid #d4af37;
+            border: 3px solid transparent;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: visible;
+        }
+        
+        /* EFFET "REFLET GLISSANT" - Reflet qui suit le tracé du cadre arrondi */
+        .container::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 20px;
+            padding: 3px;
+            background: 
+                conic-gradient(
+                    from 0deg at 50% 50%,
+                    transparent 0deg,
+                    transparent 70deg,
+                    rgba(212, 175, 55, 0.3) 80deg,
+                    rgba(240, 212, 111, 0.6) 85deg,
+                    rgba(255, 235, 150, 0.9) 88deg,
+                    rgba(255, 245, 200, 1) 90deg,      /* Point le plus brillant */
+                    rgba(255, 235, 150, 0.9) 92deg,
+                    rgba(240, 212, 111, 0.6) 95deg,
+                    rgba(212, 175, 55, 0.3) 100deg,
+                    transparent 110deg,
+                    transparent 360deg
+                );
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: refletGlissant 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Bordure dorée de base */
+        .container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes refletGlissant {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* S'assurer que le contenu reste au-dessus du reflet */
+        .header, .logo-container, .stats, .results-list, .refresh-notice, .loading, .error-message {
+            position: relative;
+            z-index: 2;
         }
         
         .header {
