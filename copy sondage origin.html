@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Overlay - Vote du Public</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .overlay-container {
+            position: relative;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            border: 6px solid #d4af37;
+            border-radius: 30px;
+            padding: 60px 80px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            min-width: 700px;
+            overflow: hidden;
+        }
+        
+        /* Animation du reflet doré qui glisse le long du cadre */
+        .overlay-container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 30px;
+            padding: 6px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                transparent 40%,
+                rgba(255, 215, 0, 0.8) 50%,
+                rgba(255, 235, 100, 0.9) 52%,
+                rgba(255, 215, 0, 0.8) 54%,
+                transparent 60%,
+                transparent 100%
+            );
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            animation: shimmer 6s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .logo-container {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo-container img {
+            max-width: 400px;
+            max-height: 120px;
+            width: auto;
+            height: auto;
+            border-radius: 15px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            background: transparent;
+            object-fit: contain;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .content-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+        }
+        
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        #qrcode {
+            width: 300px;
+            height: 300px;
+        }
+        
+        #qrcode img {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .title {
+            color: #d4af37;
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            letter-spacing: 1px;
+            line-height: 1.3;
+            white-space: pre-line;
+        }
+        
+        /* Configuration panel */
+        .config-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .config-panel.hidden {
+            display: none;
+        }
+        
+        .config-panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .config-panel label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .config-panel input[type="text"],
+        .config-panel textarea,
+        .config-panel input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .config-panel textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .config-panel button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .config-panel button:hover {
+            background: #5568d3;
+        }
+        
+        .config-panel .toggle-btn {
+            background: #dc3545;
+        }
+        
+        .config-panel .toggle-btn:hover {
+            background: #c82333;
+        }
+        
+        .config-panel .refresh-btn {
+            background: #28a745;
+        }
+        
+        .config-panel .refresh-btn:hover {
+            background: #218838;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <!-- Panel de configuration -->
+    <div class="config-panel" id="configPanel">
+        <h3>⚙️ Configuration Overlay</h3>
+        
+        <div id="statusMessage" style="display: none;"></div>
+        
+        <label for="urlInput">URL de la page de vote :</label>
+        <input type="text" id="urlInput" placeholder="https://sacpa1888.github.io/sondage-judo/sondage.html">
+        
+        <label for="textInput">Texte de l'overlay :</label>
+        <textarea id="textInput" placeholder="le·la joueur·euse&#10;préféré·e du public !">le·la joueur·euse
+préféré·e du public !</textarea>
+        
+        <button onclick="updateOverlay()">✅ Appliquer les modifications</button>
+        <button class="refresh-btn" onclick="loadLogoFromSupabase()">🔄 Recharger le logo depuis Supabase</button>
+        <button class="toggle-btn" onclick="togglePanel()">🙈 Masquer le panel</button>
+        
+        <div class="info-text">
+            💡 <strong>Pour OBS :</strong><br>
+            1. Configurez l'URL et le texte<br>
+            2. Masquez le panel (touche H)<br>
+            3. Ajoutez comme "Source navigateur"<br>
+            4. Taille : 1920x1080<br>
+            5. Décochez "Contrôler l'audio via OBS"<br>
+            <br>
+            📌 <strong>Le logo</strong> se charge automatiquement depuis la page admin !<br>
+            ✨ <strong>Animation :</strong> Un reflet doré tourne lentement autour du cadre
+        </div>
+    </div>
+    
+    <!-- Overlay principal -->
+    <div class="overlay-container">
+        <!-- Logo (chargé depuis Supabase) -->
+        <div class="logo-container" id="logoContainer" style="display: none;">
+            <!-- Le logo sera inséré ici -->
+        </div>
+        
+        <div class="content-column">
+            <!-- QR Code -->
+            <div class="qr-container">
+                <div id="qrcode"></div>
+            </div>
+            
+            <!-- Titre -->
+            <div class="title" id="titleText">
+                le·la joueur·euse<br>préféré·e du public !
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let qrCodeInstance = null;
+        let supabaseClient = null;
+        
+        // Configuration par défaut
+        const defaultUrl = 'https://sacpa1888.github.io/sondage-judo/sondage.html';
+        const defaultText = 'le·la joueur·euse\npréféré·e du public !';
+        
+        // Initialiser Supabase
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    showStatus('⚠️ Configuration Supabase manquante', 'error');
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                showStatus('✅ Connecté à Supabase', 'success');
+                return true;
+            } catch (error) {
+                showStatus('❌ Erreur de connexion Supabase', 'error');
+                return false;
+            }
+        }
+        
+        // Afficher un message de statut
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // Charger le logo depuis Supabase
+        async function loadLogoFromSupabase() {
+            if (!supabaseClient) {
+                showStatus('❌ Supabase non initialisé', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('⏳ Chargement du logo...', 'info');
+                
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (logoError) {
+                    showStatus('ℹ️ Aucun logo trouvé dans Supabase', 'info');
+                    document.getElementById('logoContainer').style.display = 'none';
+                    return;
+                }
+                
+                if (logoData && logoData.value) {
+                    const logoContainer = document.getElementById('logoContainer');
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
+                    logoContainer.style.display = 'block';
+                    showStatus('✅ Logo chargé depuis Supabase', 'success');
+                } else {
+                    showStatus('ℹ️ Logo vide dans Supabase', 'info');
+                    document.getElementById('logoContainer').style.display = 'none';
+                }
+            } catch (error) {
+                showStatus('❌ Erreur lors du chargement du logo', 'error');
+                console.error('Erreur:', error);
+            }
+        }
+        
+        // Générer le QR code
+        function generateQRCode(url) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            qrCodeInstance = new QRCode(qrContainer, {
+                text: url,
+                width: 300,
+                height: 300,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+        
+        // Mettre à jour l'overlay
+        function updateOverlay() {
+            const url = document.getElementById('urlInput').value || defaultUrl;
+            const text = document.getElementById('textInput').value || defaultText;
+            
+            // Régénérer le QR code
+            generateQRCode(url);
+            
+            // Mettre à jour le texte
+            document.getElementById('titleText').textContent = text;
+            
+            showStatus('✅ Overlay mis à jour !', 'success');
+        }
+        
+        // Masquer/afficher le panel
+        function togglePanel() {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
+        }
+        
+        // Initialiser au chargement
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Initialiser les valeurs par défaut
+            document.getElementById('urlInput').value = defaultUrl;
+            document.getElementById('textInput').value = defaultText;
+            
+            // Générer le QR code
+            generateQRCode(defaultUrl);
+            
+            // Initialiser Supabase et charger le logo
+            const initialized = await initSupabase();
+            if (initialized) {
+                await loadLogoFromSupabase();
+            }
+        });
+        
+        // Raccourci clavier pour afficher/masquer le panel (touche H)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'h' || e.key === 'H') {
+                togglePanel();
+            }
+        });
+    </script>
+</body>
+</html>
