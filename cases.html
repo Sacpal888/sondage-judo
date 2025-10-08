@@ -6,6 +6,7 @@
     <title>Administration - Gestion des Candidats</title>
     <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -210,11 +211,7 @@
     </div>
 
     <script>
-        // IMPORTANT: Créez un fichier config.js avec vos clés Supabase
-        // const SUPABASE_URL = 'https://votre-projet.supabase.co';
-        // const SUPABASE_ANON_KEY = 'votre-cle-anon';
-        
-        let supabase;
+        let supabaseClient;
         let players = [];
         
         // Initialiser Supabase
@@ -223,11 +220,11 @@
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
                     document.getElementById('configNotice').style.display = 'block';
                     document.getElementById('configNotice').className = 'config-notice error';
-                    document.getElementById('configNotice').innerHTML = '❌ Erreur: config.js introuvable. Créez config.js avec vos clés Supabase.';
+                    document.getElementById('configNotice').innerHTML = '❌ Erreur: config.js introuvable ou incomplet. Vérifiez vos clés Supabase.';
                     return false;
                 }
                 
-                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 showStatus('✅ Connecté à Supabase', 'success');
                 return true;
             } catch (error) {
@@ -252,13 +249,13 @@
         
         // Charger les données depuis Supabase
         async function loadData() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Chargement des données...', 'loading');
                 
                 // Charger les joueurs
-                const { data: playersData, error: playersError } = await supabase
+                const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
                     .select('*')
                     .order('id', { ascending: true });
@@ -269,7 +266,7 @@
                 updatePlayerList();
                 
                 // Charger le logo
-                const { data: settingsData, error: settingsError } = await supabase
+                const { data: settingsData, error: settingsError } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
@@ -288,7 +285,7 @@
         // Upload du logo
         document.getElementById('logoUpload').addEventListener('change', async function(e) {
             const file = e.target.files[0];
-            if (!file || !supabase) return;
+            if (!file || !supabaseClient) return;
             
             const reader = new FileReader();
             reader.onload = async function(event) {
@@ -298,7 +295,7 @@
                     showStatus('⏳ Enregistrement du logo...', 'loading');
                     
                     // Vérifier si le logo existe déjà
-                    const { data: existing } = await supabase
+                    const { data: existing } = await supabaseClient
                         .from('settings')
                         .select('*')
                         .eq('key', 'logo')
@@ -306,7 +303,7 @@
                     
                     if (existing) {
                         // Mettre à jour
-                        const { error } = await supabase
+                        const { error } = await supabaseClient
                             .from('settings')
                             .update({ value: logoData })
                             .eq('key', 'logo');
@@ -314,7 +311,7 @@
                         if (error) throw error;
                     } else {
                         // Insérer
-                        const { error } = await supabase
+                        const { error } = await supabaseClient
                             .from('settings')
                             .insert({ key: 'logo', value: logoData });
                         
@@ -339,7 +336,7 @@
         
         // Ajouter un joueur manuellement
         async function addPlayer() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             const input = document.getElementById('playerName');
             const name = input.value.trim();
@@ -358,7 +355,7 @@
             try {
                 showStatus('⏳ Ajout du joueur...', 'loading');
                 
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('players')
                     .insert({ name: name })
                     .select();
@@ -383,7 +380,7 @@
                 return;
             }
             
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             const status = document.getElementById('ocrStatus');
             status.className = 'loading';
@@ -405,7 +402,7 @@
                 for (const name of lines) {
                     if (!players.some(p => p.name === name)) {
                         try {
-                            await supabase
+                            await supabaseClient
                                 .from('players')
                                 .insert({ name: name });
                             addedCount++;
@@ -451,12 +448,12 @@
         // Supprimer un joueur
         async function deletePlayer(playerId) {
             if (!confirm('Supprimer ce joueur ?')) return;
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Suppression...', 'loading');
                 
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('players')
                     .delete()
                     .eq('id', playerId);
@@ -473,19 +470,19 @@
         // Tout effacer
         async function clearAll() {
             if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Suppression en cours...', 'loading');
                 
                 // Supprimer tous les joueurs
-                await supabase.from('players').delete().neq('id', 0);
+                await supabaseClient.from('players').delete().neq('id', 0);
                 
                 // Supprimer tous les votes
-                await supabase.from('votes').delete().neq('id', 0);
+                await supabaseClient.from('votes').delete().neq('id', 0);
                 
                 // Supprimer le logo
-                await supabase.from('settings').delete().eq('key', 'logo');
+                await supabaseClient.from('settings').delete().eq('key', 'logo');
                 
                 players = [];
                 updatePlayerList();
@@ -510,8 +507,5 @@
             }
         });
     </script>
-    
-    <!-- Inclure le fichier de configuration -->
-    <script src="config.js"></script>
 </body>
 </html>
