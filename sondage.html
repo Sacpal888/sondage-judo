@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coupe virtuelle du public</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -265,7 +266,7 @@
     </div>
 
     <script>
-        let supabase;
+        let supabaseClient;
         let hasVoted = false;
         let userIP = null;
         
@@ -277,7 +278,7 @@
                     return false;
                 }
                 
-                supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 return true;
             } catch (error) {
                 showError('Erreur de connexion: ' + error.message);
@@ -306,7 +307,7 @@
         // Vérifier si l'utilisateur a déjà voté
         async function checkIfVoted(ip) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('votes')
                     .select('*')
                     .eq('ip_address', ip)
@@ -323,7 +324,7 @@
         
         // Charger les données
         async function loadData() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
             
             try {
                 document.getElementById('loadingMessage').style.display = 'block';
@@ -342,7 +343,7 @@
                 }
                 
                 // Charger le logo
-                const { data: logoData, error: logoError } = await supabase
+                const { data: logoData, error: logoError } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
@@ -354,7 +355,7 @@
                 }
                 
                 // Charger les joueurs
-                const { data: playersData, error: playersError } = await supabase
+                const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
                     .select('*')
                     .order('name', { ascending: true });
@@ -412,11 +413,11 @@
         });
         
         async function saveVote(playerId) {
-            if (!supabase || !userIP) return;
+            if (!supabaseClient || !userIP) return;
             
             try {
                 // Enregistrer le vote
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('votes')
                     .insert({
                         player_id: playerId,
@@ -455,8 +456,5 @@
             }
         });
     </script>
-    
-    <!-- Inclure le fichier de configuration -->
-    <script src="config.js"></script>
 </body>
 </html>
