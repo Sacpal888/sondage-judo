@@ -196,22 +196,87 @@
         .already-voted {
             display: none;
             text-align: center;
-            color: #f0d46f;
-            background: rgba(212, 175, 55, 0.1);
-            padding: 20px;
-            border-radius: 12px;
+            color: #d4af37;
+            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
+            padding: 30px;
+            border-radius: 15px;
             border: 2px solid #d4af37;
             margin-top: 20px;
+            animation: fadeIn 0.5s ease-in;
         }
         
         .already-voted.show {
             display: block;
+        }
+        
+        .already-voted h3 {
+            color: #d4af37;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+        
+        .already-voted p {
+            color: #ffffff;
+            font-size: 1.1em;
+            line-height: 1.6;
         }
 
         .loading {
             text-align: center;
             color: #f0d46f;
             padding: 20px;
+        }
+        
+        .queue-message {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(240, 212, 111, 0.15));
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .queue-message.show {
+            display: block;
+        }
+        
+        .queue-message h3 {
+            color: #f0d46f;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .queue-message p {
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .queue-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212, 175, 55, 0.3);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            }
         }
 
         .error-message {
@@ -262,6 +327,17 @@
             ⏳ Chargement...
         </div>
         
+        <!-- Message de file d'attente -->
+        <div class="queue-message" id="queueMessage">
+            <div class="queue-spinner"></div>
+            <h3>⏳ Beaucoup de monde vote en ce moment !</h3>
+            <p>Merci de patienter quelques secondes...<br>
+            Votre vote sera enregistré automatiquement.</p>
+            <p id="queueAttempt" style="font-size: 0.9em; color: #f0d46f; margin-top: 15px;">
+                Tentative <span id="attemptNumber">1</span>/5
+            </p>
+        </div>
+        
         <div id="mainContent" style="display: none;">
             <div class="vote-text">
                 Votez pour votre joueur(euse) favori(te) !
@@ -274,7 +350,11 @@
             </div>
             
             <div class="already-voted" id="alreadyVoted">
-                <p>⚠️ Vous avez déjà voté !</p>
+                <h3>✅ Merci, votre vote a déjà été enregistré !</h3>
+                <p>Nous avons bien pris en compte votre participation.</p>
+                <p style="margin-top: 15px; font-size: 0.95em; color: #f0d46f;">
+                    N'hésitez pas à consulter les résultats en temps réel !
+                </p>
             </div>
             
             <div class="thank-you" id="thankYou">
@@ -290,6 +370,71 @@
         let supabaseClient;
         let hasVoted = false;
         let userIP = null;
+        
+        // Configuration du système de retry
+        const RETRY_CONFIG = {
+            maxAttempts: 5,
+            initialDelay: 2000,  // 2 secondes
+            maxDelay: 15000,     // 15 secondes max
+            backoffMultiplier: 1.5
+        };
+        
+        // Fonction de retry avec backoff exponentiel et jitter
+        async function retryWithBackoff(fn, context = '', attempt = 1) {
+            try {
+                return await fn();
+            } catch (error) {
+                console.error(`Erreur tentative ${attempt} (${context}):`, error);
+                
+                // Vérifier si c'est une erreur de connexion ou de rate limit
+                const isRetryable = 
+                    error.message?.includes('Failed to fetch') ||
+                    error.message?.includes('network') ||
+                    error.message?.includes('timeout') ||
+                    error.code === 'PGRST301' || // Supabase rate limit
+                    error.code === '429' ||
+                    error.status === 429 ||
+                    error.status === 503;
+                
+                if (!isRetryable || attempt >= RETRY_CONFIG.maxAttempts) {
+                    throw error;
+                }
+                
+                // Afficher le message de file d'attente
+                showQueueMessage(attempt);
+                
+                // Calculer le délai avec backoff exponentiel + jitter aléatoire
+                const baseDelay = Math.min(
+                    RETRY_CONFIG.initialDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt - 1),
+                    RETRY_CONFIG.maxDelay
+                );
+                
+                // Ajouter un jitter aléatoire de ±30% pour éviter que tous les clients retry en même temps
+                const jitter = baseDelay * (0.7 + Math.random() * 0.6);
+                const delay = Math.floor(jitter);
+                
+                console.log(`Nouvelle tentative dans ${delay}ms...`);
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+                
+                // Retry
+                return retryWithBackoff(fn, context, attempt + 1);
+            }
+        }
+        
+        // Afficher le message de file d'attente
+        function showQueueMessage(attempt) {
+            const queueMsg = document.getElementById('queueMessage');
+            const attemptNumber = document.getElementById('attemptNumber');
+            
+            attemptNumber.textContent = attempt;
+            queueMsg.classList.add('show');
+        }
+        
+        // Masquer le message de file d'attente
+        function hideQueueMessage() {
+            document.getElementById('queueMessage').classList.remove('show');
+        }
         
         // Initialiser Supabase
         async function initSupabase() {
@@ -460,22 +605,73 @@
             if (!supabaseClient || !userIP) return;
             
             try {
-                // Enregistrer le vote
-                const { error } = await supabaseClient
-                    .from('votes')
-                    .insert({
-                        player_id: playerId,
-                        ip_address: userIP
-                    });
+                // Afficher le message de file d'attente préventivement
+                document.getElementById('queueMessage').classList.add('show');
+                document.getElementById('attemptNumber').textContent = '1';
                 
-                if (error) throw error;
+                // Enregistrer le vote avec retry
+                await retryWithBackoff(async () => {
+                    const { error } = await supabaseClient
+                        .from('votes')
+                        .insert({
+                            player_id: playerId,
+                            ip_address: userIP
+                        });
+                    
+                    // Si l'erreur est "duplicate key" (IP a déjà voté), c'est OK !
+                    if (error && error.code === '23505') {
+                        console.log('Vote déjà enregistré (duplicate), considéré comme succès');
+                        return; // Pas d'erreur, le vote est là
+                    }
+                    
+                    if (error) throw error;
+                }, 'enregistrement vote');
                 
                 hasVoted = true;
+                hideQueueMessage();
                 console.log('Vote enregistré avec succès');
                 
             } catch (error) {
-                console.error('Erreur lors du vote:', error);
-                showError('Une erreur est survenue lors de l\'enregistrement du vote.');
+                console.error('Erreur lors du vote après tous les retries:', error);
+                hideQueueMessage();
+                
+                // SÉCURITÉ 1 : Vérifier si le vote a finalement été enregistré malgré l'erreur
+                console.log('Vérification finale si le vote est passé...');
+                try {
+                    const finalCheck = await supabaseClient
+                        .from('votes')
+                        .select('*')
+                        .eq('ip_address', userIP)
+                        .limit(1);
+                    
+                    if (finalCheck.data && finalCheck.data.length > 0) {
+                        // Le vote est bien là ! Afficher le succès
+                        console.log('✅ Vote trouvé dans la DB malgré l\'erreur réseau');
+                        hasVoted = true;
+                        document.getElementById('voteSection').style.display = 'none';
+                        document.getElementById('thankYou').classList.add('show');
+                        return;
+                    }
+                } catch (checkError) {
+                    console.error('Erreur lors de la vérification finale:', checkError);
+                }
+                
+                // Si vraiment le vote n'est pas passé, afficher l'erreur
+                const voteSection = document.getElementById('voteSection');
+                voteSection.innerHTML = `
+                    <div style="text-align: center; color: #ff6b6b; padding: 20px; background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 2px solid #dc3545;">
+                        <h3 style="margin-bottom: 10px;">😔 Trop de monde vote en ce moment</h3>
+                        <p>Nous n'avons pas pu enregistrer votre vote immédiatement.</p>
+                        <p style="margin-top: 15px;">
+                            <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                                🔄 Réessayer de voter
+                            </button>
+                        </p>
+                        <p style="font-size: 0.9em; color: #aaa; margin-top: 10px;">
+                            Si votre vote était déjà passé, nous vous le confirmerons
+                        </p>
+                    </div>
+                `;
             }
         }
         
