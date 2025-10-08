@@ -181,6 +181,7 @@
             <h2>📷 Logo du Sondage</h2>
             <input type="file" id="logoUpload" accept="image/*">
             <div class="logo-preview" id="logoPreview"></div>
+            <button onclick="deleteLogo()" id="deleteLogoBtn" style="background: #dc3545; display: none; margin-top: 10px;">🗑️ Supprimer le logo</button>
         </div>
         
         <!-- Section Ajout Manuel -->
@@ -274,6 +275,8 @@
                 
                 if (settingsData && settingsData.value) {
                     displayLogo(settingsData.value);
+                } else {
+                    displayLogo(null);
                 }
                 
                 showStatus('✅ Données chargées', 'success');
@@ -282,55 +285,172 @@
             }
         }
         
-        // Upload du logo
+        // Upload du logo avec compression automatique
         document.getElementById('logoUpload').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file || !supabaseClient) return;
             
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                const logoData = event.target.result;
+            // Vérifier le type de fichier
+            if (!file.type.match('image.*')) {
+                alert('Veuillez sélectionner une image (PNG, JPG, etc.)');
+                return;
+            }
+            
+            showStatus('⏳ Optimisation de l\'image...', 'loading');
+            
+            try {
+                // Compresser et redimensionner l'image
+                const compressedData = await compressImage(file);
                 
-                try {
-                    showStatus('⏳ Enregistrement du logo...', 'loading');
-                    
-                    // Vérifier si le logo existe déjà
-                    const { data: existing } = await supabaseClient
+                // Afficher la taille
+                const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
+                showStatus(`⏳ Enregistrement du logo (${sizeKB} Ko)...`, 'loading');
+                
+                // Vérifier si le logo existe déjà
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (existing) {
+                    // Mettre à jour
+                    const { error } = await supabaseClient
                         .from('settings')
-                        .select('*')
-                        .eq('key', 'logo')
-                        .single();
+                        .update({ value: compressedData })
+                        .eq('key', 'logo');
                     
-                    if (existing) {
-                        // Mettre à jour
-                        const { error } = await supabaseClient
-                            .from('settings')
-                            .update({ value: logoData })
-                            .eq('key', 'logo');
-                        
-                        if (error) throw error;
-                    } else {
-                        // Insérer
-                        const { error } = await supabaseClient
-                            .from('settings')
-                            .insert({ key: 'logo', value: logoData });
-                        
-                        if (error) throw error;
-                    }
+                    if (error) throw error;
+                } else {
+                    // Insérer
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'logo', value: compressedData });
                     
-                    displayLogo(logoData);
-                    showStatus('✅ Logo enregistré', 'success');
-                } catch (error) {
-                    showStatus('❌ Erreur: ' + error.message, 'error');
+                    if (error) throw error;
                 }
-            };
-            reader.readAsDataURL(file);
+                
+                displayLogo(compressedData);
+                showStatus(`✅ Logo enregistré (${sizeKB} Ko)`, 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
         });
+        
+        // Fonction de compression d'image (préserve PNG avec transparence)
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        // Calculer les nouvelles dimensions (max 500x500)
+                        let width = img.width;
+                        let height = img.height;
+                        const maxSize = 500;
+                        
+                        if (width > maxSize || height > maxSize) {
+                            if (width > height) {
+                                height = (height / width) * maxSize;
+                                width = maxSize;
+                            } else {
+                                width = (width / height) * maxSize;
+                                height = maxSize;
+                            }
+                        }
+                        
+                        // Créer un canvas pour redimensionner
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Fond transparent pour PNG
+                        ctx.clearRect(0, 0, width, height);
+                        
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Détecter si c'est un PNG (on préserve la transparence)
+                        const isPNG = file.type === 'image/png';
+                        
+                        let compressedData;
+                        if (isPNG) {
+                            // Pour PNG, garder le format PNG (avec transparence)
+                            compressedData = canvas.toDataURL('image/png', 0.9);
+                        } else {
+                            // Pour autres formats, convertir en JPEG
+                            compressedData = canvas.toDataURL('image/jpeg', 0.85);
+                        }
+                        
+                        // Vérifier la taille finale
+                        const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
+                        
+                        if (sizeKB > 400 && isPNG) {
+                            // Si PNG trop gros, réduire encore la qualité
+                            const finalData = canvas.toDataURL('image/png', 0.7);
+                            resolve(finalData);
+                        } else if (sizeKB > 400 && !isPNG) {
+                            // Si JPEG trop gros
+                            const finalData = canvas.toDataURL('image/jpeg', 0.6);
+                            resolve(finalData);
+                        } else {
+                            resolve(compressedData);
+                        }
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('Impossible de charger l\'image'));
+                    };
+                    
+                    img.src = e.target.result;
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('Impossible de lire le fichier'));
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
         
         function displayLogo(logoData) {
             const preview = document.getElementById('logoPreview');
+            const deleteBtn = document.getElementById('deleteLogoBtn');
+            
             if (logoData) {
                 preview.innerHTML = `<img src="${logoData}" alt="Logo">`;
+                deleteBtn.style.display = 'inline-block';
+            } else {
+                preview.innerHTML = '';
+                deleteBtn.style.display = 'none';
+            }
+        }
+        
+        // Supprimer le logo
+        async function deleteLogo() {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer le logo ?')) return;
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('⏳ Suppression du logo...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .delete()
+                    .eq('key', 'logo');
+                
+                if (error) throw error;
+                
+                document.getElementById('logoPreview').innerHTML = '';
+                document.getElementById('deleteLogoBtn').style.display = 'none';
+                document.getElementById('logoUpload').value = '';
+                
+                showStatus('✅ Logo supprimé', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
         
