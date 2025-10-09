@@ -17,15 +17,12 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         
         .container {
-            width: 100%;
-            max-width: 500px;
+            max-width: 900px;
+            margin: 0 auto;
             background: rgba(13, 39, 68, 0.95);
             border: 3px solid #d4af37;
             border-radius: 20px;
@@ -38,7 +35,6 @@
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-            position: relative;
         }
         
         .title-container {
@@ -86,82 +82,176 @@
             background-color: rgba(255, 255, 255, 0.05);
         }
         
-        .logo-placeholder {
-            color: #666;
-            font-size: 0.9em;
-            font-style: italic;
-        }
-        
         .vote-text {
             color: #ffffff;
             text-align: center;
             font-size: 1.2em;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             font-weight: 500;
+            line-height: 1.5;
         }
         
-        .select-container {
-            position: relative;
-            margin-bottom: 20px;
+        /* Grille des candidats */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
         }
         
-        select {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            background: rgba(26, 47, 74, 0.8);
-            color: #ffffff;
-            border: 2px solid #d4af37;
-            border-radius: 12px;
+        .player-card {
+            background: rgba(26, 47, 74, 0.6);
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
             cursor: pointer;
-            appearance: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        select:hover {
-            background: rgba(26, 47, 74, 1);
-            border-color: #f0d46f;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-        }
-        
-        select:focus {
-            outline: none;
-            border-color: #f0d46f;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-        }
-        
-        select option {
-            background: #1a2f4a;
-            color: #ffffff;
-            padding: 10px;
-        }
-        
-        select option:disabled {
-            color: #888;
-        }
-        
-        select.disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .select-container::after {
-            content: '▼';
+        .player-card::before {
+            content: '';
             position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #d4af37;
-            pointer-events: none;
-            font-size: 12px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         
+        .player-card:hover::before {
+            opacity: 1;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            border-color: #f0d46f;
+        }
+        
+        .player-card.selected {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(240, 212, 111, 0.2));
+            border: 3px solid #FFD700;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.6);
+        }
+        
+        .player-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #FFD700;
+            color: #0a1828;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            animation: checkmark 0.3s ease;
+        }
+        
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(-45deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(10deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        .player-card.faded {
+            opacity: 0.3;
+            transform: scale(0.95);
+        }
+        
+        .player-card.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        .player-name {
+            color: #ffffff;
+            font-size: 1.3em;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .player-card.selected .player-name {
+            color: #FFD700;
+        }
+        
+        /* Bouton voter */
+        .vote-button-container {
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .vote-button-container.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .vote-btn {
+            background: linear-gradient(135deg, #d4af37, #f0d46f);
+            color: #0a1828;
+            border: none;
+            padding: 18px 60px;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.5);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .vote-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.7);
+        }
+        
+        .vote-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .vote-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        /* Messages */
         .thank-you {
             display: none;
             text-align: center;
             color: #ffffff;
             background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
             border: 2px solid #d4af37;
             animation: fadeIn 0.5s ease-in;
@@ -173,13 +263,13 @@
         
         .thank-you h2 {
             color: #d4af37;
-            margin-bottom: 15px;
-            font-size: 1.5em;
+            margin-bottom: 20px;
+            font-size: 2em;
         }
         
         .thank-you p {
-            font-size: 1.1em;
-            line-height: 1.6;
+            font-size: 1.2em;
+            line-height: 1.8;
         }
         
         @keyframes fadeIn {
@@ -198,10 +288,9 @@
             text-align: center;
             color: #d4af37;
             background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
+            padding: 40px;
             border-radius: 15px;
             border: 2px solid #d4af37;
-            margin-top: 20px;
             animation: fadeIn 0.5s ease-in;
         }
         
@@ -211,7 +300,7 @@
         
         .already-voted h3 {
             color: #d4af37;
-            font-size: 1.4em;
+            font-size: 1.6em;
             margin-bottom: 15px;
         }
         
@@ -224,9 +313,21 @@
         .loading {
             text-align: center;
             color: #f0d46f;
-            padding: 20px;
+            padding: 40px;
+            font-size: 1.2em;
         }
         
+        .error-message {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        /* Queue message */
         .queue-message {
             display: none;
             text-align: center;
@@ -278,19 +379,13 @@
                 box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
             }
         }
-
-        .error-message {
-            background: rgba(220, 53, 69, 0.2);
-            border: 2px solid #dc3545;
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-        }
         
         /* Responsive */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .container {
                 padding: 20px;
             }
@@ -299,10 +394,21 @@
                 font-size: 1.5em;
             }
             
-            .kimono-icon {
-                font-size: 1.8em;
+            .player-card {
+                padding: 18px;
             }
             
+            .player-name {
+                font-size: 1.2em;
+            }
+            
+            .vote-btn {
+                padding: 15px 40px;
+                font-size: 1.1em;
+            }
+        }
+        
+        @media (max-width: 480px) {
             .vote-text {
                 font-size: 1.1em;
             }
@@ -313,12 +419,12 @@
     <div class="container">
         <div class="header">
             <div class="title-container">
-                <h1>Coupe virtuelle du public</h1>
+                <h1 id="pageTitle">Coupe virtuelle du public</h1>
                 <span class="kimono-icon">🥋</span>
             </div>
         </div>
         
-        <!-- Logo TOUJOURS visible, même après le vote -->
+        <!-- Logo TOUJOURS visible -->
         <div class="logo-container" id="logoContainer">
             <!-- Le logo sera inséré ici -->
         </div>
@@ -339,27 +445,38 @@
         </div>
         
         <div id="mainContent" style="display: none;">
-            <div class="vote-text">
+            <div class="vote-text" id="invitationText">
                 Votez pour votre joueur(euse) favori(te) !
             </div>
             
-            <div class="select-container" id="voteSection">
-                <select id="playerSelect">
-                    <option value="">-- Sélectionnez un joueur --</option>
-                </select>
+            <div id="voteSection">
+                <!-- Grille des candidats -->
+                <div class="players-grid" id="playersGrid">
+                    <!-- Les cartes seront générées ici -->
+                </div>
+                
+                <!-- Bouton voter -->
+                <div class="vote-button-container" id="voteButtonContainer">
+                    <button class="vote-btn" id="voteBtn" onclick="confirmVote()">
+                        🗳️ Voter
+                    </button>
+                </div>
             </div>
             
             <div class="already-voted" id="alreadyVoted">
-                <h3>✅ Merci, votre vote a déjà été enregistré !</h3>
-                <p>Nous avons bien pris en compte votre participation.</p>
-                <p style="margin-top: 15px; font-size: 0.95em; color: #f0d46f;">
-                    N'hésitez pas à consulter les résultats en temps réel !
+                <h3>✅ Merci !</h3>
+                <p id="alreadyVotedText">
+                    Merci, votre vote a déjà été enregistré !<br>
+                    Nous avons bien pris en compte votre participation.
                 </p>
             </div>
             
             <div class="thank-you" id="thankYou">
-                <h2>✨ Merci d'avoir voté ! ✨</h2>
-                <p>N'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives</p>
+                <h2>✨ Merci ! ✨</h2>
+                <p id="thankYouText">
+                    Merci d'avoir voté !<br><br>
+                    N'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives
+                </p>
             </div>
         </div>
 
@@ -370,28 +487,29 @@
         let supabaseClient;
         let hasVoted = false;
         let userIP = null;
+        let selectedPlayerId = null;
+        let players = [];
         
         // Configuration du système de retry
         const RETRY_CONFIG = {
             maxAttempts: 5,
-            initialDelay: 2000,  // 2 secondes
-            maxDelay: 15000,     // 15 secondes max
+            initialDelay: 2000,
+            maxDelay: 15000,
             backoffMultiplier: 1.5
         };
         
-        // Fonction de retry avec backoff exponentiel et jitter
+        // Fonction de retry avec backoff exponentiel
         async function retryWithBackoff(fn, context = '', attempt = 1) {
             try {
                 return await fn();
             } catch (error) {
                 console.error(`Erreur tentative ${attempt} (${context}):`, error);
                 
-                // Vérifier si c'est une erreur de connexion ou de rate limit
                 const isRetryable = 
                     error.message?.includes('Failed to fetch') ||
                     error.message?.includes('network') ||
                     error.message?.includes('timeout') ||
-                    error.code === 'PGRST301' || // Supabase rate limit
+                    error.code === 'PGRST301' ||
                     error.code === '429' ||
                     error.status === 429 ||
                     error.status === 503;
@@ -400,16 +518,13 @@
                     throw error;
                 }
                 
-                // Afficher le message de file d'attente
                 showQueueMessage(attempt);
                 
-                // Calculer le délai avec backoff exponentiel + jitter aléatoire
                 const baseDelay = Math.min(
                     RETRY_CONFIG.initialDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt - 1),
                     RETRY_CONFIG.maxDelay
                 );
                 
-                // Ajouter un jitter aléatoire de ±30% pour éviter que tous les clients retry en même temps
                 const jitter = baseDelay * (0.7 + Math.random() * 0.6);
                 const delay = Math.floor(jitter);
                 
@@ -417,12 +532,10 @@
                 
                 await new Promise(resolve => setTimeout(resolve, delay));
                 
-                // Retry
                 return retryWithBackoff(fn, context, attempt + 1);
             }
         }
         
-        // Afficher le message de file d'attente
         function showQueueMessage(attempt) {
             const queueMsg = document.getElementById('queueMessage');
             const attemptNumber = document.getElementById('attemptNumber');
@@ -431,7 +544,6 @@
             queueMsg.classList.add('show');
         }
         
-        // Masquer le message de file d'attente
         function hideQueueMessage() {
             document.getElementById('queueMessage').classList.remove('show');
         }
@@ -460,7 +572,6 @@
                 return data.ip;
             } catch (error) {
                 console.error('Erreur récupération IP:', error);
-                // Fallback: utiliser un identifiant dans le localStorage
                 let fallbackId = localStorage.getItem('voter_id');
                 if (!fallbackId) {
                     fallbackId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -503,7 +614,6 @@
                 const voted = await checkIfVoted(userIP);
                 if (voted) {
                     showAlreadyVoted();
-                    // Charger quand même le logo pour l'afficher
                     await loadLogo();
                     document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
@@ -513,6 +623,9 @@
                 // Charger le logo
                 await loadLogo();
                 
+                // Charger les messages personnalisés
+                await loadCustomMessages();
+                
                 // Charger les joueurs
                 const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
@@ -521,19 +634,14 @@
                 
                 if (playersError) throw playersError;
                 
-                const select = document.getElementById('playerSelect');
-                select.innerHTML = '<option value="">-- Sélectionnez un joueur --</option>';
+                players = playersData || [];
                 
-                if (playersData && playersData.length > 0) {
-                    playersData.forEach(player => {
-                        const option = document.createElement('option');
-                        option.value = player.id;
-                        option.textContent = player.name;
-                        select.appendChild(option);
-                    });
-                } else {
-                    select.innerHTML = '<option value="">Aucun candidat disponible</option>';
+                if (players.length === 0) {
+                    showError('Aucun candidat disponible pour le moment.');
+                    return;
                 }
+                
+                displayPlayers();
                 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
@@ -543,7 +651,7 @@
             }
         }
         
-        // Charger le logo (fonction séparée)
+        // Charger le logo
         async function loadLogo() {
             try {
                 const { data: logoData, error: logoError } = await supabaseClient
@@ -554,62 +662,110 @@
                 
                 const logoContainer = document.getElementById('logoContainer');
                 
-                if (logoError) {
-                    console.log('Pas de logo trouvé:', logoError.message);
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configuré)</div>';
+                if (logoError || !logoData || !logoData.value) {
+                    logoContainer.style.display = 'none';
                     return;
                 }
                 
-                if (logoData && logoData.value) {
-                    console.log('Logo chargé, taille:', logoData.value.length, 'caractères');
-                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
-                } else {
-                    console.log('Logo vide dans la base');
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
-                }
+                logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
+                logoContainer.style.display = 'flex';
             } catch (error) {
                 console.error('Erreur chargement logo:', error);
-                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur chargement logo)</div>';
             }
         }
         
-        // Gérer le vote
-        document.getElementById('playerSelect').addEventListener('change', async function(e) {
+        // Charger les messages personnalisés
+        async function loadCustomMessages() {
+            try {
+                const { data } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
+                
+                if (data) {
+                    data.forEach(item => {
+                        if (item.key === 'msg_title' && item.value) {
+                            document.getElementById('pageTitle').textContent = item.value;
+                        } else if (item.key === 'msg_invitation' && item.value) {
+                            document.getElementById('invitationText').textContent = item.value;
+                        } else if (item.key === 'msg_thankyou' && item.value) {
+                            document.getElementById('thankYouText').innerHTML = item.value.replace(/\n/g, '<br>');
+                        } else if (item.key === 'msg_alreadyvoted' && item.value) {
+                            document.getElementById('alreadyVotedText').innerHTML = item.value.replace(/\n/g, '<br>');
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur chargement messages:', error);
+            }
+        }
+        
+        // Afficher les joueurs en grille
+        function displayPlayers() {
+            const grid = document.getElementById('playersGrid');
+            
+            grid.innerHTML = players.map(player => `
+                <div class="player-card" data-player-id="${player.id}" onclick="selectPlayer(${player.id})">
+                    <div class="player-name">${player.name}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Sélectionner un joueur
+        function selectPlayer(playerId) {
             if (hasVoted) return;
             
-            const selectedId = e.target.value;
-            if (selectedId === '') return;
+            // Retirer la sélection précédente
+            document.querySelectorAll('.player-card').forEach(card => {
+                card.classList.remove('selected', 'faded');
+            });
             
-            // Griser les autres options
-            const options = e.target.options;
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value !== selectedId) {
-                    options[i].disabled = true;
-                    options[i].style.color = '#666';
+            // Sélectionner le nouveau joueur
+            const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
+            selectedCard.classList.add('selected');
+            
+            // Griser les autres
+            document.querySelectorAll('.player-card').forEach(card => {
+                if (card.getAttribute('data-player-id') != playerId) {
+                    card.classList.add('faded');
                 }
-            }
+            });
             
-            e.target.classList.add('disabled');
+            // Afficher le bouton voter
+            selectedPlayerId = playerId;
+            document.getElementById('voteButtonContainer').classList.add('show');
+        }
+        
+        // Confirmer le vote
+        async function confirmVote() {
+            if (!selectedPlayerId || hasVoted) return;
+            
+            const voteBtn = document.getElementById('voteBtn');
+            voteBtn.disabled = true;
+            voteBtn.textContent = '⏳ Enregistrement...';
+            
+            // Désactiver toutes les cartes
+            document.querySelectorAll('.player-card').forEach(card => {
+                card.classList.add('disabled');
+            });
             
             // Enregistrer le vote
-            await saveVote(parseInt(selectedId));
+            await saveVote(selectedPlayerId);
             
-            // Après 1 seconde, afficher le message de remerciement
+            // Afficher le message de remerciement
             setTimeout(() => {
                 document.getElementById('voteSection').style.display = 'none';
                 document.getElementById('thankYou').classList.add('show');
             }, 1000);
-        });
+        }
         
         async function saveVote(playerId) {
             if (!supabaseClient || !userIP) return;
             
             try {
-                // Afficher le message de file d'attente préventivement
                 document.getElementById('queueMessage').classList.add('show');
                 document.getElementById('attemptNumber').textContent = '1';
                 
-                // Enregistrer le vote avec retry
                 await retryWithBackoff(async () => {
                     const { error } = await supabaseClient
                         .from('votes')
@@ -618,10 +774,9 @@
                             ip_address: userIP
                         });
                     
-                    // Si l'erreur est "duplicate key" (IP a déjà voté), c'est OK !
                     if (error && error.code === '23505') {
                         console.log('Vote déjà enregistré (duplicate), considéré comme succès');
-                        return; // Pas d'erreur, le vote est là
+                        return;
                     }
                     
                     if (error) throw error;
@@ -635,8 +790,7 @@
                 console.error('Erreur lors du vote après tous les retries:', error);
                 hideQueueMessage();
                 
-                // SÉCURITÉ 1 : Vérifier si le vote a finalement été enregistré malgré l'erreur
-                console.log('Vérification finale si le vote est passé...');
+                // Vérification finale si le vote est passé
                 try {
                     const finalCheck = await supabaseClient
                         .from('votes')
@@ -645,7 +799,6 @@
                         .limit(1);
                     
                     if (finalCheck.data && finalCheck.data.length > 0) {
-                        // Le vote est bien là ! Afficher le succès
                         console.log('✅ Vote trouvé dans la DB malgré l\'erreur réseau');
                         hasVoted = true;
                         document.getElementById('voteSection').style.display = 'none';
@@ -656,7 +809,7 @@
                     console.error('Erreur lors de la vérification finale:', checkError);
                 }
                 
-                // Si vraiment le vote n'est pas passé, afficher l'erreur
+                // Si vraiment le vote n'est pas passé
                 const voteSection = document.getElementById('voteSection');
                 voteSection.innerHTML = `
                     <div style="text-align: center; color: #ff6b6b; padding: 20px; background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 2px solid #dc3545;">
@@ -666,9 +819,6 @@
                             <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">
                                 🔄 Réessayer de voter
                             </button>
-                        </p>
-                        <p style="font-size: 0.9em; color: #aaa; margin-top: 10px;">
-                            Si votre vote était déjà passé, nous vous le confirmerons
                         </p>
                     </div>
                 `;
