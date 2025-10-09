@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administration Sécurisée</title>
+    <title>Administration - Gestion des Candidats</title>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -17,36 +18,66 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         
-        .login-container {
+        /* === ÉCRAN DE CONNEXION === */
+        .login-screen {
+            display: none;
+            max-width: 450px;
+            margin: 50px auto;
             background: white;
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            max-width: 400px;
-            width: 100%;
         }
         
-        .login-container h1 {
+        .login-screen.show {
+            display: block;
+        }
+        
+        .login-screen h1 {
             color: #333;
             margin-bottom: 10px;
             text-align: center;
         }
         
-        .security-notice {
+        .security-badge {
             background: #d4edda;
             border: 2px solid #28a745;
             color: #155724;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             margin-bottom: 25px;
-            font-size: 14px;
             text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .setup-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .setup-box h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .setup-box ol {
+            margin-left: 20px;
+            line-height: 1.8;
+            color: #856404;
+        }
+        
+        .setup-box code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
         
         .form-group {
@@ -73,7 +104,7 @@
             border-color: #667eea;
         }
         
-        button {
+        .login-btn {
             width: 100%;
             padding: 15px;
             background: #667eea;
@@ -86,60 +117,41 @@
             transition: all 0.3s;
         }
         
-        button:hover {
+        .login-btn:hover {
             background: #5568d3;
             transform: translateY(-2px);
         }
         
-        button:disabled {
+        .login-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
         }
         
-        .message {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-            display: none;
-        }
-        
-        .message.show {
-            display: block;
-        }
-        
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        /* Interface admin */
-        .admin-interface {
-            display: none;
+        .setup-btn {
             width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        /* === INTERFACE ADMIN === */
+        .container {
+            display: none;
             max-width: 800px;
+            margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         
-        .admin-interface.show {
+        .container.show {
             display: block;
         }
         
@@ -147,20 +159,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 20px;
             border-bottom: 2px solid #ddd;
         }
         
-        .user-info {
+        .admin-header h1 {
+            color: #333;
+            font-size: 1.8em;
+        }
+        
+        .user-badge {
+            text-align: right;
+        }
+        
+        .user-email {
             color: #666;
             font-size: 14px;
+            margin-bottom: 8px;
         }
         
         .logout-btn {
             background: #dc3545;
-            padding: 10px 20px;
-            width: auto;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
         }
         
         .logout-btn:hover {
@@ -177,10 +204,52 @@
         .section h2 {
             color: #555;
             margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .player-list {
             list-style: none;
+            margin-top: 15px;
         }
         
         .player-item {
@@ -191,110 +260,232 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .delete-btn {
-            background: #dc3545 !important;
-            padding: 6px 12px !important;
-            font-size: 14px !important;
-            width: auto !important;
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 14px;
         }
         
-        .setup-instructions {
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        #ocrStatus, #statusMessage, #voteStatusMessage, #messagesStatus {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        #ocrStatus.loading, #statusMessage.loading, #voteStatusMessage.loading {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        #ocrStatus.success, #statusMessage.success, #voteStatusMessage.success, #messagesStatus.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        #ocrStatus.error, #statusMessage.error, #voteStatusMessage.error, #messagesStatus.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .logo-preview {
+            margin-top: 15px;
+            max-width: 300px;
+        }
+        
+        .logo-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .config-notice {
             background: #fff3cd;
             border: 2px solid #ffc107;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .config-notice.error {
+            background: #f8d7da;
+            border-color: #dc3545;
         }
         
-        .setup-instructions h3 {
-            color: #856404;
-            margin-bottom: 10px;
+        .login-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
         }
         
-        .setup-instructions ol {
-            margin-left: 20px;
-            line-height: 1.8;
+        .login-message.show {
+            display: block;
         }
         
-        .setup-instructions code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
+        .login-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .login-message.success {
+            background: #d4edda;
+            color: #155724;
         }
     </style>
 </head>
 <body>
-    <!-- Écran de connexion -->
-    <div class="login-container" id="loginContainer">
-        <h1>🔐 Connexion Admin</h1>
+    <!-- ÉCRAN DE CONNEXION -->
+    <div class="login-screen" id="loginScreen">
+        <h1>🔐 Connexion Sécurisée</h1>
         
-        <div class="security-notice">
-            ✅ <strong>Authentification sécurisée</strong><br>
-            Vos identifiants sont vérifiés sur le serveur Supabase
+        <div class="security-badge">
+            ✅ Authentification cryptée via Supabase
         </div>
         
-        <div class="setup-instructions" id="setupInstructions">
-            <h3>⚙️ Configuration requise (une seule fois)</h3>
+        <div class="setup-box" id="setupBox">
+            <h3>⚙️ Configuration (une seule fois)</h3>
             <ol>
-                <li>Allez sur <strong>Supabase.com</strong> → Votre projet</li>
+                <li>Allez sur <strong>supabase.com</strong> → Votre projet</li>
                 <li>Menu <strong>"Authentication"</strong> → <strong>"Users"</strong></li>
-                <li>Cliquez sur <strong>"Add user"</strong> → <strong>"Create new user"</strong></li>
-                <li>Entrez votre email et mot de passe admin</li>
-                <li>Cliquez sur <strong>"Create user"</strong></li>
-                <li>Revenez ici et connectez-vous ! ✅</li>
+                <li>Cliquez <strong>"Add user"</strong> → <strong>"Create new user"</strong></li>
+                <li>Email: <code>votre@email.com</code> + mot de passe fort</li>
+                <li>✅ Cochez <strong>"Auto Confirm User"</strong></li>
+                <li>Cliquez <strong>"Create user"</strong></li>
             </ol>
-            <button onclick="hideSetup()" style="margin-top: 15px; background: #28a745;">
-                J'ai créé mon compte admin
-            </button>
+            <button class="setup-btn" onclick="hideSetupBox()">J'ai créé mon compte ✅</button>
         </div>
         
         <form id="loginForm" style="display: none;">
             <div class="form-group">
-                <label for="email">Email administrateur</label>
-                <input type="email" id="email" placeholder="admin@example.com" required>
+                <label for="emailInput">📧 Email administrateur</label>
+                <input type="email" id="emailInput" placeholder="admin@example.com" required>
             </div>
             
             <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" placeholder="Votre mot de passe sécurisé" required>
+                <label for="passwordInput">🔒 Mot de passe</label>
+                <input type="password" id="passwordInput" placeholder="Votre mot de passe sécurisé" required>
             </div>
             
-            <button type="submit" id="loginBtn">Se connecter</button>
+            <button type="submit" class="login-btn" id="loginBtn">Se connecter</button>
         </form>
         
-        <div class="message" id="loginMessage"></div>
+        <div class="login-message" id="loginMessage"></div>
     </div>
 
-    <!-- Interface admin -->
-    <div class="admin-interface" id="adminInterface">
+    <!-- INTERFACE ADMIN COMPLÈTE -->
+    <div class="container" id="adminContainer">
         <div class="admin-header">
-            <div>
-                <h1>🛠️ Administration</h1>
-                <div class="user-info">Connecté en tant que : <strong id="userEmail"></strong></div>
+            <h1>🛠️ Administration - Gestion des Candidats</h1>
+            <div class="user-badge">
+                <div class="user-email">👤 <span id="userEmail"></span></div>
+                <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
             </div>
-            <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
         </div>
 
-        <div class="message" id="statusMessage"></div>
+        <div id="statusMessage"></div>
         
-        <!-- Section Ajout Joueur -->
+        <!-- Section Upload Logo -->
         <div class="section">
-            <h2>✏️ Ajout de Candidats</h2>
-            <input type="text" id="playerName" placeholder="Nom du joueur" style="width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 8px;">
-            <button onclick="addPlayer()" style="width: auto;">Ajouter</button>
+            <h2>📷 Logo du Sondage</h2>
+            <input type="file" id="logoUpload" accept="image/*">
+            <div class="logo-preview" id="logoPreview"></div>
+            <button onclick="deleteLogo()" id="deleteLogoBtn" style="background: #dc3545; display: none; margin-top: 10px;">🗑️ Supprimer le logo</button>
+        </div>
+        
+        <!-- Section Ajout Manuel -->
+        <div class="section">
+            <h2>✏️ Ajout Manuel de Joueurs</h2>
+            <input type="text" id="playerName" placeholder="Nom du joueur">
+            <button onclick="addPlayer()">Ajouter</button>
+        </div>
+        
+        <!-- Section OCR -->
+        <div class="section">
+            <h2>🔍 Détection OCR (Image)</h2>
+            <input type="file" id="ocrImage" accept="image/*">
+            <button onclick="analyzeImage()">Analyser l'image</button>
+            <div id="ocrStatus"></div>
         </div>
         
         <!-- Liste des Joueurs -->
         <div class="section">
             <h2>👥 Liste des Candidats (<span id="playerCount">0</span>)</h2>
             <ul class="player-list" id="playerList"></ul>
-            <div style="margin-top: 20px;">
-                <button onclick="refreshData()" style="width: auto; margin-right: 10px;">🔄 Actualiser</button>
-                <button onclick="clearAll()" style="width: auto; background: #dc3545;">🗑️ Tout Effacer</button>
+            
+            <div class="export-section">
+                <button onclick="clearAll()" style="background: #dc3545;">🗑️ Tout Effacer</button>
+                <button onclick="refreshData()">🔄 Actualiser</button>
             </div>
+        </div>
+        
+        <!-- Section Gestion des Votes -->
+        <div class="section">
+            <h2>⚙️ Paramètres de Vote</h2>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="singleVoteToggle" onchange="toggleSingleVote()" style="width: auto; margin-right: 10px; transform: scale(1.5);">
+                    <span style="font-weight: normal; color: #333;">
+                        <strong>Limiter à 1 vote par personne (IP)</strong><br>
+                        <small style="color: #666;">Décochez pour autoriser les votes multiples (utile pour les tests)</small>
+                    </span>
+                </label>
+                <div id="voteStatusMessage" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+            </div>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <p style="color: #555; margin-bottom: 10px;">
+                    <strong>Votes actuels :</strong> <span id="totalVotesCount" style="color: #667eea; font-size: 1.2em; font-weight: bold;">0</span>
+                </p>
+                <button onclick="resetVotes()" style="background: #ffc107; color: #000;">
+                    🔄 Réinitialiser tous les votes
+                </button>
+                <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                    ⚠️ Cette action supprime tous les votes mais garde les candidats
+                </p>
+            </div>
+        </div>
+        
+        <!-- Section Personnalisation des Messages -->
+        <div class="section">
+            <h2>✏️ Personnalisation des Messages</h2>
+            
+            <label>Titre principal de la page de vote :</label>
+            <input type="text" id="msgTitle" placeholder="Coupe virtuelle du public" maxlength="100">
+            
+            <label>Message d'invitation au vote :</label>
+            <textarea id="msgInvitation" placeholder="Votez pour votre joueur(euse) favori(te) !" rows="2" maxlength="200"></textarea>
+            
+            <label>Message de remerciement (après le vote) :</label>
+            <textarea id="msgThankYou" placeholder="Merci d'avoir voté !" rows="3" maxlength="300"></textarea>
+            
+            <label>Message si déjà voté :</label>
+            <textarea id="msgAlreadyVoted" placeholder="Merci, votre vote a déjà été enregistré !" rows="3" maxlength="300"></textarea>
+            
+            <button onclick="saveMessages()" style="background: #28a745;">💾 Enregistrer les messages</button>
+            <button onclick="resetMessagesToDefault()" style="background: #6c757d;">🔄 Restaurer les messages par défaut</button>
+            
+            <div id="messagesStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
         </div>
     </div>
 
@@ -303,11 +494,20 @@
         let currentUser = null;
         let players = [];
         
-        // Initialiser Supabase
+        // Messages par défaut
+        const DEFAULT_MESSAGES = {
+            title: 'Coupe virtuelle du public',
+            invitation: 'Votez pour votre joueur(euse) favori(te) !',
+            thankYou: 'Merci d\'avoir voté !\n\nN\'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives',
+            alreadyVoted: 'Merci, votre vote a déjà été enregistré !\n\nNous avons bien pris en compte votre participation.'
+        };
+        
+        // === AUTHENTIFICATION ===
+        
         async function initSupabase() {
             try {
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showMessage('loginMessage', '❌ Configuration Supabase manquante', 'error');
+                    showLoginMessage('❌ Configuration Supabase manquante dans config.js', 'error');
                     return false;
                 }
                 
@@ -320,39 +520,45 @@
                     currentUser = session.user;
                     showAdminInterface();
                 } else {
-                    showLoginForm();
+                    showLoginScreen();
                 }
                 
                 return true;
             } catch (error) {
-                showMessage('loginMessage', '❌ Erreur: ' + error.message, 'error');
+                showLoginMessage('❌ Erreur: ' + error.message, 'error');
                 return false;
             }
         }
         
-        function hideSetup() {
-            document.getElementById('setupInstructions').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-        
-        function showLoginForm() {
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('adminInterface').classList.remove('show');
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.add('show');
+            document.getElementById('adminContainer').classList.remove('show');
         }
         
         function showAdminInterface() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('adminInterface').classList.add('show');
+            document.getElementById('loginScreen').classList.remove('show');
+            document.getElementById('adminContainer').classList.add('show');
             document.getElementById('userEmail').textContent = currentUser.email;
             loadData();
         }
         
-        // Gestion de la connexion
+        function hideSetupBox() {
+            document.getElementById('setupBox').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        function showLoginMessage(message, type) {
+            const msg = document.getElementById('loginMessage');
+            msg.textContent = message;
+            msg.className = `login-message ${type} show`;
+        }
+        
+        // Gestion du formulaire de connexion
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
             const loginBtn = document.getElementById('loginBtn');
             
             loginBtn.disabled = true;
@@ -367,144 +573,558 @@
                 if (error) throw error;
                 
                 currentUser = data.user;
-                showMessage('loginMessage', '✅ Connexion réussie !', 'success');
+                showLoginMessage('✅ Connexion réussie !', 'success');
                 
                 setTimeout(() => {
                     showAdminInterface();
                 }, 1000);
                 
             } catch (error) {
-                showMessage('loginMessage', '❌ ' + error.message, 'error');
+                let errorMsg = error.message;
+                if (errorMsg.includes('Invalid login')) {
+                    errorMsg = 'Email ou mot de passe incorrect';
+                }
+                showLoginMessage('❌ ' + errorMsg, 'error');
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Se connecter';
             }
         });
         
-        // Déconnexion
         async function logout() {
             await supabaseClient.auth.signOut();
             currentUser = null;
+            players = [];
             location.reload();
         }
         
-        // Afficher un message
-        function showMessage(elementId, message, type = 'info') {
-            const messageEl = document.getElementById(elementId);
-            messageEl.textContent = message;
-            messageEl.className = `message ${type} show`;
+        // === FONCTIONS ADMIN ===
+        
+        function showStatus(message, type = 'loading') {
+            const status = document.getElementById('statusMessage');
+            status.className = type;
+            status.textContent = message;
+            status.style.display = 'block';
             
-            if (type !== 'info') {
+            if (type === 'success' || type === 'error') {
                 setTimeout(() => {
-                    messageEl.classList.remove('show');
-                }, 5000);
+                    status.style.display = 'none';
+                }, 3000);
             }
         }
         
-        // Charger les données
         async function loadData() {
             if (!supabaseClient || !currentUser) return;
             
             try {
-                showMessage('statusMessage', '⏳ Chargement...', 'info');
+                showStatus('⏳ Chargement des données...', 'loading');
                 
-                const { data: playersData, error } = await supabaseClient
+                // Charger les joueurs
+                const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
                     .select('*')
                     .order('id', { ascending: true });
                 
-                if (error) throw error;
+                if (playersError) throw playersError;
                 
                 players = playersData || [];
                 updatePlayerList();
                 
-                showMessage('statusMessage', '✅ Données chargées', 'success');
+                // Charger le logo
+                const { data: settingsData } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (settingsData && settingsData.value) {
+                    displayLogo(settingsData.value);
+                } else {
+                    displayLogo(null);
+                }
+                
+                await loadSingleVoteSetting();
+                await loadVotesCount();
+                await loadCustomMessages();
+                
+                showStatus('✅ Données chargées', 'success');
             } catch (error) {
-                showMessage('statusMessage', '❌ Erreur: ' + error.message, 'error');
+                showStatus('❌ Erreur de chargement: ' + error.message, 'error');
             }
         }
         
-        // Mettre à jour la liste
-        function updatePlayerList() {
-            document.getElementById('playerCount').textContent = players.length;
-            const list = document.getElementById('playerList');
+        async function loadVotesCount() {
+            try {
+                const { count } = await supabaseClient
+                    .from('votes')
+                    .select('*', { count: 'exact', head: true });
+                
+                document.getElementById('totalVotesCount').textContent = count || 0;
+            } catch (error) {
+                console.error('Erreur chargement nombre de votes:', error);
+            }
+        }
+        
+        async function loadSingleVoteSetting() {
+            try {
+                const { data } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                const checkbox = document.getElementById('singleVoteToggle');
+                checkbox.checked = data?.value === 'true' ? true : true;
+            } catch (error) {
+                document.getElementById('singleVoteToggle').checked = true;
+            }
+        }
+        
+        async function toggleSingleVote() {
+            const checkbox = document.getElementById('singleVoteToggle');
+            const enabled = checkbox.checked;
+            const statusDiv = document.getElementById('voteStatusMessage');
             
-            if (players.length === 0) {
-                list.innerHTML = '<li style="text-align: center; color: #999; padding: 20px;">Aucun candidat</li>';
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Enregistrement...';
+                
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                if (existing) {
+                    await supabaseClient
+                        .from('settings')
+                        .update({ value: enabled.toString() })
+                        .eq('key', 'single_vote_enabled');
+                } else {
+                    await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'single_vote_enabled', value: enabled.toString() });
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = enabled 
+                    ? '✅ Limite activée : 1 vote par IP' 
+                    : '✅ Votes multiples autorisés (mode test)';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
+                checkbox.checked = !enabled;
+            }
+        }
+        
+        async function resetVotes() {
+            if (!confirm('⚠️ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservés, seuls les votes seront effacés.')) {
                 return;
             }
             
-            list.innerHTML = players.map(p => `
+            try {
+                showStatus('⏳ Suppression de tous les votes...', 'loading');
+                
+                await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .neq('id', 0);
+                
+                await loadVotesCount();
+                showStatus('✅ Tous les votes ont été supprimés', 'success');
+                
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadCustomMessages() {
+            try {
+                const { data } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
+                
+                const messages = {};
+                if (data) {
+                    data.forEach(item => {
+                        messages[item.key] = item.value;
+                    });
+                }
+                
+                document.getElementById('msgTitle').value = messages.msg_title || DEFAULT_MESSAGES.title;
+                document.getElementById('msgInvitation').value = messages.msg_invitation || DEFAULT_MESSAGES.invitation;
+                document.getElementById('msgThankYou').value = messages.msg_thankyou || DEFAULT_MESSAGES.thankYou;
+                document.getElementById('msgAlreadyVoted').value = messages.msg_alreadyvoted || DEFAULT_MESSAGES.alreadyVoted;
+                
+            } catch (error) {
+                console.error('Erreur chargement messages:', error);
+            }
+        }
+        
+        async function saveMessages() {
+            const statusDiv = document.getElementById('messagesStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Enregistrement des messages...';
+                
+                const messages = [
+                    { key: 'msg_title', value: document.getElementById('msgTitle').value || DEFAULT_MESSAGES.title },
+                    { key: 'msg_invitation', value: document.getElementById('msgInvitation').value || DEFAULT_MESSAGES.invitation },
+                    { key: 'msg_thankyou', value: document.getElementById('msgThankYou').value || DEFAULT_MESSAGES.thankYou },
+                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
+                ];
+                
+                for (const msg of messages) {
+                    const { data: existing } = await supabaseClient
+                        .from('settings')
+                        .select('*')
+                        .eq('key', msg.key)
+                        .single();
+                    
+                    if (existing) {
+                        await supabaseClient
+                            .from('settings')
+                            .update({ value: msg.value })
+                            .eq('key', msg.key);
+                    } else {
+                        await supabaseClient
+                            .from('settings')
+                            .insert({ key: msg.key, value: msg.value });
+                    }
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = '✅ Messages enregistrés avec succès !';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
+            }
+        }
+        
+        async function resetMessagesToDefault() {
+            if (!confirm('Restaurer tous les messages à leurs valeurs par défaut ?')) {
+                return;
+            }
+            
+            document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
+            document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
+            document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
+            document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
+            
+            await saveMessages();
+        }
+        
+        // Upload du logo avec compression automatique
+        document.getElementById('logoUpload').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file || !supabaseClient) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Veuillez sélectionner une image (PNG, JPG, etc.)');
+                return;
+            }
+            
+            showStatus('⏳ Optimisation de l\'image...', 'loading');
+            
+            try {
+                const compressedData = await compressImage(file);
+                
+                const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
+                showStatus(`⏳ Enregistrement du logo (${sizeKB} Ko)...`, 'loading');
+                
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (existing) {
+                    await supabaseClient
+                        .from('settings')
+                        .update({ value: compressedData })
+                        .eq('key', 'logo');
+                } else {
+                    await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'logo', value: compressedData });
+                }
+                
+                displayLogo(compressedData);
+                showStatus(`✅ Logo enregistré (${sizeKB} Ko)`, 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        });
+        
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        let width = img.width;
+                        let height = img.height;
+                        const maxSize = 500;
+                        
+                        if (width > maxSize || height > maxSize) {
+                            if (width > height) {
+                                height = (height / width) * maxSize;
+                                width = maxSize;
+                            } else {
+                                width = (width / height) * maxSize;
+                                height = maxSize;
+                            }
+                        }
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        const isPNG = file.type === 'image/png';
+                        let compressedData;
+                        
+                        if (isPNG) {
+                            compressedData = canvas.toDataURL('image/png', 0.9);
+                        } else {
+                            compressedData = canvas.toDataURL('image/jpeg', 0.85);
+                        }
+                        
+                        const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
+                        
+                        if (sizeKB > 400 && isPNG) {
+                            const finalData = canvas.toDataURL('image/png', 0.7);
+                            resolve(finalData);
+                        } else if (sizeKB > 400 && !isPNG) {
+                            const finalData = canvas.toDataURL('image/jpeg', 0.6);
+                            resolve(finalData);
+                        } else {
+                            resolve(compressedData);
+                        }
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('Impossible de charger l\'image'));
+                    };
+                    
+                    img.src = e.target.result;
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('Impossible de lire le fichier'));
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function displayLogo(logoData) {
+            const preview = document.getElementById('logoPreview');
+            const deleteBtn = document.getElementById('deleteLogoBtn');
+            
+            if (logoData) {
+                preview.innerHTML = `<img src="${logoData}" alt="Logo">`;
+                deleteBtn.style.display = 'inline-block';
+            } else {
+                preview.innerHTML = '';
+                deleteBtn.style.display = 'none';
+            }
+        }
+        
+        async function deleteLogo() {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer le logo ?')) return;
+            
+            try {
+                showStatus('⏳ Suppression du logo...', 'loading');
+                
+                await supabaseClient
+                    .from('settings')
+                    .delete()
+                    .eq('key', 'logo');
+                
+                document.getElementById('logoPreview').innerHTML = '';
+                document.getElementById('deleteLogoBtn').style.display = 'none';
+                document.getElementById('logoUpload').value = '';
+                
+                showStatus('✅ Logo supprimé', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function addPlayer() {
+            if (!supabaseClient) return;
+            
+            const input = document.getElementById('playerName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+            
+            if (players.some(p => p.name === name)) {
+                alert('Ce joueur existe déjà !');
+                return;
+            }
+            
+            try {
+                showStatus('⏳ Ajout du joueur...', 'loading');
+                
+                await supabaseClient
+                    .from('players')
+                    .insert({ name: name });
+                
+                input.value = '';
+                await loadData();
+                showStatus('✅ Joueur ajouté', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function analyzeImage() {
+            const fileInput = document.getElementById('ocrImage');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Veuillez sélectionner une image');
+                return;
+            }
+            
+            if (!supabaseClient) return;
+            
+            const status = document.getElementById('ocrStatus');
+            status.className = 'loading';
+            status.textContent = '🔄 Analyse en cours... Cela peut prendre quelques secondes.';
+            
+            try {
+                const result = await Tesseract.recognize(file, 'fra+eng', {
+                    logger: m => console.log(m)
+                });
+                
+                const text = result.data.text;
+                const lines = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 2 && line.length < 50);
+                
+                let addedCount = 0;
+                
+                for (const name of lines) {
+                    if (!players.some(p => p.name === name)) {
+                        try {
+                            await supabaseClient
+                                .from('players')
+                                .insert({ name: name });
+                            addedCount++;
+                        } catch (err) {
+                            console.error('Erreur ajout:', name, err);
+                        }
+                    }
+                }
+                
+                await loadData();
+                
+                status.className = 'success';
+                status.textContent = `✅ Analyse terminée ! ${addedCount} nouveau(x) nom(s) ajouté(s).`;
+                
+                fileInput.value = '';
+                
+            } catch (error) {
+                status.className = 'error';
+                status.textContent = '❌ Erreur lors de l\'analyse : ' + error.message;
+            }
+        }
+        
+        function updatePlayerList() {
+            const list = document.getElementById('playerList');
+            const count = document.getElementById('playerCount');
+            
+            count.textContent = players.length;
+            
+            if (players.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: #999;">Aucun candidat pour le moment</li>';
+                return;
+            }
+            
+            list.innerHTML = players.map(player => `
                 <li class="player-item">
-                    <span>${p.name}</span>
-                    <button class="delete-btn" onclick="deletePlayer(${p.id})">Supprimer</button>
+                    <span>${player.name}</span>
+                    <button class="delete-btn" onclick="deletePlayer(${player.id})">Supprimer</button>
                 </li>
             `).join('');
         }
         
-        // Ajouter un joueur
-        async function addPlayer() {
-            const name = document.getElementById('playerName').value.trim();
-            if (!name) return alert('Entrez un nom');
-            
-            if (players.some(p => p.name === name)) {
-                return alert('Ce joueur existe déjà !');
-            }
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('players')
-                    .insert({ name });
-                
-                if (error) throw error;
-                
-                document.getElementById('playerName').value = '';
-                await loadData();
-            } catch (error) {
-                showMessage('statusMessage', '❌ Erreur: ' + error.message, 'error');
-            }
-        }
-        
-        // Supprimer un joueur
-        async function deletePlayer(id) {
+        async function deletePlayer(playerId) {
             if (!confirm('Supprimer ce joueur ?')) return;
             
             try {
-                const { error } = await supabaseClient
+                showStatus('⏳ Suppression...', 'loading');
+                
+                await supabaseClient
                     .from('players')
                     .delete()
-                    .eq('id', id);
-                
-                if (error) throw error;
+                    .eq('id', playerId);
                 
                 await loadData();
+                showStatus('✅ Joueur supprimé', 'success');
             } catch (error) {
-                showMessage('statusMessage', '❌ Erreur: ' + error.message, 'error');
+                showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
         
-        // Tout effacer
         async function clearAll() {
-            if (!confirm('TOUT effacer ?')) return;
+            if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
             
             try {
+                showStatus('⏳ Suppression en cours...', 'loading');
+                
                 await supabaseClient.from('players').delete().neq('id', 0);
                 await supabaseClient.from('votes').delete().neq('id', 0);
+                await supabaseClient.from('settings').delete().eq('key', 'logo');
                 
                 players = [];
                 updatePlayerList();
-                showMessage('statusMessage', '✅ Tout effacé', 'success');
+                document.getElementById('logoPreview').innerHTML = '';
+                
+                showStatus('✅ Tout a été effacé', 'success');
             } catch (error) {
-                showMessage('statusMessage', '❌ Erreur: ' + error.message, 'error');
+                showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
         
-        // Actualiser
         async function refreshData() {
             await loadData();
         }
         
         // Initialiser au chargement
-        window.addEventListener('DOMContentLoaded', initSupabase);
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initSupabase();
+        });
     </script>
 </body>
 </html>
