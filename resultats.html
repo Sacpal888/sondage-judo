@@ -290,8 +290,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏆 Résultats du Vote 🏆</h1>
-            <p class="subtitle">Coupe virtuelle du public</p>
+            <h1 id="resultsTitle">🏆 Résultats du Vote 🏆</h1>
+            <p class="subtitle" id="resultsSubtitle">Coupe virtuelle du public</p>
         </div>
         
         <!-- Logo affiché en permanence -->
@@ -316,13 +316,13 @@
             </div>
             
             <div class="results-list" id="resultsList">
-                <div class="no-votes">
+                <div class="no-votes" id="noVotesDefault">
                     Aucun vote pour le moment...<br>
                     Soyez le premier à voter ! 🥋
                 </div>
             </div>
             
-            <div class="refresh-notice">
+            <div class="refresh-notice" id="refreshNotice">
                 <span class="auto-refresh">🔄</span> Mise à jour en temps réel
             </div>
         </div>
@@ -333,6 +333,7 @@
     <script>
         let supabaseClient;
         let realtimeChannel;
+        let NOVOTES_HTML = null; // sera alimenté par msg_results_novotes si présent
         
         // Initialiser Supabase
         async function initSupabase() {
@@ -351,6 +352,44 @@
             } catch (error) {
                 showError('Erreur de connexion: ' + error.message);
                 return false;
+            }
+        }
+
+        // Charger les messages dynamiques depuis settings (sans order exotique)
+        async function loadMessages() {
+            try {
+                if (!supabaseClient) return;
+                const KEYS = ['msg_results_title','msg_results_subtitle','msg_results_refresh','msg_results_novotes'];
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('key, value')
+                    .in('key', KEYS);
+                if (error) throw error;
+                
+                const map = {};
+                (data || []).forEach(row => { map[row.key] = row.value; });
+                
+                const titleEl = document.getElementById('resultsTitle');
+                const subtitleEl = document.getElementById('resultsSubtitle');
+                const refreshEl = document.getElementById('refreshNotice');
+                
+                if (titleEl && map['msg_results_title']) {
+                    titleEl.textContent = map['msg_results_title'];
+                    document.title = map['msg_results_title'];
+                }
+                if (subtitleEl && map['msg_results_subtitle']) {
+                    subtitleEl.innerHTML = map['msg_results_subtitle'].replace(/\n/g, '<br>');
+                }
+                if (refreshEl && map['msg_results_refresh']) {
+                    // on conserve l'icône auto-refresh si présente
+                    const icon = '<span class="auto-refresh">🔄</span> ';
+                    refreshEl.innerHTML = icon + map['msg_results_refresh'].replace(/\n/g, '<br>');
+                }
+                if (map['msg_results_novotes']) {
+                    NOVOTES_HTML = map['msg_results_novotes'].replace(/\n/g, '<br>');
+                }
+            } catch (e) {
+                console.warn('loadMessages(): utilisation des valeurs par défaut (échec de chargement)', e);
             }
         }
 
@@ -477,7 +516,9 @@
             
             // Si aucun vote
             if (totalVotes === 0) {
-                resultsList.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋</div>';
+                const html = NOVOTES_HTML ? `<div class="no-votes">${NOVOTES_HTML}</div>` :
+                    '<div class="no-votes">Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋</div>';
+                resultsList.innerHTML = html;
                 return;
             }
             
@@ -511,8 +552,9 @@
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('totalVotes').textContent = '0';
             document.getElementById('totalPlayers').textContent = '0';
-            document.getElementById('resultsList').innerHTML = 
+            const msg = NOVOTES_HTML ? `<div class="no-votes">${NOVOTES_HTML}</div>` :
                 '<div class="no-votes">Aucun candidat configuré.<br>Contactez l\'administrateur.</div>';
+            document.getElementById('resultsList').innerHTML = msg;
         }
 
         function showError(message) {
@@ -522,10 +564,11 @@
             document.getElementById('errorMessage').style.display = 'block';
         }
         
-        // Initialiser au chargement
+        // Initialiser au chargement : init -> messages -> résultats
         window.addEventListener('DOMContentLoaded', async () => {
             const initialized = await initSupabase();
             if (initialized) {
+                await loadMessages();
                 await loadResults();
             }
         });
