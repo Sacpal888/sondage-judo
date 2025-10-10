@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration - Gestion des Candidats</title>
-    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -21,129 +20,8 @@
             padding: 20px;
         }
         
-        /* === ÉCRAN DE CONNEXION === */
-        .login-screen {
-            display: none;
-            max-width: 450px;
-            margin: 50px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        
-        .login-screen.show {
-            display: block;
-        }
-        
-        .login-screen h1 {
-            color: #333;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        
-        .security-badge {
-            background: #d4edda;
-            border: 2px solid #28a745;
-            color: #155724;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        
-        .setup-box {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .setup-box h3 {
-            color: #856404;
-            margin-bottom: 15px;
-        }
-        
-        .setup-box ol {
-            margin-left: 20px;
-            line-height: 1.8;
-            color: #856404;
-        }
-        
-        .setup-box code {
-            background: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .login-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-        }
-        
-        .login-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .setup-btn {
-            width: 100%;
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 15px;
-        }
-        
-        /* === INTERFACE ADMIN === */
         .container {
-            display: none;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             padding: 30px;
@@ -151,47 +29,10 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         
-        .container.show {
-            display: block;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #ddd;
-        }
-        
-        .admin-header h1 {
+        h1 {
             color: #333;
-            font-size: 1.8em;
-        }
-        
-        .user-badge {
-            text-align: right;
-        }
-        
-        .user-email {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        
-        .logout-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .logout-btn:hover {
-            background: #c82333;
+            margin-bottom: 30px;
+            text-align: center;
         }
         
         .section {
@@ -214,12 +55,12 @@
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
+            font-family: inherit;
         }
         
         textarea {
-            font-family: inherit;
-            resize: vertical;
             min-height: 80px;
+            resize: vertical;
         }
         
         button {
@@ -263,6 +104,22 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
+        .player-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #000;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
         .delete-btn {
             background: #dc3545;
             padding: 6px 12px;
@@ -273,26 +130,26 @@
             background: #c82333;
         }
         
-        #ocrStatus, #statusMessage, #voteStatusMessage, #messagesStatus {
+        #statusMessage {
             margin-top: 10px;
             padding: 10px;
             border-radius: 6px;
             display: none;
         }
         
-        #ocrStatus.loading, #statusMessage.loading, #voteStatusMessage.loading {
+        #statusMessage.loading {
             display: block;
             background: #fff3cd;
             color: #856404;
         }
         
-        #ocrStatus.success, #statusMessage.success, #voteStatusMessage.success, #messagesStatus.success {
+        #statusMessage.success {
             display: block;
             background: #d4edda;
             color: #155724;
         }
         
-        #ocrStatus.error, #statusMessage.error, #voteStatusMessage.error, #messagesStatus.error {
+        #statusMessage.error {
             display: block;
             background: #f8d7da;
             color: #721c24;
@@ -329,77 +186,122 @@
             border-color: #dc3545;
         }
         
-        .login-message {
+        label {
+            display: block;
             margin-top: 15px;
-            padding: 12px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .rgpd-stats {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 15px;
             border-radius: 8px;
             text-align: center;
-            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Modal pour éditer */
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
         }
-        
-        .login-message.show {
-            display: block;
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        
-        .login-message.error {
-            background: #f8d7da;
-            color: #721c24;
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: slideDown 0.3s;
         }
-        
-        .login-message.success {
-            background: #d4edda;
-            color: #155724;
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
         }
     </style>
 </head>
 <body>
-    <!-- ÉCRAN DE CONNEXION -->
-    <div class="login-screen" id="loginScreen">
-        <h1>🔐 Connexion Sécurisée</h1>
+    <div class="container">
+        <h1>🛠️ Administration - Gestion des Candidats</h1>
         
-        <div class="security-badge">
-            ✅ Authentification cryptée via Supabase
-        </div>
-        
-        <div class="setup-box" id="setupBox">
-            <h3>⚙️ Configuration (une seule fois)</h3>
-            <ol>
-                <li>Allez sur <strong>supabase.com</strong> → Votre projet</li>
-                <li>Menu <strong>"Authentication"</strong> → <strong>"Users"</strong></li>
-                <li>Cliquez <strong>"Add user"</strong> → <strong>"Create new user"</strong></li>
-                <li>Email: <code>votre@email.com</code> + mot de passe fort</li>
-                <li>✅ Cochez <strong>"Auto Confirm User"</strong></li>
-                <li>Cliquez <strong>"Create user"</strong></li>
-            </ol>
-            <button class="setup-btn" onclick="hideSetupBox()">J'ai créé mon compte ✅</button>
-        </div>
-        
-        <form id="loginForm" style="display: none;">
-            <div class="form-group">
-                <label for="emailInput">📧 Email administrateur</label>
-                <input type="email" id="emailInput" placeholder="admin@example.com" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="passwordInput">🔒 Mot de passe</label>
-                <input type="password" id="passwordInput" placeholder="Votre mot de passe sécurisé" required>
-            </div>
-            
-            <button type="submit" class="login-btn" id="loginBtn">Se connecter</button>
-        </form>
-        
-        <div class="login-message" id="loginMessage"></div>
-    </div>
-
-    <!-- INTERFACE ADMIN COMPLÈTE -->
-    <div class="container" id="adminContainer">
-        <div class="admin-header">
-            <h1>🛠️ Administration - Gestion des Candidats</h1>
-            <div class="user-badge">
-                <div class="user-email">👤 <span id="userEmail"></span></div>
-                <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
-            </div>
+        <div id="configNotice" class="config-notice" style="display: none;">
+            ⚠️ Configuration Supabase requise dans config.js
         </div>
 
         <div id="statusMessage"></div>
@@ -414,17 +316,9 @@
         
         <!-- Section Ajout Manuel -->
         <div class="section">
-            <h2>✏️ Ajout Manuel de Joueurs</h2>
+            <h2>✏️ Ajout Manuel de Candidats</h2>
             <input type="text" id="playerName" placeholder="Nom du joueur">
             <button onclick="addPlayer()">Ajouter</button>
-        </div>
-        
-        <!-- Section OCR -->
-        <div class="section">
-            <h2>🔍 Détection OCR (Image)</h2>
-            <input type="file" id="ocrImage" accept="image/*">
-            <button onclick="analyzeImage()">Analyser l'image</button>
-            <div id="ocrStatus"></div>
         </div>
         
         <!-- Liste des Joueurs -->
@@ -466,138 +360,142 @@
             </div>
         </div>
         
-        <!-- Section Personnalisation des Messages -->
+        <!-- Section Messages du Sondage -->
         <div class="section">
-            <h2>✏️ Personnalisation des Messages</h2>
+            <h2>✏️ Messages du Sondage</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les messages affichés sur la page de vote (sondage.html)
+            </p>
             
-            <label>Titre principal de la page de vote :</label>
+            <label for="msgTitle">Titre principal de la page de vote :</label>
             <input type="text" id="msgTitle" placeholder="Coupe virtuelle du public" maxlength="100">
             
-            <label>Message d'invitation au vote :</label>
+            <label for="msgInvitation">Message d'invitation au vote :</label>
             <textarea id="msgInvitation" placeholder="Votez pour votre joueur(euse) favori(te) !" rows="2" maxlength="200"></textarea>
             
-            <label>Message de remerciement (après le vote) :</label>
+            <label for="msgThankYou">Message de remerciement (après le vote) :</label>
             <textarea id="msgThankYou" placeholder="Merci d'avoir voté !" rows="3" maxlength="300"></textarea>
             
-            <label>Message si déjà voté :</label>
+            <label for="msgAlreadyVoted">Message si déjà voté :</label>
             <textarea id="msgAlreadyVoted" placeholder="Merci, votre vote a déjà été enregistré !" rows="3" maxlength="300"></textarea>
             
-            <button onclick="saveMessages()" style="background: #28a745;">💾 Enregistrer les messages</button>
-            <button onclick="resetMessagesToDefault()" style="background: #6c757d;">🔄 Restaurer les messages par défaut</button>
+            <button onclick="saveMessages()" style="background: #28a745; margin-top: 15px;">💾 Enregistrer les messages du sondage</button>
+            <button onclick="resetMessagesToDefault()" style="background: #6c757d;">🔄 Restaurer par défaut</button>
             
             <div id="messagesStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+        </div>
+        
+        <!-- Section Messages des Résultats -->
+        <div class="section">
+            <h2>📊 Messages des Résultats</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les messages affichés sur la page de résultats (resultats.html)
+            </p>
+            
+            <label for="msgResultsTitle">Titre de la page des résultats :</label>
+            <input type="text" id="msgResultsTitle" placeholder="🏆 Résultats du Vote 🏆" maxlength="100">
+            
+            <label for="msgResultsSubtitle">Sous-titre de la page :</label>
+            <input type="text" id="msgResultsSubtitle" placeholder="Coupe virtuelle du public" maxlength="100">
+            
+            <label for="msgResultsNoVotes">Message si aucun vote :</label>
+            <textarea id="msgResultsNoVotes" placeholder="Aucun vote pour le moment... Soyez le premier à voter ! 🥋" rows="2" maxlength="200"></textarea>
+            
+            <label for="msgResultsRefresh">Message de mise à jour en temps réel :</label>
+            <input type="text" id="msgResultsRefresh" placeholder="Mise à jour en temps réel" maxlength="100">
+            
+            <button onclick="saveResultsMessages()" style="background: #28a745; margin-top: 15px;">💾 Enregistrer les messages des résultats</button>
+            <button onclick="resetResultsMessagesToDefault()" style="background: #6c757d;">🔄 Restaurer par défaut</button>
+            
+            <div id="resultsMessagesStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+        </div>
+        
+        <!-- Section RGPD -->
+        <div class="section">
+            <h2>🔒 Conformité RGPD - Gestion des Données</h2>
+            
+            <div class="info-box">
+                <strong>📋 Informations collectées :</strong><br>
+                Pour empêcher les votes multiples, nous stockons les adresses IP des votants.<br>
+                <strong>Base légale :</strong> Intérêt légitime (prévention de la fraude électorale)<br>
+                <strong>Durée de conservation :</strong> Limitée dans le temps (recommandé : 30 jours maximum)
+            </div>
+            
+            <div class="rgpd-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="ipCount">-</div>
+                    <div class="stat-label">Adresses IP stockées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="oldestVote">-</div>
+                    <div class="stat-label">Vote le plus ancien (jours)</div>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <strong>⚠️ Recommandations RGPD :</strong><br>
+                • Informez les utilisateurs sur la page de vote (bannière d'information)<br>
+                • Supprimez régulièrement les IPs anciennes (tous les 30 jours recommandé)<br>
+                • Ne partagez jamais ces données avec des tiers<br>
+                • Les utilisateurs peuvent demander la suppression de leurs données
+            </div>
+            
+            <button onclick="anonymizeOldIPs()" style="background: #17a2b8; margin-top: 15px;">
+                🗑️ Anonymiser les IPs de plus de 30 jours
+            </button>
+            <button onclick="deleteAllIPs()" style="background: #dc3545;">
+                ⚠️ Supprimer TOUTES les IPs (réinitialisation complète)
+            </button>
+            
+            <div id="rgpdStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+            
+            <div class="info-box" style="margin-top: 15px;">
+                <strong>💡 Conseils :</strong><br>
+                • Ajoutez une mention sur votre page de vote : "En votant, vous acceptez que votre adresse IP soit temporairement stockée pour prévenir les votes multiples"<br>
+                • Créez une page "Politique de confidentialité" expliquant vos pratiques<br>
+                • Respectez les demandes de suppression des utilisateurs
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal d'édition -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>✏️ Modifier le Candidat</h3>
+            <input type="text" id="editPlayerName" placeholder="Nouveau nom">
+            <div class="modal-buttons">
+                <button onclick="saveEdit()" style="background: #28a745;">💾 Enregistrer</button>
+                <button onclick="closeEditModal()" style="background: #6c757d;">❌ Annuler</button>
+            </div>
         </div>
     </div>
 
     <script>
         let supabaseClient;
-        let currentUser = null;
         let players = [];
+        let editingPlayerId = null;
         
-        // Messages par défaut
-        const DEFAULT_MESSAGES = {
-            title: 'Coupe virtuelle du public',
-            invitation: 'Votez pour votre joueur(euse) favori(te) !',
-            thankYou: 'Merci d\'avoir voté !\n\nN\'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives',
-            alreadyVoted: 'Merci, votre vote a déjà été enregistré !\n\nNous avons bien pris en compte votre participation.'
-        };
-        
-        // === AUTHENTIFICATION ===
+        // ============================================
+        // INITIALISATION SUPABASE
+        // ============================================
         
         async function initSupabase() {
             try {
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showLoginMessage('❌ Configuration Supabase manquante dans config.js', 'error');
+                    document.getElementById('configNotice').style.display = 'block';
+                    document.getElementById('configNotice').className = 'config-notice error';
+                    document.getElementById('configNotice').innerHTML = '❌ Erreur: config.js introuvable ou incomplet. Vérifiez vos clés Supabase.';
                     return false;
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
-                // Vérifier si l'utilisateur est déjà connecté
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                if (session) {
-                    currentUser = session.user;
-                    showAdminInterface();
-                } else {
-                    showLoginScreen();
-                }
-                
+                showStatus('✅ Connecté à Supabase', 'success');
                 return true;
             } catch (error) {
-                showLoginMessage('❌ Erreur: ' + error.message, 'error');
+                showStatus('❌ Erreur de connexion: ' + error.message, 'error');
                 return false;
             }
         }
-        
-        function showLoginScreen() {
-            document.getElementById('loginScreen').classList.add('show');
-            document.getElementById('adminContainer').classList.remove('show');
-        }
-        
-        function showAdminInterface() {
-            document.getElementById('loginScreen').classList.remove('show');
-            document.getElementById('adminContainer').classList.add('show');
-            document.getElementById('userEmail').textContent = currentUser.email;
-            loadData();
-        }
-        
-        function hideSetupBox() {
-            document.getElementById('setupBox').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-        
-        function showLoginMessage(message, type) {
-            const msg = document.getElementById('loginMessage');
-            msg.textContent = message;
-            msg.className = `login-message ${type} show`;
-        }
-        
-        // Gestion du formulaire de connexion
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            const loginBtn = document.getElementById('loginBtn');
-            
-            loginBtn.disabled = true;
-            loginBtn.textContent = '⏳ Connexion...';
-            
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                if (error) throw error;
-                
-                currentUser = data.user;
-                showLoginMessage('✅ Connexion réussie !', 'success');
-                
-                setTimeout(() => {
-                    showAdminInterface();
-                }, 1000);
-                
-            } catch (error) {
-                let errorMsg = error.message;
-                if (errorMsg.includes('Invalid login')) {
-                    errorMsg = 'Email ou mot de passe incorrect';
-                }
-                showLoginMessage('❌ ' + errorMsg, 'error');
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Se connecter';
-            }
-        });
-        
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            currentUser = null;
-            players = [];
-            location.reload();
-        }
-        
-        // === FONCTIONS ADMIN ===
         
         function showStatus(message, type = 'loading') {
             const status = document.getElementById('statusMessage');
@@ -612,13 +510,16 @@
             }
         }
         
+        // ============================================
+        // CHARGEMENT DES DONNÉES
+        // ============================================
+        
         async function loadData() {
-            if (!supabaseClient || !currentUser) return;
+            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Chargement des données...', 'loading');
                 
-                // Charger les joueurs
                 const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
                     .select('*')
@@ -629,8 +530,7 @@
                 players = playersData || [];
                 updatePlayerList();
                 
-                // Charger le logo
-                const { data: settingsData } = await supabaseClient
+                const { data: settingsData, error: settingsError } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
@@ -645,6 +545,8 @@
                 await loadSingleVoteSetting();
                 await loadVotesCount();
                 await loadCustomMessages();
+                await loadResultsMessages();
+                await loadRGPDStats();
                 
                 showStatus('✅ Données chargées', 'success');
             } catch (error) {
@@ -654,186 +556,194 @@
         
         async function loadVotesCount() {
             try {
-                const { count } = await supabaseClient
+                const { data, error, count } = await supabaseClient
                     .from('votes')
                     .select('*', { count: 'exact', head: true });
+                
+                if (error) throw error;
                 
                 document.getElementById('totalVotesCount').textContent = count || 0;
             } catch (error) {
                 console.error('Erreur chargement nombre de votes:', error);
+                document.getElementById('totalVotesCount').textContent = '?';
             }
         }
         
         async function loadSingleVoteSetting() {
             try {
-                const { data } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'single_vote_enabled')
                     .single();
                 
                 const checkbox = document.getElementById('singleVoteToggle');
-                checkbox.checked = data?.value === 'true' ? true : true;
+                
+                if (data && data.value !== null) {
+                    checkbox.checked = data.value === 'true';
+                } else {
+                    checkbox.checked = true;
+                }
             } catch (error) {
+                console.error('Erreur chargement paramètre single vote:', error);
                 document.getElementById('singleVoteToggle').checked = true;
             }
         }
         
-        async function toggleSingleVote() {
-            const checkbox = document.getElementById('singleVoteToggle');
-            const enabled = checkbox.checked;
-            const statusDiv = document.getElementById('voteStatusMessage');
-            
-            try {
-                statusDiv.style.display = 'block';
-                statusDiv.style.background = '#fff3cd';
-                statusDiv.style.color = '#856404';
-                statusDiv.textContent = '⏳ Enregistrement...';
-                
-                const { data: existing } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .eq('key', 'single_vote_enabled')
-                    .single();
-                
-                if (existing) {
-                    await supabaseClient
-                        .from('settings')
-                        .update({ value: enabled.toString() })
-                        .eq('key', 'single_vote_enabled');
-                } else {
-                    await supabaseClient
-                        .from('settings')
-                        .insert({ key: 'single_vote_enabled', value: enabled.toString() });
-                }
-                
-                statusDiv.style.background = '#d4edda';
-                statusDiv.style.color = '#155724';
-                statusDiv.textContent = enabled 
-                    ? '✅ Limite activée : 1 vote par IP' 
-                    : '✅ Votes multiples autorisés (mode test)';
-                
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 3000);
-                
-            } catch (error) {
-                statusDiv.style.background = '#f8d7da';
-                statusDiv.style.color = '#721c24';
-                statusDiv.textContent = '❌ Erreur: ' + error.message;
-                checkbox.checked = !enabled;
-            }
-        }
+        // ============================================
+        // GESTION DES CANDIDATS
+        // ============================================
         
-        async function resetVotes() {
-            if (!confirm('⚠️ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservés, seuls les votes seront effacés.')) {
+        async function addPlayer() {
+            if (!supabaseClient) return;
+            
+            const input = document.getElementById('playerName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+            
+            if (players.some(p => p.name === name)) {
+                alert('Ce joueur existe déjà !');
                 return;
             }
             
             try {
-                showStatus('⏳ Suppression de tous les votes...', 'loading');
+                showStatus('⏳ Ajout du joueur...', 'loading');
                 
-                await supabaseClient
-                    .from('votes')
-                    .delete()
-                    .neq('id', 0);
+                const { data, error } = await supabaseClient
+                    .from('players')
+                    .insert({ name: name })
+                    .select();
                 
-                await loadVotesCount();
-                showStatus('✅ Tous les votes ont été supprimés', 'success');
+                if (error) throw error;
                 
+                input.value = '';
+                await loadData();
+                showStatus('✅ Joueur ajouté', 'success');
             } catch (error) {
                 showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
         
-        async function loadCustomMessages() {
-            try {
-                const { data } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
-                
-                const messages = {};
-                if (data) {
-                    data.forEach(item => {
-                        messages[item.key] = item.value;
-                    });
-                }
-                
-                document.getElementById('msgTitle').value = messages.msg_title || DEFAULT_MESSAGES.title;
-                document.getElementById('msgInvitation').value = messages.msg_invitation || DEFAULT_MESSAGES.invitation;
-                document.getElementById('msgThankYou').value = messages.msg_thankyou || DEFAULT_MESSAGES.thankYou;
-                document.getElementById('msgAlreadyVoted').value = messages.msg_alreadyvoted || DEFAULT_MESSAGES.alreadyVoted;
-                
-            } catch (error) {
-                console.error('Erreur chargement messages:', error);
-            }
-        }
-        
-        async function saveMessages() {
-            const statusDiv = document.getElementById('messagesStatus');
+        function updatePlayerList() {
+            const list = document.getElementById('playerList');
+            const count = document.getElementById('playerCount');
             
-            try {
-                statusDiv.style.display = 'block';
-                statusDiv.style.background = '#fff3cd';
-                statusDiv.style.color = '#856404';
-                statusDiv.textContent = '⏳ Enregistrement des messages...';
-                
-                const messages = [
-                    { key: 'msg_title', value: document.getElementById('msgTitle').value || DEFAULT_MESSAGES.title },
-                    { key: 'msg_invitation', value: document.getElementById('msgInvitation').value || DEFAULT_MESSAGES.invitation },
-                    { key: 'msg_thankyou', value: document.getElementById('msgThankYou').value || DEFAULT_MESSAGES.thankYou },
-                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
-                ];
-                
-                for (const msg of messages) {
-                    const { data: existing } = await supabaseClient
-                        .from('settings')
-                        .select('*')
-                        .eq('key', msg.key)
-                        .single();
-                    
-                    if (existing) {
-                        await supabaseClient
-                            .from('settings')
-                            .update({ value: msg.value })
-                            .eq('key', msg.key);
-                    } else {
-                        await supabaseClient
-                            .from('settings')
-                            .insert({ key: msg.key, value: msg.value });
-                    }
-                }
-                
-                statusDiv.style.background = '#d4edda';
-                statusDiv.style.color = '#155724';
-                statusDiv.textContent = '✅ Messages enregistrés avec succès !';
-                
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 3000);
-                
-            } catch (error) {
-                statusDiv.style.background = '#f8d7da';
-                statusDiv.style.color = '#721c24';
-                statusDiv.textContent = '❌ Erreur: ' + error.message;
-            }
-        }
-        
-        async function resetMessagesToDefault() {
-            if (!confirm('Restaurer tous les messages à leurs valeurs par défaut ?')) {
+            count.textContent = players.length;
+            
+            if (players.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: #999;">Aucun candidat pour le moment</li>';
                 return;
             }
             
-            document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
-            document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
-            document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
-            document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
-            
-            await saveMessages();
+            list.innerHTML = players.map(player => `
+                <li class="player-item">
+                    <span>${player.name}</span>
+                    <div class="player-actions">
+                        <button class="edit-btn" onclick="editPlayer(${player.id}, '${player.name.replace(/'/g, "\\'")}')">✏️ Modifier</button>
+                        <button class="delete-btn" onclick="deletePlayer(${player.id})">🗑️ Supprimer</button>
+                    </div>
+                </li>
+            `).join('');
         }
         
-        // Upload du logo avec compression automatique
+        function editPlayer(playerId, playerName) {
+            editingPlayerId = playerId;
+            document.getElementById('editPlayerName').value = playerName;
+            document.getElementById('editModal').classList.add('show');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingPlayerId = null;
+        }
+        
+        async function saveEdit() {
+            if (!supabaseClient || !editingPlayerId) return;
+            
+            const newName = document.getElementById('editPlayerName').value.trim();
+            
+            if (!newName) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+            
+            if (players.some(p => p.name === newName && p.id !== editingPlayerId)) {
+                alert('Ce nom existe déjà pour un autre joueur !');
+                return;
+            }
+            
+            try {
+                showStatus('⏳ Modification en cours...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('players')
+                    .update({ name: newName })
+                    .eq('id', editingPlayerId);
+                
+                if (error) throw error;
+                
+                closeEditModal();
+                await loadData();
+                showStatus('✅ Joueur modifié avec succès', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function deletePlayer(playerId) {
+            if (!confirm('Supprimer ce joueur ?')) return;
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('⏳ Suppression...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('players')
+                    .delete()
+                    .eq('id', playerId);
+                
+                if (error) throw error;
+                
+                await loadData();
+                showStatus('✅ Joueur supprimé', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function clearAll() {
+            if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('⏳ Suppression en cours...', 'loading');
+                
+                await supabaseClient.from('players').delete().neq('id', 0);
+                await supabaseClient.from('votes').delete().neq('id', 0);
+                await supabaseClient.from('settings').delete().eq('key', 'logo');
+                
+                players = [];
+                updatePlayerList();
+                document.getElementById('logoPreview').innerHTML = '';
+                
+                showStatus('✅ Tout a été effacé', 'success');
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function refreshData() {
+            await loadData();
+        }
+        
+        // ============================================
+        // GESTION DU LOGO
+        // ============================================
+        
         document.getElementById('logoUpload').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file || !supabaseClient) return;
@@ -847,7 +757,6 @@
             
             try {
                 const compressedData = await compressImage(file);
-                
                 const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
                 showStatus(`⏳ Enregistrement du logo (${sizeKB} Ko)...`, 'loading');
                 
@@ -858,14 +767,18 @@
                     .single();
                 
                 if (existing) {
-                    await supabaseClient
+                    const { error } = await supabaseClient
                         .from('settings')
                         .update({ value: compressedData })
                         .eq('key', 'logo');
+                    
+                    if (error) throw error;
                 } else {
-                    await supabaseClient
+                    const { error } = await supabaseClient
                         .from('settings')
                         .insert({ key: 'logo', value: compressedData });
+                    
+                    if (error) throw error;
                 }
                 
                 displayLogo(compressedData);
@@ -957,14 +870,17 @@
         
         async function deleteLogo() {
             if (!confirm('Êtes-vous sûr de vouloir supprimer le logo ?')) return;
+            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Suppression du logo...', 'loading');
                 
-                await supabaseClient
+                const { error } = await supabaseClient
                     .from('settings')
                     .delete()
                     .eq('key', 'logo');
+                
+                if (error) throw error;
                 
                 document.getElementById('logoPreview').innerHTML = '';
                 document.getElementById('deleteLogoBtn').style.display = 'none';
@@ -976,154 +892,414 @@
             }
         }
         
-        async function addPlayer() {
-            if (!supabaseClient) return;
+        // ============================================
+        // GESTION DES VOTES
+        // ============================================
+        
+        async function toggleSingleVote() {
+            const checkbox = document.getElementById('singleVoteToggle');
+            const enabled = checkbox.checked;
+            const statusDiv = document.getElementById('voteStatusMessage');
             
-            const input = document.getElementById('playerName');
-            const name = input.value.trim();
-            
-            if (!name) {
-                alert('Veuillez entrer un nom');
-                return;
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Enregistrement...';
+                
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                if (existing) {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .update({ value: enabled.toString() })
+                        .eq('key', 'single_vote_enabled');
+                    
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'single_vote_enabled', value: enabled.toString() });
+                    
+                    if (error) throw error;
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = enabled 
+                    ? '✅ Limite activée : 1 vote par IP' 
+                    : '✅ Votes multiples autorisés (mode test)';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
+                checkbox.checked = !enabled;
             }
-            
-            if (players.some(p => p.name === name)) {
-                alert('Ce joueur existe déjà !');
+        }
+        
+        async function resetVotes() {
+            if (!confirm('⚠️ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservés, seuls les votes seront effacés.')) {
                 return;
             }
             
             try {
-                showStatus('⏳ Ajout du joueur...', 'loading');
+                showStatus('⏳ Suppression de tous les votes...', 'loading');
                 
-                await supabaseClient
-                    .from('players')
-                    .insert({ name: name });
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .neq('id', 0);
                 
-                input.value = '';
-                await loadData();
-                showStatus('✅ Joueur ajouté', 'success');
+                if (error) throw error;
+                
+                await loadVotesCount();
+                await loadRGPDStats();
+                showStatus('✅ Tous les votes ont été supprimés', 'success');
+                
             } catch (error) {
                 showStatus('❌ Erreur: ' + error.message, 'error');
             }
         }
         
-        async function analyzeImage() {
-            const fileInput = document.getElementById('ocrImage');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('Veuillez sélectionner une image');
-                return;
+        // ============================================
+        // MESSAGES DU SONDAGE
+        // ============================================
+        
+        const DEFAULT_MESSAGES = {
+            title: 'Coupe virtuelle du public',
+            invitation: 'Votez pour votre joueur(euse) favori(te) !',
+            thankYou: 'Merci d\'avoir voté !\n\nN\'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives',
+            alreadyVoted: 'Merci, votre vote a déjà été enregistré !\n\nNous avons bien pris en compte votre participation.'
+        };
+        
+        async function loadCustomMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
+                
+                if (error) throw error;
+                
+                const messages = {};
+                if (data) {
+                    data.forEach(item => {
+                        messages[item.key] = item.value;
+                    });
+                }
+                
+                document.getElementById('msgTitle').value = messages.msg_title || DEFAULT_MESSAGES.title;
+                document.getElementById('msgInvitation').value = messages.msg_invitation || DEFAULT_MESSAGES.invitation;
+                document.getElementById('msgThankYou').value = messages.msg_thankyou || DEFAULT_MESSAGES.thankYou;
+                document.getElementById('msgAlreadyVoted').value = messages.msg_alreadyvoted || DEFAULT_MESSAGES.alreadyVoted;
+                
+            } catch (error) {
+                console.error('Erreur chargement messages:', error);
+                document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
+                document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
+                document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
+                document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
             }
-            
-            if (!supabaseClient) return;
-            
-            const status = document.getElementById('ocrStatus');
-            status.className = 'loading';
-            status.textContent = '🔄 Analyse en cours... Cela peut prendre quelques secondes.';
+        }
+        
+        async function saveMessages() {
+            const statusDiv = document.getElementById('messagesStatus');
             
             try {
-                const result = await Tesseract.recognize(file, 'fra+eng', {
-                    logger: m => console.log(m)
-                });
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Enregistrement des messages...';
                 
-                const text = result.data.text;
-                const lines = text.split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 2 && line.length < 50);
+                const messages = [
+                    { key: 'msg_title', value: document.getElementById('msgTitle').value || DEFAULT_MESSAGES.title },
+                    { key: 'msg_invitation', value: document.getElementById('msgInvitation').value || DEFAULT_MESSAGES.invitation },
+                    { key: 'msg_thankyou', value: document.getElementById('msgThankYou').value || DEFAULT_MESSAGES.thankYou },
+                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
+                ];
                 
-                let addedCount = 0;
-                
-                for (const name of lines) {
-                    if (!players.some(p => p.name === name)) {
-                        try {
-                            await supabaseClient
-                                .from('players')
-                                .insert({ name: name });
-                            addedCount++;
-                        } catch (err) {
-                            console.error('Erreur ajout:', name, err);
-                        }
+                for (const msg of messages) {
+                    const { data: existing } = await supabaseClient
+                        .from('settings')
+                        .select('*')
+                        .eq('key', msg.key)
+                        .single();
+                    
+                    if (existing) {
+                        await supabaseClient
+                            .from('settings')
+                            .update({ value: msg.value })
+                            .eq('key', msg.key);
+                    } else {
+                        await supabaseClient
+                            .from('settings')
+                            .insert({ key: msg.key, value: msg.value });
                     }
                 }
                 
-                await loadData();
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = '✅ Messages du sondage enregistrés !';
                 
-                status.className = 'success';
-                status.textContent = `✅ Analyse terminée ! ${addedCount} nouveau(x) nom(s) ajouté(s).`;
-                
-                fileInput.value = '';
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
                 
             } catch (error) {
-                status.className = 'error';
-                status.textContent = '❌ Erreur lors de l\'analyse : ' + error.message;
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
             }
         }
         
-        function updatePlayerList() {
-            const list = document.getElementById('playerList');
-            const count = document.getElementById('playerCount');
-            
-            count.textContent = players.length;
-            
-            if (players.length === 0) {
-                list.innerHTML = '<li style="text-align: center; color: #999;">Aucun candidat pour le moment</li>';
+        async function resetMessagesToDefault() {
+            if (!confirm('Restaurer tous les messages du sondage à leurs valeurs par défaut ?')) {
                 return;
             }
             
-            list.innerHTML = players.map(player => `
-                <li class="player-item">
-                    <span>${player.name}</span>
-                    <button class="delete-btn" onclick="deletePlayer(${player.id})">Supprimer</button>
-                </li>
-            `).join('');
+            document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
+            document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
+            document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
+            document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
+            
+            await saveMessages();
         }
         
-        async function deletePlayer(playerId) {
-            if (!confirm('Supprimer ce joueur ?')) return;
+        // ============================================
+        // MESSAGES DES RÉSULTATS
+        // ============================================
+        
+        const DEFAULT_RESULTS_MESSAGES = {
+            title: '🏆 Résultats du Vote 🏆',
+            subtitle: 'Coupe virtuelle du public',
+            noVotes: 'Aucun vote pour le moment...\nSoyez le premier à voter ! 🥋',
+            refresh: 'Mise à jour en temps réel'
+        };
+        
+        async function loadResultsMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .in('key', ['msg_results_title', 'msg_results_subtitle', 'msg_results_no_votes', 'msg_results_refresh']);
+                
+                if (error) throw error;
+                
+                const messages = {};
+                if (data) {
+                    data.forEach(item => {
+                        messages[item.key] = item.value;
+                    });
+                }
+                
+                document.getElementById('msgResultsTitle').value = messages.msg_results_title || DEFAULT_RESULTS_MESSAGES.title;
+                document.getElementById('msgResultsSubtitle').value = messages.msg_results_subtitle || DEFAULT_RESULTS_MESSAGES.subtitle;
+                document.getElementById('msgResultsNoVotes').value = messages.msg_results_no_votes || DEFAULT_RESULTS_MESSAGES.noVotes;
+                document.getElementById('msgResultsRefresh').value = messages.msg_results_refresh || DEFAULT_RESULTS_MESSAGES.refresh;
+                
+            } catch (error) {
+                console.error('Erreur chargement messages résultats:', error);
+                document.getElementById('msgResultsTitle').value = DEFAULT_RESULTS_MESSAGES.title;
+                document.getElementById('msgResultsSubtitle').value = DEFAULT_RESULTS_MESSAGES.subtitle;
+                document.getElementById('msgResultsNoVotes').value = DEFAULT_RESULTS_MESSAGES.noVotes;
+                document.getElementById('msgResultsRefresh').value = DEFAULT_RESULTS_MESSAGES.refresh;
+            }
+        }
+        
+        async function saveResultsMessages() {
+            const statusDiv = document.getElementById('resultsMessagesStatus');
             
             try {
-                showStatus('⏳ Suppression...', 'loading');
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Enregistrement des messages...';
                 
-                await supabaseClient
-                    .from('players')
+                const messages = [
+                    { key: 'msg_results_title', value: document.getElementById('msgResultsTitle').value || DEFAULT_RESULTS_MESSAGES.title },
+                    { key: 'msg_results_subtitle', value: document.getElementById('msgResultsSubtitle').value || DEFAULT_RESULTS_MESSAGES.subtitle },
+                    { key: 'msg_results_no_votes', value: document.getElementById('msgResultsNoVotes').value || DEFAULT_RESULTS_MESSAGES.noVotes },
+                    { key: 'msg_results_refresh', value: document.getElementById('msgResultsRefresh').value || DEFAULT_RESULTS_MESSAGES.refresh }
+                ];
+                
+                for (const msg of messages) {
+                    const { data: existing } = await supabaseClient
+                        .from('settings')
+                        .select('*')
+                        .eq('key', msg.key)
+                        .single();
+                    
+                    if (existing) {
+                        await supabaseClient
+                            .from('settings')
+                            .update({ value: msg.value })
+                            .eq('key', msg.key);
+                    } else {
+                        await supabaseClient
+                            .from('settings')
+                            .insert({ key: msg.key, value: msg.value });
+                    }
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = '✅ Messages des résultats enregistrés !';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
+            }
+        }
+        
+        async function resetResultsMessagesToDefault() {
+            if (!confirm('Restaurer tous les messages des résultats à leurs valeurs par défaut ?')) {
+                return;
+            }
+            
+            document.getElementById('msgResultsTitle').value = DEFAULT_RESULTS_MESSAGES.title;
+            document.getElementById('msgResultsSubtitle').value = DEFAULT_RESULTS_MESSAGES.subtitle;
+            document.getElementById('msgResultsNoVotes').value = DEFAULT_RESULTS_MESSAGES.noVotes;
+            document.getElementById('msgResultsRefresh').value = DEFAULT_RESULTS_MESSAGES.refresh;
+            
+            await saveResultsMessages();
+        }
+        
+        // ============================================
+        // GESTION RGPD
+        // ============================================
+        
+        async function loadRGPDStats() {
+            try {
+                const { data: votes, error: votesError, count } = await supabaseClient
+                    .from('votes')
+                    .select('voted_at', { count: 'exact' })
+                    .order('voted_at', { ascending: true });
+                
+                if (votesError) throw votesError;
+                
+                document.getElementById('ipCount').textContent = count || 0;
+                
+                if (votes && votes.length > 0) {
+                    const oldestVote = new Date(votes[0].voted_at);
+                    const today = new Date();
+                    const daysDiff = Math.floor((today - oldestVote) / (1000 * 60 * 60 * 24));
+                    document.getElementById('oldestVote').textContent = daysDiff;
+                } else {
+                    document.getElementById('oldestVote').textContent = '0';
+                }
+                
+            } catch (error) {
+                console.error('Erreur chargement stats RGPD:', error);
+                document.getElementById('ipCount').textContent = '?';
+                document.getElementById('oldestVote').textContent = '?';
+            }
+        }
+        
+        async function anonymizeOldIPs() {
+            if (!confirm('Anonymiser toutes les adresses IP de plus de 30 jours ?\n\nLes votes seront conservés mais les IPs seront remplacées par "anonymized".')) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('rgpdStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Anonymisation en cours...';
+                
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                const { data, error } = await supabaseClient
+                    .from('votes')
+                    .update({ ip_address: 'anonymized' })
+                    .lt('voted_at', thirtyDaysAgo.toISOString());
+                
+                if (error) throw error;
+                
+                await loadRGPDStats();
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = '✅ IPs anciennes anonymisées avec succès';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
+            }
+        }
+        
+        async function deleteAllIPs() {
+            if (!confirm('⚠️ ATTENTION : Supprimer TOUTES les adresses IP ?\n\nLes votes seront supprimés. Cette action est IRRÉVERSIBLE.')) {
+                return;
+            }
+            
+            if (!confirm('Êtes-vous ABSOLUMENT SÛR ? Cette action supprime tous les votes.')) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('rgpdStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = '⏳ Suppression en cours...';
+                
+                const { error } = await supabaseClient
+                    .from('votes')
                     .delete()
-                    .eq('id', playerId);
+                    .neq('id', 0);
                 
-                await loadData();
-                showStatus('✅ Joueur supprimé', 'success');
+                if (error) throw error;
+                
+                await loadVotesCount();
+                await loadRGPDStats();
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = '✅ Toutes les IPs ont été supprimées';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
             } catch (error) {
-                showStatus('❌ Erreur: ' + error.message, 'error');
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = '❌ Erreur: ' + error.message;
             }
         }
         
-        async function clearAll() {
-            if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
-            
-            try {
-                showStatus('⏳ Suppression en cours...', 'loading');
-                
-                await supabaseClient.from('players').delete().neq('id', 0);
-                await supabaseClient.from('votes').delete().neq('id', 0);
-                await supabaseClient.from('settings').delete().eq('key', 'logo');
-                
-                players = [];
-                updatePlayerList();
-                document.getElementById('logoPreview').innerHTML = '';
-                
-                showStatus('✅ Tout a été effacé', 'success');
-            } catch (error) {
-                showStatus('❌ Erreur: ' + error.message, 'error');
-            }
-        }
+        // ============================================
+        // INITIALISATION
+        // ============================================
         
-        async function refreshData() {
-            await loadData();
-        }
-        
-        // Initialiser au chargement
         window.addEventListener('DOMContentLoaded', async () => {
-            await initSupabase();
+            const initialized = await initSupabase();
+            if (initialized) {
+                await loadData();
+            }
         });
     </script>
 </body>
