@@ -796,9 +796,48 @@
         });
     
         // --- NEW: charge les textes dynamiques depuis Supabase.settings ---
+        
         async function loadMessages() {
             try {
                 const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('id, key, value');
+                if (error) throw error;
+                
+                // Garder la valeur la plus récente pour chaque clé (max id)
+                const latest = {};
+                for (const row of (data || [])) {
+                    const k = row.key;
+                    if (!latest[k] || row.id > latest[k].id) {
+                        latest[k] = row;
+                    }
+                }
+                const map = Object.fromEntries(Object.entries(latest).map(([k, v]) => [k, v.value]));
+
+                const $ = (id) => document.getElementById(id);
+
+                if ($('pageTitle')) {
+                    const newTitle = map['msg_title'] || $('pageTitle').textContent;
+                    $('pageTitle').textContent = newTitle;
+                    document.title = newTitle;
+                }
+                if ($('invitationText')) {
+                    $('invitationText').innerHTML = (map['msg_invitation'] || $('invitationText').innerHTML).replace(/
+/g, '<br>');
+                }
+                if ($('thankYouText')) {
+                    $('thankYouText').innerHTML = (map['msg_thankyou'] || $('thankYouText').innerHTML).replace(/
+/g, '<br>');
+                }
+                if ($('alreadyVotedText')) {
+                    $('alreadyVotedText').innerHTML = (map['msg_alreadyvoted'] || $('alreadyVotedText').innerHTML).replace(/
+/g, '<br>');
+                }
+            } catch (e) {
+                console.warn('loadMessages(): utilisation des valeurs par défaut (échec de chargement)', e);
+            }
+        }
+= await supabaseClient
                     .from('settings')
                     .select('key, value')
                     .in('key', ['msg_title','msg_invitation','msg_thankyou','msg_alreadyvoted'])
