@@ -583,8 +583,6 @@
         }
         
         async function loadData() {
-            await loadMessages(); // NEW: applique les textes dynamiques
-
             if (!supabaseClient) return;
             
             try {
@@ -597,7 +595,9 @@
                 if (voted) {
                     showAlreadyVoted();
                     await loadLogo();
-                    document.getElementById('loadingMessage').style.display = 'none';
+                    
+                loadMessages(); // non-blocking: apply dynamic texts
+document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     return;
                 }
@@ -795,39 +795,42 @@
             }
         });
     
-        // --- NEW: charge les textes dynamiques depuis Supabase.settings ---
-        async function loadMessages() {
+        // === Injected: dynamic texts loader from Supabase.settings ===
+        function loadMessages() {
             try {
-                const { data, error } = await supabaseClient
+                if (!window.supabaseClient) return;
+                return supabaseClient
                     .from('settings')
-                    .select('key, value')
-                    .in('key', ['msg_title','msg_invitation','msg_thankyou','msg_alreadyvoted'])
-                    .order('inserted_at', { ascending: false }); // si la colonne existe, sinon pas grave
+                    .select('id, key, value')
+                    .then(({ data, error }) => {
+                        if (error) { console.warn('settings error:', error); return; }
+                        const latest = {};
+                        (data || []).forEach(row => {
+                            if (!latest[row.key] || row.id > latest[row.key].id) latest[row.key] = row;
+                        });
+                        const map = {};
+                        Object.keys(latest).forEach(k => map[k] = latest[k].value);
 
-                if (error) throw error;
-                const map = {};
-                (data || []).forEach(row => {
-                    // garde la dernière valeur rencontrée pour chaque clé
-                    if (!(row.key in map)) map[row.key] = row.value;
-                });
+                        const $ = (id) => document.getElementById(id);
 
-                const $ = (id) => document.getElementById(id);
-
-                if ($('pageTitle')) {
-                    $('pageTitle').textContent = map['msg_title'] || $('pageTitle').textContent;
-                    document.title = $('pageTitle').textContent;
-                }
-                if ($('invitationText')) {
-                    $('invitationText').innerHTML = (map['msg_invitation'] || $('invitationText').innerHTML).replace(/\\n/g, '<br>');
-                }
-                if ($('thankYouText')) {
-                    $('thankYouText').innerHTML = (map['msg_thankyou'] || $('thankYouText').innerHTML).replace(/\\n/g, '<br>');
-                }
-                if ($('alreadyVotedText')) {
-                    $('alreadyVotedText').innerHTML = (map['msg_alreadyvoted'] || $('alreadyVotedText').innerHTML).replace(/\\n/g, '<br>');
-                }
+                        if ($('pageTitle')) {
+                            const newTitle = map['msg_title'] || $('pageTitle').textContent;
+                            $('pageTitle').textContent = newTitle;
+                            document.title = newTitle;
+                        }
+                        if ($('invitationText')) {
+                            $('invitationText').innerHTML = (map['msg_invitation'] || $('invitationText').innerHTML).replace(/\n/g, '<br>');
+                        }
+                        if ($('thankYouText')) {
+                            $('thankYouText').innerHTML = (map['msg_thankyou'] || $('thankYouText').innerHTML).replace(/\n/g, '<br>');
+                        }
+                        if ($('alreadyVotedText')) {
+                            $('alreadyVotedText').innerHTML = (map['msg_alreadyvoted'] || $('alreadyVotedText').innerHTML).replace(/\n/g, '<br>');
+                        }
+                    })
+                    .catch(e => console.warn('loadMessages() failed softly:', e));
             } catch (e) {
-                console.warn('loadMessages(): utilisation des valeurs par défaut (échec de chargement)', e);
+                console.warn('loadMessages() soft failure:', e);
             }
         }
 </script>
