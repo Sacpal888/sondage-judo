@@ -21,70 +21,177 @@
             padding: 20px;
         }
         
-        /* Style pour l'écran de connexion */
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
+        /* === ÉCRAN DE CONNEXION === */
+        .login-screen {
+            display: none;
+            max-width: 450px;
+            margin: 50px auto;
             background: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .login-screen.show {
+            display: block;
+        }
+        
+        .login-screen h1 {
+            color: #333;
+            margin-bottom: 10px;
             text-align: center;
         }
         
-        .login-container h2 {
-            color: #333;
-            margin-bottom: 30px;
+        .security-badge {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
         }
         
-        .login-container input[type="password"] {
+        .setup-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .setup-box h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .setup-box ol {
+            margin-left: 20px;
+            line-height: 1.8;
+            color: #856404;
+        }
+        
+        .setup-box code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        .form-group input {
             width: 100%;
             padding: 12px;
-            margin-bottom: 20px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
         }
         
-        .login-container button {
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
             width: 100%;
+            padding: 15px;
             background: #667eea;
             color: white;
             border: none;
-            padding: 12px 25px;
             border-radius: 8px;
-            cursor: pointer;
             font-size: 16px;
             font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s;
         }
         
-        .login-container button:hover {
+        .login-btn:hover {
             background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
-        .login-error {
-            color: #dc3545;
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .setup-btn {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
             margin-top: 15px;
-            display: none;
         }
         
+        /* === INTERFACE ADMIN === */
         .container {
+            display: none;
             max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            display: none; /* Caché par défaut */
         }
         
-        h1 {
+        .container.show {
+            display: block;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .admin-header h1 {
             color: #333;
-            margin-bottom: 30px;
-            text-align: center;
+            font-size: 1.8em;
+        }
+        
+        .user-badge {
+            text-align: right;
+        }
+        
+        .user-email {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
         }
         
         .section {
@@ -100,13 +207,19 @@
             font-size: 1.3em;
         }
         
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="file"], textarea {
             width: 100%;
             padding: 12px;
             margin-bottom: 10px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
+        }
+        
+        textarea {
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
         }
         
         button {
@@ -160,26 +273,26 @@
             background: #c82333;
         }
         
-        #ocrStatus, #statusMessage {
+        #ocrStatus, #statusMessage, #voteStatusMessage, #messagesStatus {
             margin-top: 10px;
             padding: 10px;
             border-radius: 6px;
             display: none;
         }
         
-        #ocrStatus.loading, #statusMessage.loading {
+        #ocrStatus.loading, #statusMessage.loading, #voteStatusMessage.loading {
             display: block;
             background: #fff3cd;
             color: #856404;
         }
         
-        #ocrStatus.success, #statusMessage.success {
+        #ocrStatus.success, #statusMessage.success, #voteStatusMessage.success, #messagesStatus.success {
             display: block;
             background: #d4edda;
             color: #155724;
         }
         
-        #ocrStatus.error, #statusMessage.error {
+        #ocrStatus.error, #statusMessage.error, #voteStatusMessage.error, #messagesStatus.error {
             display: block;
             background: #f8d7da;
             color: #721c24;
@@ -215,40 +328,78 @@
             background: #f8d7da;
             border-color: #dc3545;
         }
-
-        .logout-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #dc3545;
-            padding: 10px 20px;
+        
+        .login-message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
             font-size: 14px;
-            z-index: 1000;
+            display: none;
         }
-
-        .logout-btn:hover {
-            background: #c82333;
+        
+        .login-message.show {
+            display: block;
+        }
+        
+        .login-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .login-message.success {
+            background: #d4edda;
+            color: #155724;
         }
     </style>
 </head>
 <body>
-    <!-- Écran de connexion -->
-    <div class="login-container" id="loginContainer">
-        <h2>🔐 Connexion Administration</h2>
-        <input type="password" id="passwordInput" placeholder="Mot de passe" onkeypress="if(event.key==='Enter') login()">
-        <button onclick="login()">Se connecter</button>
-        <div class="login-error" id="loginError">Mot de passe incorrect</div>
+    <!-- ÉCRAN DE CONNEXION -->
+    <div class="login-screen" id="loginScreen">
+        <h1>🔐 Connexion Sécurisée</h1>
+        
+        <div class="security-badge">
+            ✅ Authentification cryptée via Supabase
+        </div>
+        
+        <div class="setup-box" id="setupBox">
+            <h3>⚙️ Configuration (une seule fois)</h3>
+            <ol>
+                <li>Allez sur <strong>supabase.com</strong> → Votre projet</li>
+                <li>Menu <strong>"Authentication"</strong> → <strong>"Users"</strong></li>
+                <li>Cliquez <strong>"Add user"</strong> → <strong>"Create new user"</strong></li>
+                <li>Email: <code>votre@email.com</code> + mot de passe fort</li>
+                <li>✅ Cochez <strong>"Auto Confirm User"</strong></li>
+                <li>Cliquez <strong>"Create user"</strong></li>
+            </ol>
+            <button class="setup-btn" onclick="hideSetupBox()">J'ai créé mon compte ✅</button>
+        </div>
+        
+        <form id="loginForm" style="display: none;">
+            <div class="form-group">
+                <label for="emailInput">📧 Email administrateur</label>
+                <input type="email" id="emailInput" placeholder="admin@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordInput">🔒 Mot de passe</label>
+                <input type="password" id="passwordInput" placeholder="Votre mot de passe sécurisé" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">Se connecter</button>
+        </form>
+        
+        <div class="login-message" id="loginMessage"></div>
     </div>
 
-    <!-- Bouton de déconnexion -->
-    <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">🚪 Déconnexion</button>
-
-    <!-- Interface d'administration (cachée par défaut) -->
+    <!-- INTERFACE ADMIN COMPLÈTE -->
     <div class="container" id="adminContainer">
-        <h1>🛠️ Administration - Gestion des Candidats</h1>
-        
-        <div id="configNotice" class="config-notice" style="display: none;">
-            ⚠️ Configuration Supabase requise dans config.js
+        <div class="admin-header">
+            <h1>🛠️ Administration - Gestion des Candidats</h1>
+            <div class="user-badge">
+                <div class="user-email">👤 <span id="userEmail"></span></div>
+                <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+            </div>
         </div>
 
         <div id="statusMessage"></div>
@@ -339,90 +490,115 @@
     </div>
 
     <script>
-        // ====================================
-        // SYSTÈME D'AUTHENTIFICATION
-        // ====================================
-        const ADMIN_PASSWORD = "admin123"; // CHANGEZ CE MOT DE PASSE !
-        
-        function checkAuth() {
-            const isAuthenticated = sessionStorage.getItem('adminAuthenticated') === 'true';
-            if (isAuthenticated) {
-                showAdminInterface();
-            } else {
-                showLoginForm();
-            }
-        }
-        
-        function login() {
-            const password = document.getElementById('passwordInput').value;
-            const errorDiv = document.getElementById('loginError');
-            
-            if (password === ADMIN_PASSWORD) {
-                sessionStorage.setItem('adminAuthenticated', 'true');
-                showAdminInterface();
-                errorDiv.style.display = 'none';
-            } else {
-                errorDiv.style.display = 'block';
-                document.getElementById('passwordInput').value = '';
-            }
-        }
-        
-        function logout() {
-            sessionStorage.removeItem('adminAuthenticated');
-            showLoginForm();
-        }
-        
-        function showLoginForm() {
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('adminContainer').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'none';
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('loginError').style.display = 'none';
-        }
-        
-        function showAdminInterface() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('adminContainer').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'block';
-            
-            // Initialiser Supabase seulement après authentification
-            if (!window.supabaseInitialized) {
-                initSupabase().then(initialized => {
-                    if (initialized) {
-                        loadData();
-                        window.supabaseInitialized = true;
-                    }
-                });
-            }
-        }
-
-        // ====================================
-        // CODE ORIGINAL DE cases_supabase.html
-        // ====================================
-        
         let supabaseClient;
+        let currentUser = null;
         let players = [];
         
-        // Initialiser Supabase
+        // Messages par défaut
+        const DEFAULT_MESSAGES = {
+            title: 'Coupe virtuelle du public',
+            invitation: 'Votez pour votre joueur(euse) favori(te) !',
+            thankYou: 'Merci d\'avoir voté !\n\nN\'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives',
+            alreadyVoted: 'Merci, votre vote a déjà été enregistré !\n\nNous avons bien pris en compte votre participation.'
+        };
+        
+        // === AUTHENTIFICATION ===
+        
         async function initSupabase() {
             try {
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    document.getElementById('configNotice').style.display = 'block';
-                    document.getElementById('configNotice').className = 'config-notice error';
-                    document.getElementById('configNotice').innerHTML = '❌ Erreur: config.js introuvable ou incomplet. Vérifiez vos clés Supabase.';
+                    showLoginMessage('❌ Configuration Supabase manquante dans config.js', 'error');
                     return false;
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                showStatus('✅ Connecté à Supabase', 'success');
+                
+                // Vérifier si l'utilisateur est déjà connecté
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    currentUser = session.user;
+                    showAdminInterface();
+                } else {
+                    showLoginScreen();
+                }
+                
                 return true;
             } catch (error) {
-                showStatus('❌ Erreur de connexion: ' + error.message, 'error');
+                showLoginMessage('❌ Erreur: ' + error.message, 'error');
                 return false;
             }
         }
         
-        // Afficher un message de statut
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.add('show');
+            document.getElementById('adminContainer').classList.remove('show');
+        }
+        
+        function showAdminInterface() {
+            document.getElementById('loginScreen').classList.remove('show');
+            document.getElementById('adminContainer').classList.add('show');
+            document.getElementById('userEmail').textContent = currentUser.email;
+            loadData();
+        }
+        
+        function hideSetupBox() {
+            document.getElementById('setupBox').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        function showLoginMessage(message, type) {
+            const msg = document.getElementById('loginMessage');
+            msg.textContent = message;
+            msg.className = `login-message ${type} show`;
+        }
+        
+        // Gestion du formulaire de connexion
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = '⏳ Connexion...';
+            
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                showLoginMessage('✅ Connexion réussie !', 'success');
+                
+                setTimeout(() => {
+                    showAdminInterface();
+                }, 1000);
+                
+            } catch (error) {
+                let errorMsg = error.message;
+                if (errorMsg.includes('Invalid login')) {
+                    errorMsg = 'Email ou mot de passe incorrect';
+                }
+                showLoginMessage('❌ ' + errorMsg, 'error');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Se connecter';
+            }
+        });
+        
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            players = [];
+            location.reload();
+        }
+        
+        // === FONCTIONS ADMIN ===
+        
         function showStatus(message, type = 'loading') {
             const status = document.getElementById('statusMessage');
             status.className = type;
@@ -436,9 +612,8 @@
             }
         }
         
-        // Charger les données depuis Supabase
         async function loadData() {
-            if (!supabaseClient) return;
+            if (!supabaseClient || !currentUser) return;
             
             try {
                 showStatus('⏳ Chargement des données...', 'loading');
@@ -455,7 +630,7 @@
                 updatePlayerList();
                 
                 // Charger le logo
-                const { data: settingsData, error: settingsError } = await supabaseClient
+                const { data: settingsData } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
@@ -467,13 +642,8 @@
                     displayLogo(null);
                 }
                 
-                // Charger le paramètre single vote
                 await loadSingleVoteSetting();
-                
-                // Charger le nombre de votes
                 await loadVotesCount();
-                
-                // Charger les messages personnalisés
                 await loadCustomMessages();
                 
                 showStatus('✅ Données chargées', 'success');
@@ -482,46 +652,33 @@
             }
         }
         
-        // Charger le nombre total de votes
         async function loadVotesCount() {
             try {
-                const { data, error, count } = await supabaseClient
+                const { count } = await supabaseClient
                     .from('votes')
                     .select('*', { count: 'exact', head: true });
-                
-                if (error) throw error;
                 
                 document.getElementById('totalVotesCount').textContent = count || 0;
             } catch (error) {
                 console.error('Erreur chargement nombre de votes:', error);
-                document.getElementById('totalVotesCount').textContent = '?';
             }
         }
         
-        // Charger le paramètre single vote
         async function loadSingleVoteSetting() {
             try {
-                const { data, error } = await supabaseClient
+                const { data } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'single_vote_enabled')
                     .single();
                 
                 const checkbox = document.getElementById('singleVoteToggle');
-                
-                if (data && data.value !== null) {
-                    checkbox.checked = data.value === 'true';
-                } else {
-                    // Par défaut, activé
-                    checkbox.checked = true;
-                }
+                checkbox.checked = data?.value === 'true' ? true : true;
             } catch (error) {
-                console.error('Erreur chargement paramètre single vote:', error);
                 document.getElementById('singleVoteToggle').checked = true;
             }
         }
         
-        // Toggle single vote
         async function toggleSingleVote() {
             const checkbox = document.getElementById('singleVoteToggle');
             const enabled = checkbox.checked;
@@ -533,7 +690,6 @@
                 statusDiv.style.color = '#856404';
                 statusDiv.textContent = '⏳ Enregistrement...';
                 
-                // Vérifier si le paramètre existe
                 const { data: existing } = await supabaseClient
                     .from('settings')
                     .select('*')
@@ -541,20 +697,14 @@
                     .single();
                 
                 if (existing) {
-                    // Mettre à jour
-                    const { error } = await supabaseClient
+                    await supabaseClient
                         .from('settings')
                         .update({ value: enabled.toString() })
                         .eq('key', 'single_vote_enabled');
-                    
-                    if (error) throw error;
                 } else {
-                    // Insérer
-                    const { error } = await supabaseClient
+                    await supabaseClient
                         .from('settings')
                         .insert({ key: 'single_vote_enabled', value: enabled.toString() });
-                    
-                    if (error) throw error;
                 }
                 
                 statusDiv.style.background = '#d4edda';
@@ -571,13 +721,10 @@
                 statusDiv.style.background = '#f8d7da';
                 statusDiv.style.color = '#721c24';
                 statusDiv.textContent = '❌ Erreur: ' + error.message;
-                
-                // Revenir à l'état précédent
                 checkbox.checked = !enabled;
             }
         }
         
-        // Réinitialiser tous les votes
         async function resetVotes() {
             if (!confirm('⚠️ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservés, seuls les votes seront effacés.')) {
                 return;
@@ -586,12 +733,10 @@
             try {
                 showStatus('⏳ Suppression de tous les votes...', 'loading');
                 
-                const { error } = await supabaseClient
+                await supabaseClient
                     .from('votes')
                     .delete()
-                    .neq('id', 0); // Supprime tous les enregistrements
-                
-                if (error) throw error;
+                    .neq('id', 0);
                 
                 await loadVotesCount();
                 showStatus('✅ Tous les votes ont été supprimés', 'success');
@@ -601,25 +746,13 @@
             }
         }
         
-        // Messages par défaut
-        const DEFAULT_MESSAGES = {
-            title: 'Coupe virtuelle du public',
-            invitation: 'Votez pour votre joueur(euse) favori(te) !',
-            thankYou: 'Merci d\'avoir voté !\n\nN\'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives',
-            alreadyVoted: 'Merci, votre vote a déjà été enregistré !\n\nNous avons bien pris en compte votre participation.'
-        };
-        
-        // Charger les messages personnalisés
         async function loadCustomMessages() {
             try {
-                const { data, error } = await supabaseClient
+                const { data } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
                 
-                if (error) throw error;
-                
-                // Remplir les champs avec les valeurs sauvegardées ou par défaut
                 const messages = {};
                 if (data) {
                     data.forEach(item => {
@@ -634,15 +767,9 @@
                 
             } catch (error) {
                 console.error('Erreur chargement messages:', error);
-                // En cas d'erreur, utiliser les valeurs par défaut
-                document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
-                document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
-                document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
-                document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
             }
         }
         
-        // Sauvegarder les messages personnalisés
         async function saveMessages() {
             const statusDiv = document.getElementById('messagesStatus');
             
@@ -659,7 +786,6 @@
                     { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
                 ];
                 
-                // Pour chaque message, vérifier s'il existe et update ou insert
                 for (const msg of messages) {
                     const { data: existing } = await supabaseClient
                         .from('settings')
@@ -694,7 +820,6 @@
             }
         }
         
-        // Restaurer les messages par défaut
         async function resetMessagesToDefault() {
             if (!confirm('Restaurer tous les messages à leurs valeurs par défaut ?')) {
                 return;
@@ -705,7 +830,6 @@
             document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
             document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
             
-            // Sauvegarder automatiquement
             await saveMessages();
         }
         
@@ -714,7 +838,6 @@
             const file = e.target.files[0];
             if (!file || !supabaseClient) return;
             
-            // Vérifier le type de fichier
             if (!file.type.match('image.*')) {
                 alert('Veuillez sélectionner une image (PNG, JPG, etc.)');
                 return;
@@ -723,14 +846,11 @@
             showStatus('⏳ Optimisation de l\'image...', 'loading');
             
             try {
-                // Compresser et redimensionner l'image
                 const compressedData = await compressImage(file);
                 
-                // Afficher la taille
                 const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
                 showStatus(`⏳ Enregistrement du logo (${sizeKB} Ko)...`, 'loading');
                 
-                // Vérifier si le logo existe déjà
                 const { data: existing } = await supabaseClient
                     .from('settings')
                     .select('*')
@@ -738,20 +858,14 @@
                     .single();
                 
                 if (existing) {
-                    // Mettre à jour
-                    const { error } = await supabaseClient
+                    await supabaseClient
                         .from('settings')
                         .update({ value: compressedData })
                         .eq('key', 'logo');
-                    
-                    if (error) throw error;
                 } else {
-                    // Insérer
-                    const { error } = await supabaseClient
+                    await supabaseClient
                         .from('settings')
                         .insert({ key: 'logo', value: compressedData });
-                    
-                    if (error) throw error;
                 }
                 
                 displayLogo(compressedData);
@@ -761,7 +875,6 @@
             }
         });
         
-        // Fonction de compression d'image (préserve PNG avec transparence)
         function compressImage(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -770,7 +883,6 @@
                     const img = new Image();
                     
                     img.onload = function() {
-                        // Calculer les nouvelles dimensions (max 500x500)
                         let width = img.width;
                         let height = img.height;
                         const maxSize = 500;
@@ -785,39 +897,29 @@
                             }
                         }
                         
-                        // Créer un canvas pour redimensionner
                         const canvas = document.createElement('canvas');
                         canvas.width = width;
                         canvas.height = height;
                         
                         const ctx = canvas.getContext('2d');
-                        
-                        // Fond transparent pour PNG
                         ctx.clearRect(0, 0, width, height);
-                        
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Détecter si c'est un PNG (on préserve la transparence)
                         const isPNG = file.type === 'image/png';
-                        
                         let compressedData;
+                        
                         if (isPNG) {
-                            // Pour PNG, garder le format PNG (avec transparence)
                             compressedData = canvas.toDataURL('image/png', 0.9);
                         } else {
-                            // Pour autres formats, convertir en JPEG
                             compressedData = canvas.toDataURL('image/jpeg', 0.85);
                         }
                         
-                        // Vérifier la taille finale
                         const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
                         
                         if (sizeKB > 400 && isPNG) {
-                            // Si PNG trop gros, réduire encore la qualité
                             const finalData = canvas.toDataURL('image/png', 0.7);
                             resolve(finalData);
                         } else if (sizeKB > 400 && !isPNG) {
-                            // Si JPEG trop gros
                             const finalData = canvas.toDataURL('image/jpeg', 0.6);
                             resolve(finalData);
                         } else {
@@ -853,20 +955,16 @@
             }
         }
         
-        // Supprimer le logo
         async function deleteLogo() {
             if (!confirm('Êtes-vous sûr de vouloir supprimer le logo ?')) return;
-            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Suppression du logo...', 'loading');
                 
-                const { error } = await supabaseClient
+                await supabaseClient
                     .from('settings')
                     .delete()
                     .eq('key', 'logo');
-                
-                if (error) throw error;
                 
                 document.getElementById('logoPreview').innerHTML = '';
                 document.getElementById('deleteLogoBtn').style.display = 'none';
@@ -878,7 +976,6 @@
             }
         }
         
-        // Ajouter un joueur manuellement
         async function addPlayer() {
             if (!supabaseClient) return;
             
@@ -890,7 +987,6 @@
                 return;
             }
             
-            // Vérifier si le joueur existe déjà
             if (players.some(p => p.name === name)) {
                 alert('Ce joueur existe déjà !');
                 return;
@@ -899,12 +995,9 @@
             try {
                 showStatus('⏳ Ajout du joueur...', 'loading');
                 
-                const { data, error } = await supabaseClient
+                await supabaseClient
                     .from('players')
-                    .insert({ name: name })
-                    .select();
-                
-                if (error) throw error;
+                    .insert({ name: name });
                 
                 input.value = '';
                 await loadData();
@@ -914,7 +1007,6 @@
             }
         }
         
-        // Analyse OCR de l'image
         async function analyzeImage() {
             const fileInput = document.getElementById('ocrImage');
             const file = fileInput.files[0];
@@ -935,7 +1027,6 @@
                     logger: m => console.log(m)
                 });
                 
-                // Extraire les noms
                 const text = result.data.text;
                 const lines = text.split('\n')
                     .map(line => line.trim())
@@ -969,7 +1060,6 @@
             }
         }
         
-        // Mettre à jour l'affichage de la liste
         function updatePlayerList() {
             const list = document.getElementById('playerList');
             const count = document.getElementById('playerCount');
@@ -989,20 +1079,16 @@
             `).join('');
         }
         
-        // Supprimer un joueur
         async function deletePlayer(playerId) {
             if (!confirm('Supprimer ce joueur ?')) return;
-            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Suppression...', 'loading');
                 
-                const { error } = await supabaseClient
+                await supabaseClient
                     .from('players')
                     .delete()
                     .eq('id', playerId);
-                
-                if (error) throw error;
                 
                 await loadData();
                 showStatus('✅ Joueur supprimé', 'success');
@@ -1011,21 +1097,14 @@
             }
         }
         
-        // Tout effacer
         async function clearAll() {
             if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
-            if (!supabaseClient) return;
             
             try {
                 showStatus('⏳ Suppression en cours...', 'loading');
                 
-                // Supprimer tous les joueurs
                 await supabaseClient.from('players').delete().neq('id', 0);
-                
-                // Supprimer tous les votes
                 await supabaseClient.from('votes').delete().neq('id', 0);
-                
-                // Supprimer le logo
                 await supabaseClient.from('settings').delete().eq('key', 'logo');
                 
                 players = [];
@@ -1038,15 +1117,13 @@
             }
         }
         
-        // Actualiser les données
         async function refreshData() {
             await loadData();
         }
         
         // Initialiser au chargement
-        window.addEventListener('DOMContentLoaded', () => {
-            // Vérifier l'authentification au chargement
-            checkAuth();
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initSupabase();
         });
     </script>
 </body>
