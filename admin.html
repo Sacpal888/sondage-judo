@@ -20,6 +20,40 @@
             padding: 20px;
         }
         
+        /* Overlay de chargement */
+        #authLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        #authLoading.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -27,6 +61,50 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        /* Header avec bouton de déconnexion */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .admin-header h1 {
+            color: #333;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-email {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
         }
         
         h1 {
@@ -297,8 +375,28 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🛠️ Administration - Gestion des Candidats</h1>
+    <!-- Overlay de chargement de l'authentification -->
+    <div id="authLoading">
+        <div style="text-align: center;">
+            <div class="spinner"></div>
+            <div>Vérification de l'authentification...</div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
+        <!-- Header avec info utilisateur et bouton déconnexion -->
+        <div class="admin-header">
+            <h1>🛠️ Administration</h1>
+            <div class="user-info">
+                <div>
+                    <div style="font-size: 0.85em; color: #999;">Connecté en tant que</div>
+                    <div class="user-email" id="userEmail">-</div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    🚪 Se déconnecter
+                </button>
+            </div>
+        </div>
         
         <div id="configNotice" class="config-notice" style="display: none;">
             ⚠️ Configuration Supabase requise dans config.js
@@ -474,6 +572,82 @@
         let supabaseClient;
         let players = [];
         let editingPlayerId = null;
+        let currentUser = null;
+        
+        // ============================================
+        // AUTHENTIFICATION
+        // ============================================
+        
+        async function checkAuth() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    console.error('Configuration Supabase manquante');
+                    redirectToLogin();
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Vérifier la session
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error) {
+                    console.error('Erreur vérification session:', error);
+                    redirectToLogin();
+                    return false;
+                }
+                
+                if (!session) {
+                    console.log('Pas de session active');
+                    redirectToLogin();
+                    return false;
+                }
+                
+                // Session valide !
+                currentUser = session.user;
+                console.log('Utilisateur connecté:', currentUser.email);
+                
+                // Afficher l'email de l'utilisateur
+                document.getElementById('userEmail').textContent = currentUser.email;
+                
+                // Masquer le loading et afficher le contenu
+                document.getElementById('authLoading').classList.add('hidden');
+                document.getElementById('mainContainer').style.display = 'block';
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Erreur authentification:', error);
+                redirectToLogin();
+                return false;
+            }
+        }
+        
+        function redirectToLogin() {
+            // Rediriger vers la page de login
+            window.location.href = 'login.html';
+        }
+        
+        async function handleLogout() {
+            if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Rediriger vers la page de login
+                window.location.href = 'login.html';
+                
+            } catch (error) {
+                console.error('Erreur déconnexion:', error);
+                alert('Erreur lors de la déconnexion: ' + error.message);
+            }
+        }
         
         // ============================================
         // INITIALISATION SUPABASE
@@ -488,7 +662,7 @@
                     return false;
                 }
                 
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                // Supabase client déjà initialisé dans checkAuth()
                 showStatus('✅ Connecté à Supabase', 'success');
                 return true;
             } catch (error) {
@@ -1296,9 +1470,15 @@
         // ============================================
         
         window.addEventListener('DOMContentLoaded', async () => {
-            const initialized = await initSupabase();
-            if (initialized) {
-                await loadData();
+            // Vérifier l'authentification AVANT tout
+            const authenticated = await checkAuth();
+            
+            if (authenticated) {
+                // Si authentifié, initialiser et charger les données
+                const initialized = await initSupabase();
+                if (initialized) {
+                    await loadData();
+                }
             }
         });
     </script>
