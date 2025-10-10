@@ -14,20 +14,42 @@
             box-sizing: border-box;
         }
         
-        /* IMPORTANT : Background transparent pour OBS */
-        body {
-            width: 1920px;
-            height: 1080px;
+        /* Force le HTML et BODY à prendre toute la hauteur - FIX OBS */
+        html, body {
+            width: 1920px !important;
+            height: 1080px !important;
+            min-height: 1080px !important;
             background: transparent !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
+            position: relative;
         }
         
-        /* Container de l'overlay - centré et visible */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Container de l'overlay - CENTRAGE ABSOLU FORCÉ */
         .overlay-container {
+            /* Positionnement absolu depuis le coin supérieur gauche */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 1920px;
+            height: 1080px;
+            
+            /* Centrage via flexbox sur ce container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            
+            /* Styles visuels sur un wrapper interne */
+            pointer-events: none;
+        }
+        
+        /* Wrapper interne pour les styles visuels */
+        .overlay-inner {
             position: relative;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 6px solid #d4af37;
@@ -41,10 +63,11 @@
             gap: 40px;
             min-width: 700px;
             overflow: hidden;
+            pointer-events: auto;
         }
         
         /* Animation du reflet doré qui glisse le long du cadre */
-        .overlay-container::before {
+        .overlay-inner::before {
             content: '';
             position: absolute;
             top: -6px;
@@ -411,15 +434,17 @@ préféré·e du public !</textarea>
     
     <!-- Overlay principal (centré, toujours visible) -->
     <div class="overlay-container">
-        <div class="logo-container" id="logoContainer" style="display: none;"></div>
-        
-        <div class="content-column">
-            <div class="qr-container">
-                <div id="qrcode"></div>
-            </div>
+        <div class="overlay-inner">
+            <div class="logo-container" id="logoContainer" style="display: none;"></div>
             
-            <div class="title" id="titleText">
-                le·la joueur·euse<br>préféré·e du public !
+            <div class="content-column">
+                <div class="qr-container">
+                    <div id="qrcode"></div>
+                </div>
+                
+                <div class="title" id="titleText">
+                    le·la joueur·euse<br>préféré·e du public !
+                </div>
             </div>
         </div>
     </div>
