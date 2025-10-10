@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Overlay - Vote du Public</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .overlay-container {
+            position: relative;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            border: 6px solid #d4af37;
+            border-radius: 30px;
+            padding: 60px 80px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            min-width: 700px;
+            overflow: hidden;
+        }
+        
+        /* Animation du reflet doré qui glisse le long du cadre */
+        .overlay-container::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 30px;
+            padding: 6px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                transparent 40%,
+                rgba(255, 215, 0, 0.8) 50%,
+                rgba(255, 235, 100, 0.9) 52%,
+                rgba(255, 215, 0, 0.8) 54%,
+                transparent 60%,
+                transparent 100%
+            );
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            animation: shimmer 6s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .logo-container {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo-container img {
+            max-width: 400px;
+            max-height: 120px;
+            width: auto;
+            height: auto;
+            border-radius: 15px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            background: transparent;
+            object-fit: contain;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .content-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+        }
+        
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        #qrcode {
+            width: 300px;
+            height: 300px;
+        }
+        
+        #qrcode img {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .title {
+            color: #d4af37;
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            letter-spacing: 1px;
+            line-height: 1.3;
+            white-space: pre-line;
+        }
+        
+        /* Login panel */
+        .login-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .login-panel.hidden {
+            display: none;
+        }
+        
+        .login-panel h3 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .login-panel input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .login-panel input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-panel button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .login-panel button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        
+        .login-panel button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Configuration panel */
+        .config-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .config-panel.hidden {
+            display: none;
+        }
+        
+        .config-panel h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .config-panel label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .config-panel input[type="text"],
+        .config-panel textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .config-panel textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .config-panel button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .config-panel button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        
+        .config-panel .refresh-btn {
+            background: #28a745;
+        }
+        
+        .config-panel .refresh-btn:hover {
+            background: #218838;
+        }
+        
+        .config-panel .reset-btn {
+            background: #6c757d;
+        }
+        
+        .config-panel .reset-btn:hover {
+            background: #5a6268;
+        }
+        
+        .config-panel .logout-btn {
+            background: #dc3545;
+        }
+        
+        .config-panel .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .config-panel .toggle-btn {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .config-panel .toggle-btn:hover {
+            background: #e0a800;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .divider {
+            border-top: 1px solid #ddd;
+            margin: 15px 0;
+        }
+        
+        .user-info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #004085;
+        }
+        
+        .user-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Panel de connexion -->
+    <div class="login-panel" id="loginPanel">
+        <h3>🔐 Connexion Admin</h3>
+        
+        <div id="loginStatus" style="display: none;"></div>
+        
+        <input type="email" id="emailInput" placeholder="Email" autocomplete="email">
+        <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="current-password">
+        
+        <button onclick="login()" id="loginButton">Se connecter</button>
+        
+        <div class="info-text" style="margin-top: 15px;">
+            🔒 Connexion sécurisée via Supabase<br>
+            Seuls les administrateurs autorisés peuvent accéder au panel de configuration.
+        </div>
+    </div>
+    
+    <!-- Panel de configuration (visible seulement si connecté) -->
+    <div class="config-panel hidden" id="configPanel">
+        <h3>⚙️ Configuration Overlay</h3>
+        
+        <div class="user-info" id="userInfo">
+            <strong>👤 Connecté en tant que :</strong>
+            <span id="userEmail">-</span>
+        </div>
+        
+        <div id="statusMessage" style="display: none;"></div>
+        
+        <label for="urlInput">URL de la page de vote :</label>
+        <input type="text" id="urlInput" placeholder="https://sacpa1888.github.io/sondage-judo/sondage.html">
+        
+        <label for="textInput">Texte de l'overlay :</label>
+        <textarea id="textInput" placeholder="le·la joueur·euse&#10;préféré·e du public !">le·la joueur·euse
+préféré·e du public !</textarea>
+        
+        <button onclick="updateOverlay()">✅ Appliquer les modifications</button>
+        <button class="refresh-btn" onclick="loadLogoFromSupabase()">🔄 Recharger le logo</button>
+        <button class="reset-btn" onclick="resetToDefaults()">🔄 Réinitialiser</button>
+        
+        <div class="divider"></div>
+        
+        <button class="toggle-btn" onclick="togglePanel()">🙈 Masquer le panel</button>
+        <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+        
+        <div class="divider"></div>
+        
+        <div class="info-text">
+            💡 <strong>Pour OBS :</strong><br>
+            1. Configurez l'URL et le texte<br>
+            2. Cliquez sur "Appliquer"<br>
+            3. Masquez le panel (touche <strong>+</strong>)<br>
+            4. Ajoutez comme "Source navigateur"<br>
+            5. Taille : 1920x1080<br>
+            <br>
+            💾 <strong>Sauvegarde :</strong> Vos paramètres sont synchronisés sur tous vos ordinateurs !<br>
+            <br>
+            🎹 <strong>Raccourci :</strong> Touche <strong>+</strong> pour masquer/afficher le panel
+        </div>
+    </div>
+    
+    <!-- Overlay principal (toujours visible) -->
+    <div class="overlay-container">
+        <div class="logo-container" id="logoContainer" style="display: none;"></div>
+        
+        <div class="content-column">
+            <div class="qr-container">
+                <div id="qrcode"></div>
+            </div>
+            
+            <div class="title" id="titleText">
+                le·la joueur·euse<br>préféré·e du public !
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+
+        let qrCodeInstance = null;
+        let supabaseClient = null;
+        let currentUser = null;
+
+        const defaultUrl = 'https://sacpa1888.github.io/sondage-judo/sondage.html';
+        const defaultText = 'le·la joueur·euse\npréféré·e du public !';
+
+        const SUPABASE_KEYS = {
+            URL: 'overlay_url',
+            TEXT: 'overlay_text'
+        };
+
+        // ============================================
+        // SUPABASE - INITIALISATION
+        // ============================================
+
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    showLoginStatus('⚠️ Configuration Supabase manquante', 'error');
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                return true;
+            } catch (error) {
+                showLoginStatus('❌ Erreur de connexion Supabase', 'error');
+                console.error('Erreur Supabase:', error);
+                return false;
+            }
+        }
+
+        // ============================================
+        // AUTHENTIFICATION
+        // ============================================
+
+        // Vérifier si l'utilisateur est déjà connecté
+        async function checkAuth() {
+            if (!supabaseClient) return null;
+            
+            try {
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                
+                if (error) throw error;
+                
+                return user;
+            } catch (error) {
+                console.error('Erreur vérification auth:', error);
+                return null;
+            }
+        }
+
+        // Connexion
+        async function login() {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            
+            if (!email || !password) {
+                showLoginStatus('⚠️ Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            const loginButton = document.getElementById('loginButton');
+            loginButton.disabled = true;
+            loginButton.textContent = '⏳ Connexion...';
+            
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                showLoginStatus('✅ Connexion réussie !', 'success');
+                
+                // Passer au panel de configuration
+                setTimeout(() => {
+                    showConfigPanel();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erreur connexion:', error);
+                
+                if (error.message.includes('Invalid login credentials')) {
+                    showLoginStatus('❌ Email ou mot de passe incorrect', 'error');
+                } else {
+                    showLoginStatus('❌ Erreur de connexion: ' + error.message, 'error');
+                }
+                
+                loginButton.disabled = false;
+                loginButton.textContent = 'Se connecter';
+            }
+        }
+
+        // Déconnexion
+        async function logout() {
+            if (!confirm('Voulez-vous vraiment vous déconnecter ?')) return;
+            
+            try {
+                await supabaseClient.auth.signOut();
+                currentUser = null;
+                
+                // Afficher le panel de connexion
+                document.getElementById('configPanel').classList.add('hidden');
+                document.getElementById('loginPanel').classList.remove('hidden');
+                
+                // Réinitialiser les champs
+                document.getElementById('emailInput').value = '';
+                document.getElementById('passwordInput').value = '';
+                
+                showLoginStatus('✅ Déconnecté avec succès', 'success');
+                
+            } catch (error) {
+                console.error('Erreur déconnexion:', error);
+                showStatus('❌ Erreur lors de la déconnexion', 'error');
+            }
+        }
+
+        // Afficher le panel de configuration
+        function showConfigPanel() {
+            document.getElementById('loginPanel').classList.add('hidden');
+            document.getElementById('configPanel').classList.remove('hidden');
+            
+            // Afficher l'email de l'utilisateur
+            if (currentUser && currentUser.email) {
+                document.getElementById('userEmail').textContent = currentUser.email;
+            }
+            
+            // Charger les données
+            loadOverlayData();
+        }
+
+        // Afficher un message de statut (login)
+        function showLoginStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('loginStatus');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Afficher un message de statut (config)
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // ============================================
+        // SUPABASE - DONNÉES
+        // ============================================
+
+        async function saveToSupabase(key, value) {
+            if (!supabaseClient || !currentUser) {
+                console.error('Non authentifié');
+                return false;
+            }
+            
+            try {
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', key)
+                    .single();
+                
+                if (existing) {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .update({ value: value })
+                        .eq('key', key);
+                    
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: key, value: value });
+                    
+                    if (error) throw error;
+                }
+                
+                console.log(`✅ ${key} sauvegardé`);
+                return true;
+            } catch (error) {
+                console.error(`Erreur sauvegarde ${key}:`, error);
+                return false;
+            }
+        }
+
+        async function loadFromSupabase(key, defaultValue) {
+            if (!supabaseClient) {
+                return defaultValue;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', key)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        return defaultValue;
+                    }
+                    throw error;
+                }
+                
+                return data && data.value ? data.value : defaultValue;
+            } catch (error) {
+                console.error(`Erreur chargement ${key}:`, error);
+                return defaultValue;
+            }
+        }
+
+        // ============================================
+        // LOGO
+        // ============================================
+
+        async function loadLogoFromSupabase() {
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('⏳ Chargement du logo...', 'info');
+                
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                const logoContainer = document.getElementById('logoContainer');
+                
+                if (logoError) {
+                    if (logoError.code === 'PGRST116') {
+                        showStatus('ℹ️ Aucun logo configuré', 'info');
+                    }
+                    logoContainer.style.display = 'none';
+                    return;
+                }
+                
+                if (logoData && logoData.value) {
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
+                    logoContainer.style.display = 'block';
+                    showStatus('✅ Logo chargé', 'success');
+                } else {
+                    logoContainer.style.display = 'none';
+                    showStatus('ℹ️ Aucun logo configuré', 'info');
+                }
+            } catch (error) {
+                console.error('Erreur chargement logo:', error);
+                document.getElementById('logoContainer').style.display = 'none';
+                showStatus('❌ Erreur chargement logo', 'error');
+            }
+        }
+
+        // ============================================
+        // QR CODE
+        // ============================================
+
+        function generateQRCode(url) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            try {
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: url,
+                    width: 300,
+                    height: 300,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                console.log('✅ QR Code généré');
+            } catch (error) {
+                console.error('Erreur génération QR Code:', error);
+            }
+        }
+
+        // ============================================
+        // MISE À JOUR OVERLAY
+        // ============================================
+
+        async function updateOverlay() {
+            if (!currentUser) {
+                showStatus('❌ Non authentifié', 'error');
+                return;
+            }
+            
+            const url = document.getElementById('urlInput').value.trim() || defaultUrl;
+            const text = document.getElementById('textInput').value.trim() || defaultText;
+            
+            showStatus('⏳ Sauvegarde...', 'info');
+            
+            try {
+                const results = await Promise.all([
+                    saveToSupabase(SUPABASE_KEYS.URL, url),
+                    saveToSupabase(SUPABASE_KEYS.TEXT, text)
+                ]);
+                
+                if (results[0] && results[1]) {
+                    generateQRCode(url);
+                    document.getElementById('titleText').textContent = text;
+                    showStatus('✅ Overlay mis à jour et sauvegardé !', 'success');
+                } else {
+                    showStatus('⚠️ Erreur lors de la sauvegarde', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur mise à jour:', error);
+                showStatus('❌ Erreur', 'error');
+            }
+        }
+
+        async function resetToDefaults() {
+            if (!currentUser) {
+                showStatus('❌ Non authentifié', 'error');
+                return;
+            }
+            
+            if (!confirm('Revenir aux valeurs par défaut ?')) return;
+            
+            try {
+                showStatus('⏳ Réinitialisation...', 'info');
+                
+                await supabaseClient
+                    .from('settings')
+                    .delete()
+                    .in('key', [SUPABASE_KEYS.URL, SUPABASE_KEYS.TEXT]);
+                
+                document.getElementById('urlInput').value = defaultUrl;
+                document.getElementById('textInput').value = defaultText;
+                document.getElementById('titleText').textContent = defaultText;
+                generateQRCode(defaultUrl);
+                
+                showStatus('✅ Réinitialisé', 'success');
+            } catch (error) {
+                console.error('Erreur réinitialisation:', error);
+                showStatus('❌ Erreur', 'error');
+            }
+        }
+
+        function togglePanel() {
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        // ============================================
+        // CHARGEMENT DES DONNÉES
+        // ============================================
+
+        async function loadOverlayData() {
+            showStatus('⏳ Chargement...', 'info');
+            
+            const savedUrl = await loadFromSupabase(SUPABASE_KEYS.URL, defaultUrl);
+            const savedText = await loadFromSupabase(SUPABASE_KEYS.TEXT, defaultText);
+            
+            document.getElementById('urlInput').value = savedUrl;
+            document.getElementById('textInput').value = savedText;
+            document.getElementById('titleText').textContent = savedText;
+            generateQRCode(savedUrl);
+            
+            await loadLogoFromSupabase();
+            
+            showStatus('✅ Paramètres chargés', 'success');
+        }
+
+        // ============================================
+        // INITIALISATION
+        // ============================================
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Initialisation...');
+            
+            const initialized = await initSupabase();
+            if (!initialized) {
+                console.error('❌ Erreur initialisation Supabase');
+                return;
+            }
+            
+            // Charger l'overlay (sans auth)
+            const savedUrl = await loadFromSupabase(SUPABASE_KEYS.URL, defaultUrl);
+            const savedText = await loadFromSupabase(SUPABASE_KEYS.TEXT, defaultText);
+            document.getElementById('titleText').textContent = savedText;
+            generateQRCode(savedUrl);
+            await loadLogoFromSupabase();
+            
+            // Vérifier si déjà connecté
+            currentUser = await checkAuth();
+            
+            if (currentUser) {
+                console.log('✅ Déjà connecté:', currentUser.email);
+                showConfigPanel();
+            } else {
+                console.log('ℹ️ Non connecté - affichage login');
+                document.getElementById('loginPanel').classList.remove('hidden');
+            }
+            
+            console.log('✅ Initialisé');
+        });
+
+        // Gestion de la touche Enter dans le login
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('passwordInput');
+            if (passwordInput) {
+                passwordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        login();
+                    }
+                });
+            }
+        });
+
+        // Raccourci clavier pour masquer/afficher le panel
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '+' && currentUser) {
+                togglePanel();
+            }
+        });
+    </script>
+</body>
+</html>
