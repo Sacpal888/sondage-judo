@@ -14,24 +14,15 @@
             box-sizing: border-box;
         }
         
-        html, body {
+        body {
             width: 1920px;
             height: 1080px;
-            background: transparent !important;
-            overflow: hidden;
-        }
-        
-        body {
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            position: relative;
-        }
-        
-        /* OVERLAY CENTRÉ - MÉTHODE INFAILLIBLE */
-        .overlay-wrapper {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            overflow: hidden;
         }
         
         .overlay-container {
@@ -47,9 +38,10 @@
             justify-content: center;
             gap: 40px;
             min-width: 700px;
+            overflow: hidden;
         }
         
-        /* Animation du reflet doré */
+        /* Animation du reflet doré qui glisse le long du cadre */
         .overlay-container::before {
             content: '';
             position: absolute;
@@ -78,8 +70,12 @@
         }
         
         @keyframes shimmer {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
         
         .logo-container {
@@ -138,40 +134,6 @@
             white-space: pre-line;
         }
         
-        /* Boutons de test positionnement (cachés par défaut) */
-        .position-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-            gap: 10px;
-            z-index: 10000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        }
-        
-        .position-controls.show {
-            display: flex;
-        }
-        
-        .position-controls button {
-            padding: 10px 15px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .position-controls button:hover {
-            background: #5568d3;
-        }
-        
         /* Login panel */
         .login-panel {
             position: fixed;
@@ -225,14 +187,16 @@
         
         .login-panel button:hover {
             background: #5568d3;
+            transform: translateY(-1px);
         }
         
         .login-panel button:disabled {
             background: #ccc;
             cursor: not-allowed;
+            transform: none;
         }
         
-        /* Config panel */
+        /* Configuration panel */
         .config-panel {
             position: fixed;
             top: 20px;
@@ -290,10 +254,12 @@
             cursor: pointer;
             font-weight: 600;
             margin-bottom: 10px;
+            transition: all 0.3s;
         }
         
         .config-panel button:hover {
             background: #5568d3;
+            transform: translateY(-1px);
         }
         
         .config-panel .refresh-btn {
@@ -379,32 +345,32 @@
     </style>
 </head>
 <body>
-    <!-- Contrôles de positionnement (pour debug) -->
-    <div class="position-controls" id="positionControls">
-        <button onclick="adjustPosition(-50)">▲ Haut</button>
-        <button onclick="adjustPosition(50)">▼ Bas</button>
-        <button onclick="toggleControls()">✅ OK</button>
-    </div>
-
-    <!-- Login panel -->
+    <!-- Panel de connexion -->
     <div class="login-panel" id="loginPanel">
         <h3>🔐 Connexion Admin</h3>
+        
         <div id="loginStatus" style="display: none;"></div>
+        
         <input type="email" id="emailInput" placeholder="Email" autocomplete="email">
         <input type="password" id="passwordInput" placeholder="Mot de passe" autocomplete="current-password">
+        
         <button onclick="login()" id="loginButton">Se connecter</button>
+        
         <div class="info-text" style="margin-top: 15px;">
-            🔒 Connexion sécurisée via Supabase
+            🔒 Connexion sécurisée via Supabase<br>
+            Seuls les administrateurs autorisés peuvent accéder au panel de configuration.
         </div>
     </div>
     
-    <!-- Config panel -->
+    <!-- Panel de configuration (visible seulement si connecté) -->
     <div class="config-panel hidden" id="configPanel">
         <h3>⚙️ Configuration Overlay</h3>
+        
         <div class="user-info" id="userInfo">
             <strong>👤 Connecté en tant que :</strong>
             <span id="userEmail">-</span>
         </div>
+        
         <div id="statusMessage" style="display: none;"></div>
         
         <label for="urlInput">URL de la page de vote :</label>
@@ -414,91 +380,67 @@
         <textarea id="textInput" placeholder="le·la joueur·euse&#10;préféré·e du public !">le·la joueur·euse
 préféré·e du public !</textarea>
         
-        <button onclick="updateOverlay()">✅ Appliquer</button>
+        <button onclick="updateOverlay()">✅ Appliquer les modifications</button>
         <button class="refresh-btn" onclick="loadLogoFromSupabase()">🔄 Recharger le logo</button>
         <button class="reset-btn" onclick="resetToDefaults()">🔄 Réinitialiser</button>
         
         <div class="divider"></div>
         
-        <button onclick="toggleControls()" style="background: #ff9800;">📐 Ajuster position</button>
-        <button class="toggle-btn" onclick="togglePanel()">🙈 Masquer</button>
+        <button class="toggle-btn" onclick="togglePanel()">🙈 Masquer le panel</button>
         <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+        
+        <div class="divider"></div>
         
         <div class="info-text">
             💡 <strong>Pour OBS :</strong><br>
-            1. Configurez et appliquez<br>
-            2. Masquez ce panel (touche +)<br>
-            3. Source navigateur : 1920x1080<br>
-            4. Si mal positionné, cliquez "Ajuster position"
+            1. Configurez l'URL et le texte<br>
+            2. Cliquez sur "Appliquer"<br>
+            3. Masquez le panel (touche <strong>+</strong>)<br>
+            4. Dans OBS → Ajouter une source → <strong>"Source navigateur"</strong><br>
+            5. URL : Cette page<br>
+            6. Largeur : <strong>1920</strong> / Hauteur : <strong>1080</strong><br>
+            7. ✅ <strong>Décochez "Contrôler l'audio via OBS"</strong><br>
+            8. ✅ Le fond est transparent automatiquement !<br>
+            <br>
+            💾 <strong>Sauvegarde :</strong> Vos paramètres sont synchronisés !<br>
+            🎹 <strong>Raccourci :</strong> Touche <strong>+</strong> pour masquer/afficher
         </div>
     </div>
     
-    <!-- Overlay principal -->
-    <div class="overlay-wrapper" id="overlayWrapper">
-        <div class="overlay-container">
-            <div class="logo-container" id="logoContainer" style="display: none;"></div>
+    <!-- Overlay principal (toujours visible) -->
+    <div class="overlay-container">
+        <div class="logo-container" id="logoContainer" style="display: none;"></div>
+        
+        <div class="content-column">
+            <div class="qr-container">
+                <div id="qrcode"></div>
+            </div>
             
-            <div class="content-column">
-                <div class="qr-container">
-                    <div id="qrcode"></div>
-                </div>
-                
-                <div class="title" id="titleText">
-                    le·la joueur·euse<br>préféré·e du public !
-                </div>
+            <div class="title" id="titleText">
+                le·la joueur·euse<br>préféré·e du public !
             </div>
         </div>
     </div>
 
     <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+
+        let qrCodeInstance = null;
         let supabaseClient = null;
         let currentUser = null;
-        let qrCodeInstance = null;
 
         const defaultUrl = 'https://sacpa1888.github.io/sondage-judo/sondage.html';
         const defaultText = 'le·la joueur·euse\npréféré·e du public !';
 
         const SUPABASE_KEYS = {
             URL: 'overlay_url',
-            TEXT: 'overlay_text',
-            POSITION: 'overlay_position'
+            TEXT: 'overlay_text'
         };
 
         // ============================================
-        // AJUSTEMENT POSITION
-        // ============================================
-        
-        function toggleControls() {
-            const controls = document.getElementById('positionControls');
-            controls.classList.toggle('show');
-        }
-        
-        function adjustPosition(offset) {
-            const wrapper = document.getElementById('overlayWrapper');
-            const current = wrapper.style.marginTop ? parseInt(wrapper.style.marginTop) : 0;
-            const newPosition = current + offset;
-            wrapper.style.marginTop = newPosition + 'px';
-            
-            // Sauvegarder si connecté
-            if (currentUser && supabaseClient) {
-                saveToSupabase(SUPABASE_KEYS.POSITION, newPosition.toString());
-            }
-            
-            console.log('Position ajustée:', newPosition + 'px');
-        }
-        
-        async function loadPosition() {
-            if (!supabaseClient) return;
-            
-            const position = await loadFromSupabase(SUPABASE_KEYS.POSITION, '0');
-            if (position && position !== '0') {
-                document.getElementById('overlayWrapper').style.marginTop = position + 'px';
-                console.log('Position chargée:', position + 'px');
-            }
-        }
-
-        // ============================================
-        // SUPABASE
+        // SUPABASE - INITIALISATION
         // ============================================
 
         async function initSupabase() {
@@ -507,30 +449,43 @@ préféré·e du public !</textarea>
                     showLoginStatus('⚠️ Configuration Supabase manquante', 'error');
                     return false;
                 }
+                
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 return true;
             } catch (error) {
+                showLoginStatus('❌ Erreur de connexion Supabase', 'error');
                 console.error('Erreur Supabase:', error);
                 return false;
             }
         }
 
+        // ============================================
+        // AUTHENTIFICATION
+        // ============================================
+
+        // Vérifier si l'utilisateur est déjà connecté
         async function checkAuth() {
             if (!supabaseClient) return null;
+            
             try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
+                const { data: { user }, error } = await supabaseClient.auth.getUser();
+                
+                if (error) throw error;
+                
                 return user;
             } catch (error) {
+                console.error('Erreur vérification auth:', error);
                 return null;
             }
         }
 
+        // Connexion
         async function login() {
             const email = document.getElementById('emailInput').value.trim();
             const password = document.getElementById('passwordInput').value;
             
             if (!email || !password) {
-                showLoginStatus('⚠️ Remplissez tous les champs', 'error');
+                showLoginStatus('⚠️ Veuillez remplir tous les champs', 'error');
                 return;
             }
             
@@ -548,61 +503,102 @@ préféré·e du public !</textarea>
                 
                 currentUser = data.user;
                 showLoginStatus('✅ Connexion réussie !', 'success');
-                setTimeout(() => showConfigPanel(), 1000);
+                
+                // Passer au panel de configuration
+                setTimeout(() => {
+                    showConfigPanel();
+                }, 1000);
                 
             } catch (error) {
-                showLoginStatus('❌ Erreur: ' + error.message, 'error');
+                console.error('Erreur connexion:', error);
+                
+                if (error.message.includes('Invalid login credentials')) {
+                    showLoginStatus('❌ Email ou mot de passe incorrect', 'error');
+                } else {
+                    showLoginStatus('❌ Erreur de connexion: ' + error.message, 'error');
+                }
+                
                 loginButton.disabled = false;
                 loginButton.textContent = 'Se connecter';
             }
         }
 
+        // Déconnexion
         async function logout() {
-            if (!confirm('Déconnexion ?')) return;
+            if (!confirm('Voulez-vous vraiment vous déconnecter ?')) return;
+            
             try {
                 await supabaseClient.auth.signOut();
                 currentUser = null;
+                
+                // Afficher le panel de connexion
                 document.getElementById('configPanel').classList.add('hidden');
                 document.getElementById('loginPanel').classList.remove('hidden');
+                
+                // Réinitialiser les champs
                 document.getElementById('emailInput').value = '';
                 document.getElementById('passwordInput').value = '';
-                showLoginStatus('✅ Déconnecté', 'success');
+                
+                showLoginStatus('✅ Déconnecté avec succès', 'success');
+                
             } catch (error) {
-                showStatus('❌ Erreur déconnexion', 'error');
+                console.error('Erreur déconnexion:', error);
+                showStatus('❌ Erreur lors de la déconnexion', 'error');
             }
         }
 
+        // Afficher le panel de configuration
         function showConfigPanel() {
             document.getElementById('loginPanel').classList.add('hidden');
             document.getElementById('configPanel').classList.remove('hidden');
+            
+            // Afficher l'email de l'utilisateur
             if (currentUser && currentUser.email) {
                 document.getElementById('userEmail').textContent = currentUser.email;
             }
+            
+            // Charger les données
             loadOverlayData();
         }
 
+        // Afficher un message de statut (login)
         function showLoginStatus(message, type = 'info') {
             const statusDiv = document.getElementById('loginStatus');
             statusDiv.className = `status-message ${type}`;
             statusDiv.textContent = message;
             statusDiv.style.display = 'block';
+            
             if (type === 'success' || type === 'error') {
-                setTimeout(() => statusDiv.style.display = 'none', 3000);
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
             }
         }
 
+        // Afficher un message de statut (config)
         function showStatus(message, type = 'info') {
             const statusDiv = document.getElementById('statusMessage');
             statusDiv.className = `status-message ${type}`;
             statusDiv.textContent = message;
             statusDiv.style.display = 'block';
+            
             if (type === 'success') {
-                setTimeout(() => statusDiv.style.display = 'none', 3000);
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
             }
         }
 
+        // ============================================
+        // SUPABASE - DONNÉES
+        // ============================================
+
         async function saveToSupabase(key, value) {
-            if (!supabaseClient || !currentUser) return false;
+            if (!supabaseClient || !currentUser) {
+                console.error('Non authentifié');
+                return false;
+            }
+            
             try {
                 const { data: existing } = await supabaseClient
                     .from('settings')
@@ -611,19 +607,33 @@ préféré·e du public !</textarea>
                     .single();
                 
                 if (existing) {
-                    await supabaseClient.from('settings').update({ value }).eq('key', key);
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .update({ value: value })
+                        .eq('key', key);
+                    
+                    if (error) throw error;
                 } else {
-                    await supabaseClient.from('settings').insert({ key, value });
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: key, value: value });
+                    
+                    if (error) throw error;
                 }
+                
+                console.log(`✅ ${key} sauvegardé`);
                 return true;
             } catch (error) {
-                console.error('Erreur sauvegarde:', error);
+                console.error(`Erreur sauvegarde ${key}:`, error);
                 return false;
             }
         }
 
         async function loadFromSupabase(key, defaultValue) {
-            if (!supabaseClient) return defaultValue;
+            if (!supabaseClient) {
+                return defaultValue;
+            }
+            
             try {
                 const { data, error } = await supabaseClient
                     .from('settings')
@@ -631,39 +641,69 @@ préféré·e du public !</textarea>
                     .eq('key', key)
                     .single();
                 
-                if (error) return defaultValue;
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        return defaultValue;
+                    }
+                    throw error;
+                }
+                
                 return data && data.value ? data.value : defaultValue;
             } catch (error) {
+                console.error(`Erreur chargement ${key}:`, error);
                 return defaultValue;
             }
         }
 
+        // ============================================
+        // LOGO
+        // ============================================
+
         async function loadLogoFromSupabase() {
             if (!supabaseClient) return;
+            
             try {
-                showStatus('⏳ Chargement logo...', 'info');
-                const { data: logoData } = await supabaseClient
+                showStatus('⏳ Chargement du logo...', 'info');
+                
+                const { data: logoData, error: logoError } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
                     .single();
                 
                 const logoContainer = document.getElementById('logoContainer');
+                
+                if (logoError) {
+                    if (logoError.code === 'PGRST116') {
+                        showStatus('ℹ️ Aucun logo configuré', 'info');
+                    }
+                    logoContainer.style.display = 'none';
+                    return;
+                }
+                
                 if (logoData && logoData.value) {
                     logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
                     logoContainer.style.display = 'block';
                     showStatus('✅ Logo chargé', 'success');
                 } else {
                     logoContainer.style.display = 'none';
+                    showStatus('ℹ️ Aucun logo configuré', 'info');
                 }
             } catch (error) {
+                console.error('Erreur chargement logo:', error);
                 document.getElementById('logoContainer').style.display = 'none';
+                showStatus('❌ Erreur chargement logo', 'error');
             }
         }
+
+        // ============================================
+        // QR CODE
+        // ============================================
 
         function generateQRCode(url) {
             const qrContainer = document.getElementById('qrcode');
             qrContainer.innerHTML = '';
+            
             try {
                 qrCodeInstance = new QRCode(qrContainer, {
                     text: url,
@@ -673,10 +713,16 @@ préféré·e du public !</textarea>
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
                 });
+                
+                console.log('✅ QR Code généré');
             } catch (error) {
-                console.error('Erreur QR:', error);
+                console.error('Erreur génération QR Code:', error);
             }
         }
+
+        // ============================================
+        // MISE À JOUR OVERLAY
+        // ============================================
 
         async function updateOverlay() {
             if (!currentUser) {
@@ -690,41 +736,64 @@ préféré·e du public !</textarea>
             showStatus('⏳ Sauvegarde...', 'info');
             
             try {
-                await Promise.all([
+                const results = await Promise.all([
                     saveToSupabase(SUPABASE_KEYS.URL, url),
                     saveToSupabase(SUPABASE_KEYS.TEXT, text)
                 ]);
                 
-                generateQRCode(url);
-                document.getElementById('titleText').textContent = text;
-                showStatus('✅ Sauvegardé !', 'success');
+                if (results[0] && results[1]) {
+                    generateQRCode(url);
+                    document.getElementById('titleText').textContent = text;
+                    showStatus('✅ Overlay mis à jour et sauvegardé !', 'success');
+                } else {
+                    showStatus('⚠️ Erreur lors de la sauvegarde', 'error');
+                }
             } catch (error) {
+                console.error('Erreur mise à jour:', error);
                 showStatus('❌ Erreur', 'error');
             }
         }
 
         async function resetToDefaults() {
-            if (!currentUser || !confirm('Réinitialiser ?')) return;
+            if (!currentUser) {
+                showStatus('❌ Non authentifié', 'error');
+                return;
+            }
+            
+            if (!confirm('Revenir aux valeurs par défaut ?')) return;
+            
             try {
                 showStatus('⏳ Réinitialisation...', 'info');
-                await supabaseClient.from('settings').delete().in('key', [SUPABASE_KEYS.URL, SUPABASE_KEYS.TEXT, SUPABASE_KEYS.POSITION]);
+                
+                await supabaseClient
+                    .from('settings')
+                    .delete()
+                    .in('key', [SUPABASE_KEYS.URL, SUPABASE_KEYS.TEXT]);
+                
                 document.getElementById('urlInput').value = defaultUrl;
                 document.getElementById('textInput').value = defaultText;
                 document.getElementById('titleText').textContent = defaultText;
-                document.getElementById('overlayWrapper').style.marginTop = '0px';
                 generateQRCode(defaultUrl);
+                
                 showStatus('✅ Réinitialisé', 'success');
             } catch (error) {
+                console.error('Erreur réinitialisation:', error);
                 showStatus('❌ Erreur', 'error');
             }
         }
 
         function togglePanel() {
-            document.getElementById('configPanel').classList.toggle('hidden');
+            const panel = document.getElementById('configPanel');
+            panel.classList.toggle('hidden');
         }
+
+        // ============================================
+        // CHARGEMENT DES DONNÉES
+        // ============================================
 
         async function loadOverlayData() {
             showStatus('⏳ Chargement...', 'info');
+            
             const savedUrl = await loadFromSupabase(SUPABASE_KEYS.URL, defaultUrl);
             const savedText = await loadFromSupabase(SUPABASE_KEYS.TEXT, defaultText);
             
@@ -732,43 +801,59 @@ préféré·e du public !</textarea>
             document.getElementById('textInput').value = savedText;
             document.getElementById('titleText').textContent = savedText;
             generateQRCode(savedUrl);
+            
             await loadLogoFromSupabase();
-            await loadPosition();
-            showStatus('✅ Chargé', 'success');
+            
+            showStatus('✅ Paramètres chargés', 'success');
         }
 
         // ============================================
-        // INIT
+        // INITIALISATION
         // ============================================
 
         window.addEventListener('DOMContentLoaded', async () => {
-            const initialized = await initSupabase();
-            if (!initialized) return;
+            console.log('🚀 Initialisation...');
             
+            const initialized = await initSupabase();
+            if (!initialized) {
+                console.error('❌ Erreur initialisation Supabase');
+                return;
+            }
+            
+            // Charger l'overlay (sans auth)
             const savedUrl = await loadFromSupabase(SUPABASE_KEYS.URL, defaultUrl);
             const savedText = await loadFromSupabase(SUPABASE_KEYS.TEXT, defaultText);
             document.getElementById('titleText').textContent = savedText;
             generateQRCode(savedUrl);
             await loadLogoFromSupabase();
-            await loadPosition();
             
+            // Vérifier si déjà connecté
             currentUser = await checkAuth();
+            
             if (currentUser) {
+                console.log('✅ Déjà connecté:', currentUser.email);
                 showConfigPanel();
             } else {
+                console.log('ℹ️ Non connecté - affichage login');
                 document.getElementById('loginPanel').classList.remove('hidden');
             }
+            
+            console.log('✅ Initialisé');
         });
 
+        // Gestion de la touche Enter dans le login
         document.addEventListener('DOMContentLoaded', () => {
             const passwordInput = document.getElementById('passwordInput');
             if (passwordInput) {
                 passwordInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') login();
+                    if (e.key === 'Enter') {
+                        login();
+                    }
                 });
             }
         });
 
+        // Raccourci clavier pour masquer/afficher le panel
         document.addEventListener('keydown', (e) => {
             if (e.key === '+' && currentUser) {
                 togglePanel();
