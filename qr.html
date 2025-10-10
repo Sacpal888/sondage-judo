@@ -28,16 +28,18 @@
         .overlay-container {
             position: relative;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
-            border: 6px solid #d4af37;
-            border-radius: 30px;
-            padding: 60px 80px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            border: 5px solid #d4af37;
+            border-radius: 25px;
+            padding: 30px 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 40px;
-            min-width: 700px;
+            gap: 20px;
+            min-width: 500px;
+            max-width: 85%;
+            max-height: 800px;
             overflow: hidden;
         }
         
@@ -45,12 +47,12 @@
         .overlay-container::before {
             content: '';
             position: absolute;
-            top: -6px;
-            left: -6px;
-            right: -6px;
-            bottom: -6px;
-            border-radius: 30px;
-            padding: 6px;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 25px;
+            padding: 5px;
             background: linear-gradient(
                 90deg,
                 transparent 0%,
@@ -84,16 +86,16 @@
         }
         
         .logo-container img {
-            max-width: 400px;
-            max-height: 120px;
+            max-width: 300px;
+            max-height: 80px;
             width: auto;
             height: auto;
-            border-radius: 15px;
-            border: 3px solid #d4af37;
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
             background: transparent;
             object-fit: contain;
-            padding: 15px;
+            padding: 10px;
             background-color: rgba(255, 255, 255, 0.05);
         }
         
@@ -102,20 +104,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 40px;
+            gap: 20px;
             width: 100%;
         }
         
         .qr-container {
             background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         
         #qrcode {
-            width: 300px;
-            height: 300px;
+            width: 200px;
+            height: 200px;
         }
         
         #qrcode img {
@@ -125,12 +127,12 @@
         
         .title {
             color: #d4af37;
-            font-size: 48px;
+            font-size: 36px;
             font-weight: bold;
             text-align: center;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
             letter-spacing: 1px;
-            line-height: 1.3;
+            line-height: 1.2;
             white-space: pre-line;
         }
         
@@ -707,8 +709,8 @@ préféré·e du public !</textarea>
             try {
                 qrCodeInstance = new QRCode(qrContainer, {
                     text: url,
-                    width: 300,
-                    height: 300,
+                    width: 200,
+                    height: 200,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
