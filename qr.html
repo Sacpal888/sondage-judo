@@ -14,10 +14,11 @@
             box-sizing: border-box;
         }
         
+        /* IMPORTANT : Background transparent pour OBS */
         body {
             width: 1920px;
             height: 1080px;
-            background: transparent;
+            background: transparent !important;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,6 +26,7 @@
             overflow: hidden;
         }
         
+        /* Container de l'overlay - centré et visible */
         .overlay-container {
             position: relative;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
@@ -129,6 +131,10 @@
             line-height: 1.3;
             white-space: pre-line;
         }
+        
+        /* ============================================ */
+        /* PANELS DE CONFIGURATION (visibles seulement pour config) */
+        /* ============================================ */
         
         /* Login panel */
         .login-panel {
@@ -392,16 +398,18 @@ préféré·e du public !</textarea>
             1. Configurez l'URL et le texte<br>
             2. Cliquez sur "Appliquer"<br>
             3. Masquez le panel (touche <strong>+</strong>)<br>
-            4. Ajoutez comme "Source navigateur"<br>
-            5. Taille : 1920x1080<br>
+            4. Dans OBS → Ajouter une source → <strong>"Source navigateur"</strong><br>
+            5. URL : Cette page<br>
+            6. Largeur : <strong>1920</strong> / Hauteur : <strong>1080</strong><br>
+            7. ✅ <strong>Décochez "Contrôler l'audio via OBS"</strong><br>
+            8. ✅ Le fond est transparent automatiquement !<br>
             <br>
-            💾 <strong>Sauvegarde :</strong> Vos paramètres sont synchronisés sur tous vos ordinateurs !<br>
-            <br>
-            🎹 <strong>Raccourci :</strong> Touche <strong>+</strong> pour masquer/afficher le panel
+            💾 <strong>Sauvegarde :</strong> Vos paramètres sont synchronisés !<br>
+            🎹 <strong>Raccourci :</strong> Touche <strong>+</strong> pour masquer/afficher
         </div>
     </div>
     
-    <!-- Overlay principal (toujours visible) -->
+    <!-- Overlay principal (centré, toujours visible) -->
     <div class="overlay-container">
         <div class="logo-container" id="logoContainer" style="display: none;"></div>
         
