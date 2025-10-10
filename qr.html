@@ -14,7 +14,7 @@
             box-sizing: border-box;
         }
         
-        /* Force le HTML et BODY à prendre toute la hauteur - FIX OBS */
+        /* Force le HTML et BODY à prendre toute la hauteur */
         html, body {
             width: 1920px !important;
             height: 1080px !important;
@@ -28,29 +28,33 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* Container de l'overlay - CENTRAGE ABSOLU FORCÉ */
+        /* Container de l'overlay - POSITIONNÉ EN ABSOLU IMMUABLE */
         .overlay-container {
-            /* Positionnement absolu depuis le coin supérieur gauche */
-            position: fixed;
+            position: absolute;
             top: 0;
+            bottom: 0;
             left: 0;
+            right: 0;
             width: 1920px;
             height: 1080px;
-            
-            /* Centrage via flexbox sur ce container */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            
-            /* Styles visuels sur un wrapper interne */
             pointer-events: none;
+            z-index: 1;
         }
         
-        /* Wrapper interne pour les styles visuels */
+        /* Wrapper interne - CENTRAGE FORCÉ AVEC TRANSFORM */
         .overlay-inner {
-            position: relative;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            /* Taille automatique basée sur le contenu */
+            width: fit-content;
+            height: fit-content;
+            max-width: 90%;
+            max-height: 90%;
+            
+            /* Styles visuels */
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 6px solid #d4af37;
             border-radius: 30px;
@@ -64,6 +68,9 @@
             min-width: 700px;
             overflow: hidden;
             pointer-events: auto;
+            
+            /* Force le recalcul après chargement */
+            will-change: transform;
         }
         
         /* Animation du reflet doré qui glisse le long du cadre */
@@ -886,6 +893,46 @@ préféré·e du public !</textarea>
                 togglePanel();
             }
         });
+
+        // ============================================
+        // FORCER LE CENTRAGE APRÈS CHARGEMENT
+        // ============================================
+        
+        function forceCentering() {
+            const overlay = document.querySelector('.overlay-inner');
+            if (!overlay) return;
+            
+            // S'assurer que le transform est bien appliqué
+            overlay.style.position = 'absolute';
+            overlay.style.top = '50%';
+            overlay.style.left = '50%';
+            overlay.style.transform = 'translate(-50%, -50%)';
+            
+            console.log('✅ Centrage forcé appliqué');
+        }
+        
+        // Forcer le centrage après tous les chargements
+        window.addEventListener('load', () => {
+            setTimeout(forceCentering, 100);
+            setTimeout(forceCentering, 500);
+            setTimeout(forceCentering, 1000);
+        });
+        
+        // Forcer le centrage après génération du QR code
+        const originalGenerateQRCode = generateQRCode;
+        generateQRCode = function(url) {
+            originalGenerateQRCode(url);
+            setTimeout(forceCentering, 100);
+        };
+        
+        // Forcer le centrage après chargement du logo
+        const originalLoadLogo = loadLogoFromSupabase;
+        loadLogoFromSupabase = async function() {
+            await originalLoadLogo();
+            setTimeout(forceCentering, 100);
+        };
+        
+        console.log('🎯 Script de centrage forcé activé');
     </script>
 </body>
 </html>
