@@ -595,14 +595,16 @@
                 if (voted) {
                     showAlreadyVoted();
                     await loadLogo();
-                    
-                loadMessages(); // non-blocking: apply dynamic texts
-document.getElementById('loadingMessage').style.display = 'none';
+                loadMessages(); // apply dynamic texts (non-blocking)
+
+                    document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     return;
                 }
                 
                 await loadLogo();
+                loadMessages(); // apply dynamic texts (non-blocking)
+
                 
                 const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
@@ -806,13 +808,11 @@ document.getElementById('loadingMessage').style.display = 'none';
                         if (error) { console.warn('settings error:', error); return; }
                         const latest = {};
                         (data || []).forEach(row => {
-                            if (!latest[row.key] || row.id > latest[row.key].id) latest[row.key] = row;
+                            if (!latest[row.key] or row.id > latest[row.key].id) latest[row.key] = row;
                         });
                         const map = {};
                         Object.keys(latest).forEach(k => map[k] = latest[k].value);
-
                         const $ = (id) => document.getElementById(id);
-
                         if ($('pageTitle')) {
                             const newTitle = map['msg_title'] || $('pageTitle').textContent;
                             $('pageTitle').textContent = newTitle;
