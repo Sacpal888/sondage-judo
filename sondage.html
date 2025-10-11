@@ -592,7 +592,10 @@
                 
                 userIP = await getUserIP();
                 
-                const voted = await checkIfVoted(userIP);
+                let voted = false;
+  if (singleVoteEnabled) {
+    voted = (singleVoteEnabled ? await checkIfVoted(userIP) : false);
+  }
                 if (voted) {
                     showAlreadyVoted();
                     await loadLogo();
