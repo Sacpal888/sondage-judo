@@ -427,8 +427,8 @@
                 sendBtn.disabled = true;
                 sendBtn.innerHTML = 'Envoi en cours <span class="loading"></span>';
                 
-                // Construire l'URL de redirection
-                const redirectUrl = window.location.origin + window.location.pathname.replace('login.html', 'admin.html');
+                // ✅ CORRECTION : Redirection vers reset-password.html (pas admin.html)
+                const redirectUrl = 'https://sacpal888.github.io/sondage-judo/reset-password.html';
                 
                 const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
                     redirectTo: redirectUrl
