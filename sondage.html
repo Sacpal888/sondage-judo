@@ -594,7 +594,7 @@
                 
                 let voted = false;
   if (singleVoteEnabled) {
-    voted = (singleVoteEnabled ? await checkIfVoted(userIP) : false);
+    voted = false /* multi-vote mode: skip DB check */ if (!singleVoteEnabled) else await checkIfVoted(userIP);
   }
                 if (voted) {
                     showAlreadyVoted();
@@ -734,9 +734,26 @@
                 
                 hasVoted = true;
                 hideQueueMessage();
-                console.log('Vote enregistré avec succès');
-                
-            } catch (error) {
+                \1
+                if (singleVoteEnabled) {
+                    // Single-vote ON: lock UI with thank-you
+                    document.getElementById('voteSection').style.display = 'none';
+                    const ty = document.getElementById('thankYou');
+                    if (ty) ty.classList.add('show');
+                    hasVoted = true;
+                } else {
+                    // Single-vote OFF: keep voting UI visible for repeat votes
+                    const already = document.getElementById('alreadyVoted');
+                    if (already) already.classList.remove('show');
+                    const ty = document.getElementById('thankYou');
+                    if (ty) ty.classList.remove('show');
+                    const vs = document.getElementById('voteSection');
+                    if (vs) vs.style.display = 'block';
+                    hasVoted = false; // allow immediate re-vote
+                    // Optionally refresh players / logo (lightweight)
+                    try { await loadLogo(); } catch(e) {}
+                }
+        } catch (error) {
                 console.error('Erreur lors du vote après tous les retries:', error);
                 hideQueueMessage();
                 
@@ -748,11 +765,17 @@
                         .eq('ip_address', userIP)
                         .limit(1);
                     
-                    if (finalCheck.data && finalCheck.data.length > 0) {
-                        console.log('✅ Vote trouvé dans la DB malgré l\'erreur réseau');
-                        hasVoted = true;
-                        document.getElementById('voteSection').style.display = 'none';
-                        document.getElementById('thankYou').classList.add('show');
+                    \1
+                        if (singleVoteEnabled) {
+                            document.getElementById('voteSection').style.display = 'none';
+                            document.getElementById('thankYou').classList.add('show');
+                            hasVoted = true;
+                        } else {
+                            // In multi-vote mode, ensure UI remains open
+                            const vs = document.getElementById('voteSection'); if (vs) vs.style.display = 'block';
+                            const ty = document.getElementById('thankYou'); if (ty) ty.classList.remove('show');
+                            hasVoted = false;
+                        }
                         return;
                     }
                 } catch (checkError) {
@@ -778,9 +801,18 @@
         }
         
         function showAlreadyVoted() {
-            document.getElementById('voteSection').style.display = 'none';
-            document.getElementById('alreadyVoted').classList.add('show');
-            hasVoted = true;
+            if (singleVoteEnabled) {
+                document.getElementById('voteSection').style.display = 'none';
+                document.getElementById('alreadyVoted').classList.add('show');
+                hasVoted = true;
+            } else {
+                // Multi-vote mode: never lock
+                const vs = document.getElementById('voteSection');
+                if (vs) vs.style.display = 'block';
+                const av = document.getElementById('alreadyVoted');
+                if (av) av.classList.remove('show');
+                hasVoted = false;
+            }
         }
 
         function showError(message) {
@@ -826,10 +858,36 @@
         }
         
         // Ordre corrigé: init -> loadMessages -> loadData
-        window.addEventListener('DOMContentLoaded', async () => {
+        
+<script>
+// --- Single-vote runtime setting (loaded from DB) ---
+let singleVoteEnabled = false; // default: multi-vote allowed unless admin enables restriction
+
+async function loadSingleVoteSetting() {
+  try {
+    if (!supabaseClient) return;
+    const { data, error } = await supabaseClient
+      .from('settings')
+      .select('value')
+      .eq('key', 'single_vote_enabled')
+      .maybeSingle();
+    if (!error && data && typeof data.value === 'string') {
+      singleVoteEnabled = (data.value === 'true');
+      console.debug('[singleVote] setting loaded:', singleVoteEnabled);
+    } else {
+      console.debug('[singleVote] no explicit setting found, default:', singleVoteEnabled, error);
+    }
+  } catch (e) {
+    console.debug('[singleVote] load error, keeping default:', e);
+  }
+}
+</script>
+
+window.addEventListener('DOMContentLoaded', async () => {
             const initialized = await initSupabase();
             if (initialized) {
-                await loadMessages(); // d’abord les textes
+                await loadMessages();       await loadSingleVoteSetting();
+      // d’abord les textes
                 await loadData();     // puis les joueurs et le reste
             }
         });
