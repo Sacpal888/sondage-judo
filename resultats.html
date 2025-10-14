@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1920, height=1080">
     <title>Résultats - Coupe virtuelle du public</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -14,33 +14,71 @@
         }
         
         body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
-            min-height: 100vh;
-            padding: 20px;
+            overflow: hidden;
         }
         
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: rgba(13, 39, 68, 0.95);
-            border: 3px solid #d4af37;
-            border-radius: 20px;
+            width: 1200px;
+            height: 800px;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            border: 5px solid #d4af37;
+            border-radius: 25px;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Animation du reflet doré qui glisse le long du cadre */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 25px;
+            padding: 5px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                transparent 40%,
+                rgba(255, 215, 0, 0.8) 50%,
+                rgba(255, 235, 100, 0.9) 52%,
+                rgba(255, 215, 0, 0.8) 54%,
+                transparent 60%,
+                transparent 100%
+            );
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            animation: shimmer 6s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            margin-bottom: 20px;
         }
         
         h1 {
             color: #d4af37;
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 2.2em;
+            margin-bottom: 8px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
@@ -49,87 +87,82 @@
             font-size: 1.1em;
         }
         
-        .logo-container {
-            margin: 30px auto 40px auto;
-            text-align: center;
-            width: 100%;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-        }
-        
-        .logo-container img {
-            max-width: 90%;
-            max-height: 150px;
-            width: auto;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid #d4af37;
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-            display: block;
-            background: transparent;
-            object-fit: contain;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .logo-placeholder {
-            color: #666;
-            font-size: 0.9em;
-            font-style: italic;
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 30px;
-            gap: 20px;
-            flex-wrap: wrap;
+        /* Ligne supérieure avec logo et statistiques */
+        .top-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
         }
         
         .stat-box {
             background: rgba(26, 47, 74, 0.6);
-            padding: 20px;
-            border-radius: 12px;
             border: 2px solid #d4af37;
-            text-align: center;
-            flex: 1;
-            min-width: 150px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            min-height: 120px;
+        }
+        
+        .logo-container {
+            background: rgba(26, 47, 74, 0.6);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            min-height: 120px;
+        }
+        
+        .logo-container img {
+            max-width: 100%;
+            max-height: 100px;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain;
         }
         
         .stat-number {
             font-size: 2.5em;
             color: #d4af37;
             font-weight: bold;
+            line-height: 1;
         }
         
         .stat-label {
             color: #ffffff;
-            margin-top: 5px;
+            margin-top: 8px;
             font-size: 0.9em;
         }
         
-        .results-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* Grille des résultats - 2 colonnes de 5 */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            flex: 1;
+            overflow: hidden;
         }
         
         .player-result {
             background: rgba(26, 47, 74, 0.6);
             border: 2px solid #d4af37;
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 15px;
             transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         
         .player-result:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
             border-color: #f0d46f;
         }
         
@@ -146,54 +179,58 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .player-name-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            flex: 1;
         }
         
         .rank-badge {
             background: linear-gradient(135deg, #d4af37, #f0d46f);
             color: #0a1828;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.1em;
+            flex-shrink: 0;
         }
         
         .player-name {
             color: #ffffff;
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 600;
+            word-break: break-word;
         }
         
         .player-stats {
             text-align: right;
+            flex-shrink: 0;
         }
         
         .vote-count {
             color: #f0d46f;
-            font-size: 1.1em;
-            margin-bottom: 5px;
+            font-size: 0.95em;
+            margin-bottom: 3px;
         }
         
         .percentage {
             color: #d4af37;
-            font-size: 1.8em;
+            font-size: 1.5em;
             font-weight: bold;
         }
         
         .progress-bar-container {
             background: rgba(10, 24, 40, 0.7);
-            border-radius: 10px;
-            height: 30px;
+            border-radius: 8px;
+            height: 20px;
             overflow: hidden;
             border: 1px solid rgba(212, 175, 55, 0.3);
         }
@@ -201,13 +238,9 @@
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #d4af37, #f0d46f);
-            border-radius: 10px;
+            border-radius: 8px;
             transition: width 0.8s ease;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
         }
         
         .progress-bar.first-place {
@@ -219,16 +252,18 @@
             color: #ffffff;
             padding: 40px;
             font-size: 1.2em;
+            grid-column: 1 / -1;
         }
         
         .refresh-notice {
             text-align: center;
             color: #f0d46f;
-            margin-top: 30px;
-            padding: 15px;
+            margin-top: 15px;
+            padding: 10px;
             background: rgba(26, 47, 74, 0.4);
             border-radius: 10px;
             border: 1px solid rgba(212, 175, 55, 0.3);
+            font-size: 0.9em;
         }
         
         .auto-refresh {
@@ -257,33 +292,10 @@
             text-align: center;
         }
         
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 1.6em;
-            }
-            
-            .player-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .player-stats {
-                text-align: left;
-            }
-            
-            .stat-box {
-                min-width: 100px;
-            }
-            
-            .stat-number {
-                font-size: 2em;
-            }
+        .logo-placeholder {
+            color: #666;
+            font-size: 0.85em;
+            font-style: italic;
         }
     </style>
 </head>
@@ -294,17 +306,16 @@
             <p class="subtitle" id="resultsSubtitle">Coupe virtuelle du public</p>
         </div>
         
-        <!-- Logo affiché en permanence -->
-        <div class="logo-container" id="logoContainer">
-            <!-- Le logo sera inséré ici -->
-        </div>
-        
         <div id="loadingMessage" class="loading">
             ⏳ Chargement des résultats...
         </div>
 
         <div id="mainContent" style="display: none;">
-            <div class="stats">
+            <!-- Ligne supérieure : Logo + Stats -->
+            <div class="top-row">
+                <div class="logo-container" id="logoContainer">
+                    <div class="logo-placeholder">Chargement...</div>
+                </div>
                 <div class="stat-box">
                     <div class="stat-number" id="totalVotes">0</div>
                     <div class="stat-label">Votes totaux</div>
@@ -315,7 +326,8 @@
                 </div>
             </div>
             
-            <div class="results-list" id="resultsList">
+            <!-- Grille des résultats - Top 10 sur 2 colonnes -->
+            <div class="results-grid" id="resultsGrid">
                 <div class="no-votes" id="noVotesDefault">
                     Aucun vote pour le moment...<br>
                     Soyez le premier à voter ! 🥋
@@ -333,7 +345,7 @@
     <script>
         let supabaseClient;
         let realtimeChannel;
-        let NOVOTES_HTML = null; // sera alimenté par msg_results_novotes si présent
+        let NOVOTES_HTML = null;
         
         // Initialiser Supabase
         async function initSupabase() {
@@ -355,7 +367,7 @@
             }
         }
 
-        // Charger les messages dynamiques depuis settings (sans order exotique)
+        // Charger les messages dynamiques depuis settings
         async function loadMessages() {
             try {
                 if (!supabaseClient) return;
@@ -381,7 +393,6 @@
                     subtitleEl.innerHTML = map['msg_results_subtitle'].replace(/\n/g, '<br>');
                 }
                 if (refreshEl && map['msg_results_refresh']) {
-                    // on conserve l'icône auto-refresh si présente
                     const icon = '<span class="auto-refresh">🔄</span> ';
                     refreshEl.innerHTML = icon + map['msg_results_refresh'].replace(/\n/g, '<br>');
                 }
@@ -389,13 +400,12 @@
                     NOVOTES_HTML = map['msg_results_novotes'].replace(/\n/g, '<br>');
                 }
             } catch (e) {
-                console.warn('loadMessages(): utilisation des valeurs par défaut (échec de chargement)', e);
+                console.warn('loadMessages(): utilisation des valeurs par défaut', e);
             }
         }
 
         // Configurer les mises à jour en temps réel
         function setupRealtimeUpdates() {
-            // Écouter les changements sur la table votes
             realtimeChannel = supabaseClient
                 .channel('votes-changes')
                 .on(
@@ -412,7 +422,7 @@
                 )
                 .subscribe();
 
-            // Fallback: actualiser toutes les 5 secondes au cas où
+            // Fallback: actualiser toutes les 5 secondes
             setInterval(loadResults, 5000);
         }
         
@@ -465,19 +475,22 @@
                 // Trier par nombre de votes décroissant
                 results.sort((a, b) => b.votes - a.votes);
                 
+                // Limiter aux 10 premiers
+                const top10 = results.slice(0, 10);
+                
                 // Mettre à jour l'affichage
-                displayResults(results, totalVotes, playersData.length);
+                displayResults(top10, totalVotes, playersData.length);
                 
                 // Afficher le contenu principal
                 document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'flex';
                 
             } catch (error) {
                 showError('Erreur de chargement: ' + error.message);
             }
         }
         
-        // Charger le logo (fonction séparée)
+        // Charger le logo
         async function loadLogo() {
             try {
                 const { data: logoData, error: logoError } = await supabaseClient
@@ -490,20 +503,20 @@
                 
                 if (logoError) {
                     console.log('Pas de logo trouvé:', logoError.message);
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configuré)</div>';
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo)</div>';
                     return;
                 }
                 
                 if (logoData && logoData.value) {
-                    console.log('Logo chargé, taille:', logoData.value.length, 'caractères');
-                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
+                    console.log('Logo chargé');
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
                 } else {
                     console.log('Logo vide dans la base');
                     logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
                 }
             } catch (error) {
                 console.error('Erreur chargement logo:', error);
-                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur chargement logo)</div>';
+                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur logo)</div>';
             }
         }
         
@@ -512,18 +525,18 @@
             document.getElementById('totalVotes').textContent = totalVotes;
             document.getElementById('totalPlayers').textContent = totalPlayers;
             
-            const resultsList = document.getElementById('resultsList');
+            const resultsGrid = document.getElementById('resultsGrid');
             
             // Si aucun vote
             if (totalVotes === 0) {
                 const html = NOVOTES_HTML ? `<div class="no-votes">${NOVOTES_HTML}</div>` :
                     '<div class="no-votes">Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋</div>';
-                resultsList.innerHTML = html;
+                resultsGrid.innerHTML = html;
                 return;
             }
             
-            // Afficher les résultats
-            resultsList.innerHTML = results.map((result, index) => {
+            // Afficher les résultats (top 10 seulement)
+            resultsGrid.innerHTML = results.map((result, index) => {
                 const isFirst = index === 0 && result.votes > 0;
                 return `
                     <div class="player-result ${isFirst ? 'first-place' : ''}">
@@ -549,12 +562,12 @@
 
         function showNoData() {
             document.getElementById('loadingMessage').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'flex';
             document.getElementById('totalVotes').textContent = '0';
             document.getElementById('totalPlayers').textContent = '0';
             const msg = NOVOTES_HTML ? `<div class="no-votes">${NOVOTES_HTML}</div>` :
                 '<div class="no-votes">Aucun candidat configuré.<br>Contactez l\'administrateur.</div>';
-            document.getElementById('resultsList').innerHTML = msg;
+            document.getElementById('resultsGrid').innerHTML = msg;
         }
 
         function showError(message) {
@@ -564,7 +577,7 @@
             document.getElementById('errorMessage').style.display = 'block';
         }
         
-        // Initialiser au chargement : init -> messages -> résultats
+        // Initialiser au chargement
         window.addEventListener('DOMContentLoaded', async () => {
             const initialized = await initSupabase();
             if (initialized) {
