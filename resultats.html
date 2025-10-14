@@ -1,196 +1,570 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=1920, height=1080">
-  <title>Résultats - Top 6</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <style>
-    :root { --scale: 0.85; } /* ≈ 15% plus petit */
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{
-      width:1920px;height:1080px;background:transparent;display:flex;justify-content:center;align-items:center;
-      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;overflow:hidden
-    }
-    .container{
-      width:1200px;height:800px;background:linear-gradient(135deg,#0a1828 0%,#1a2f4a 50%,#0d2744 100%);
-      border:5px solid #d4af37;border-radius:25px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.8);
-      display:flex;flex-direction:column;overflow:hidden
-    }
-    .header{text-align:center;margin-bottom:14px}
-    h1{color:#d4af37;font-size:calc(2.3em * var(--scale));margin-bottom:6px;text-shadow:2px 2px 4px rgba(0,0,0,0.5)}
-    .subtitle{color:#f0d46f;font-size:calc(1.05em * var(--scale))}
-    .top-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin:16px 8px 10px 8px}
-    .stat-box,.logo-container{
-      background:rgba(26,47,74,0.6);border:2px solid #d4af37;border-radius:14px;display:flex;justify-content:center;align-items:center;
-      height:calc(110px * var(--scale));padding:12px
-    }
-    .logo-container img{max-width:100%;max-height:calc(88px * var(--scale));border-radius:8px;object-fit:contain}
-    .stat-number{font-size:calc(2.2em * var(--scale));color:#d4af37;font-weight:700;line-height:1}
-    .stat-label{color:#fff;margin-top:6px;font-size:calc(0.9em * var(--scale))}
-    /* Zone résultats : marges internes pour ne pas coller au cadre */
-    .results-wrap{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:12px 28px 18px 28px;flex:1;align-items:start}
-    .col{display:flex;flex-direction:column;gap:14px}
-    .player-result{
-      background:rgba(26,47,74,0.6);border:2px solid #d4af37;border-radius:12px;padding:calc(12px * var(--scale));
-      transition:all .25s;display:flex;flex-direction:column;gap:calc(8px * var(--scale))
-    }
-    .player-result:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(212,175,55,0.28)}
-    .player-header{display:flex;justify-content:space-between;align-items:center;gap:calc(8px * var(--scale))}
-    .player-name-container{display:flex;align-items:center;gap:calc(8px * var(--scale));flex:1;min-width:0}
-    .rank-badge{
-      background:linear-gradient(135deg,#d4af37,#f0d46f);color:#0a1828;width:calc(32px * var(--scale));height:calc(32px * var(--scale));
-      border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:calc(1em * var(--scale));flex-shrink:0
-    }
-    .player-name{color:#fff;font-size:calc(1em * var(--scale));font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .player-stats{text-align:right;flex-shrink:0}
-    .vote-count{color:#f0d46f;font-size:calc(.85em * var(--scale));margin-bottom:2px}
-    .percentage{color:#d4af37;font-size:calc(1.25em * var(--scale));font-weight:700}
-    .progress-bar-container{background:rgba(10,24,40,0.7);border-radius:8px;height:calc(14px * var(--scale));overflow:hidden;border:1px solid rgba(212,175,55,.28)}
-    .progress-bar{height:100%;background:linear-gradient(90deg,#d4af37,#f0d46f);border-radius:8px;transition:width .8s ease;box-shadow:0 0 10px rgba(212,175,55,.45)}
-    .no-votes{text-align:center;color:#fff;padding:24px;font-size:calc(1.05em * var(--scale));grid-column:1 / -1}
-    .loading{text-align:center;color:#f0d46f;padding:24px;font-size:calc(1.05em * var(--scale))}
-    .error-message{
-      background:rgba(220,53,69,.2);border:2px solid #dc3545;color:#ff6b6b;padding:14px;border-radius:10px;text-align:center;margin-top:8px
-    }
-    .debug{margin-top:8px;color:#f0d46f;font-size:12px;white-space:pre-wrap;max-height:140px;overflow:auto}
-    .badge{display:inline-block;font-size:11px;color:#0a1828;background:#f0d46f;border-radius:10px;padding:2px 8px;margin-left:8px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Résultats - Coupe virtuelle du public</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 1920px;
+            height: 1080px;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 1200px;
+            height: 880px;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            border: 5px solid #d4af37;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        h1 {
+            color: #d4af37;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            color: #f0d46f;
+            font-size: 1.3em;
+        }
+        
+        /* Ligne supérieure avec logo et statistiques - 3 cases horizontales */
+        .top-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: rgba(26, 47, 74, 0.6);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            height: 140px;
+        }
+        
+        .logo-container {
+            background: rgba(26, 47, 74, 0.6);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            height: 140px;
+        }
+        
+        .logo-container img {
+            max-width: 100%;
+            max-height: 110px;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            color: #d4af37;
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            color: #ffffff;
+            margin-top: 10px;
+            font-size: 1em;
+        }
+        
+        /* Grille des résultats - 2 colonnes de 5, remplissage vertical */
+        .results-grid {
+            display: grid;
+            grid-template-rows: repeat(5, 1fr);
+            grid-auto-flow: column;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            flex: 1;
+        }
+        
+        .player-result {
+            background: rgba(26, 47, 74, 0.6);
+            border: 2px solid #d4af37;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .player-result:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+            border-color: #f0d46f;
+        }
+        
+        .player-result.first-place {
+            border: 3px solid #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        .player-result.first-place .rank-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+        
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .player-name-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .rank-badge {
+            background: linear-gradient(135deg, #d4af37, #f0d46f);
+            color: #0a1828;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+        
+        .player-name {
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: 600;
+            word-break: break-word;
+        }
+        
+        .player-stats {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .vote-count {
+            color: #f0d46f;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        
+        .percentage {
+            color: #d4af37;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .progress-bar-container {
+            background: rgba(10, 24, 40, 0.7);
+            border-radius: 8px;
+            height: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f0d46f);
+            border-radius: 8px;
+            transition: width 0.8s ease;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        
+        .progress-bar.first-place {
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        
+        .no-votes {
+            text-align: center;
+            color: #ffffff;
+            padding: 40px;
+            font-size: 1.3em;
+            grid-column: 1 / -1;
+        }
+        
+        .refresh-notice {
+            text-align: center;
+            color: #f0d46f;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(26, 47, 74, 0.4);
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            font-size: 1em;
+        }
+        
+        .auto-refresh {
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            text-align: center;
+            color: #f0d46f;
+            padding: 40px;
+            font-size: 1.3em;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .logo-placeholder {
+            color: #999;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1 id="resultsTitle">🏆 Résultats du Vote 🏆</h1>
-      <p class="subtitle" id="resultsSubtitle">Coupe virtuelle du public <span id="modeBadge" class="badge" style="display:none;">mode dégradé</span></p>
+    <div class="container">
+        <div class="header">
+            <h1 id="resultsTitle">🏆 Résultats du Vote 🏆</h1>
+            <p class="subtitle" id="resultsSubtitle">Coupe virtuelle du public</p>
+        </div>
+        
+        <div id="loadingMessage" class="loading">
+            ⏳ Chargement des résultats...
+        </div>
+
+        <div id="mainContent" style="display: none; flex-direction: column; flex: 1;">
+            <!-- Ligne supérieure : Logo + Stats -->
+            <div class="top-row">
+                <div class="logo-container" id="logoContainer">
+                    <div class="logo-placeholder">Chargement...</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalVotes">0</div>
+                    <div class="stat-label">Votes totaux</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalPlayers">0</div>
+                    <div class="stat-label">Candidats</div>
+                </div>
+            </div>
+            
+            <!-- Grille des résultats - Top 10 sur 2 colonnes -->
+            <div class="results-grid" id="resultsGrid">
+                <div class="no-votes" id="noVotesDefault">
+                    Aucun vote pour le moment...<br>
+                    Soyez le premier à voter ! 🥋
+                </div>
+            </div>
+            
+            <div class="refresh-notice" id="refreshNotice">
+                <span class="auto-refresh">🔄</span> Mise à jour en temps réel
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
     </div>
 
-    <div id="loadingMessage" class="loading">⏳ Chargement des résultats...</div>
-
-    <div id="mainContent" style="display:none;flex-direction:column;flex:1;">
-      <div class="top-row">
-        <div class="logo-container" id="logoContainer"><div style="color:#999;font-style:italic;font-size:12px">Logo</div></div>
-        <div class="stat-box">
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <div class="stat-number" id="totalVotes">0</div>
-            <div class="stat-label">Votes totaux</div>
-          </div>
-        </div>
-        <div class="stat-box">
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <div class="stat-number" id="totalPlayers">0</div>
-            <div class="stat-label">Candidats</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Résultats : 2 colonnes (1-3 à gauche, 4-6 à droite) -->
-      <div class="results-wrap" id="resultsWrap">
-        <div class="no-votes">Aucun vote pour le moment... 🥋</div>
-      </div>
-    </div>
-
-    <div id="errorMessage" class="error-message" style="display:none;"></div>
-    <div id="debug" class="debug"></div>
-  </div>
-
-  <script>
-    let supabaseClient;
-
-    function log(msg){ console.log('[Top6]', msg); const d=document.getElementById('debug'); d.textContent += (typeof msg==='string'?msg:JSON.stringify(msg))+'\\n'; }
-    function showError(message){
-      document.getElementById('loadingMessage').style.display='none';
-      document.getElementById('mainContent').style.display='none';
-      const el = document.getElementById('errorMessage'); el.textContent = message; el.style.display='block'; log('ERROR: '+message);
-    }
-    function showMain(){ document.getElementById('loadingMessage').style.display='none'; document.getElementById('mainContent').style.display='flex'; }
-
-    function card(r, rank){ return `
-      <div class="player-result">
-        <div class="player-header">
-          <div class="player-name-container">
-            <div class="rank-badge">${rank}</div>
-            <div class="player-name">${r.name}</div>
-          </div>
-          <div class="player-stats">
-            <div class="vote-count">${r.votes} vote${r.votes>1?'s':''}</div>
-            <div class="percentage">${r.percentage}%</div>
-          </div>
-        </div>
-        <div class="progress-bar-container"><div class="progress-bar" style="width:${r.percentage}%"></div></div>
-      </div>`; }
-
-    function renderResults(results, totals){
-      const wrap = document.getElementById('resultsWrap');
-      if (!results || results.length===0 || !totals.totalVotes){
-        wrap.innerHTML = '<div class="no-votes">Aucun vote pour le moment... 🥋</div>';
-        return;
-      }
-      const left = results.slice(0,3);
-      const right = results.slice(3,6);
-      const leftHtml = left.map((r,i)=>card(r, i+1)).join('');
-      const rightHtml = right.map((r,i)=>card(r, i+4)).join('');
-      wrap.innerHTML = `<div class="col">${leftHtml}</div><div class="col">${rightHtml}</div>`;
-      document.getElementById('totalVotes').textContent = totals.totalVotes;
-      document.getElementById('totalPlayers').textContent = totals.totalPlayers;
-    }
-
-    function computeResults(players, votes){
-      const counts = {}; let total = 0;
-      (votes||[]).forEach(v=>{ counts[v.player_id]=(counts[v.player_id]||0)+1; total++; });
-      const results = (players||[]).map(p=>{
-        const v = counts[p.id]||0; return { id:p.id, name:p.name, votes:v, percentage: total?((v/total)*100).toFixed(1):0 };
-      }).sort((a,b)=>b.votes-a.votes).slice(0,6);
-      return { results, totals:{ totalVotes: total, totalPlayers: players.length } };
-    }
-
-    async function trySupabase(){
-      try{
-        if (typeof window.supabase === 'undefined') throw new Error('Supabase CDN introuvable');
-        if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') throw new Error('config.js manquant ou incomplet');
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const [{ data: players, error: pe }, { data: votes, error: ve }] = await Promise.all([
-          supabaseClient.from('players').select('*').order('name', { ascending:true }),
-          supabaseClient.from('votes').select('*')
-        ]);
-        if (pe) throw pe; if (ve) throw ve;
-        log('Données Supabase OK');
-        return { players, votes };
-      }catch(e){
-        log('Supabase KO: '+ (e.message||e));
-        return null;
-      }
-    }
-
-    async function load(){
-      try{
-        const data = await trySupabase();
-        showMain();
-        if (data){
-          const { results, totals } = computeResults(data.players, data.votes);
-          renderResults(results, totals);
-          document.getElementById('modeBadge').style.display='none';
-        }else{
-          // Mode dégradé : jeu de données factice pour valider DESIGN/MISE EN PAGE
-          document.getElementById('modeBadge').style.display='inline-block';
-          const demoPlayers = [
-            {id:1,name:'Candidat A'},{id:2,name:'Candidat B'},{id:3,name:'Candidat C'},
-            {id:4,name:'Candidat D'},{id:5,name:'Candidat E'},{id:6,name:'Candidat F'}
-          ];
-          const demoVotes = [
-            {player_id:1},{player_id:1},{player_id:2},{player_id:3},{player_id:1},{player_id:4},
-            {player_id:2},{player_id:5},{player_id:6},{player_id:2},{player_id:3}
-          ];
-          const { results, totals } = computeResults(demoPlayers, demoVotes);
-          renderResults(results, totals);
-          showError('Mode dégradé : vérifiez config.js, CORS/RLS ou la connexion Supabase.');
+    <script>
+        let supabaseClient;
+        let realtimeChannel;
+        let NOVOTES_HTML = null;
+        
+        // Initialiser Supabase
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    showError('Configuration manquante. Contactez l\'administrateur.');
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Configurer les mises à jour en temps réel
+                setupRealtimeUpdates();
+                
+                return true;
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+                return false;
+            }
         }
-      }catch(e){
-        showError('Erreur inattendue: '+ (e.message||e));
-      }
-    }
 
-    window.addEventListener('DOMContentLoaded', load);
-  </script>
+        // Charger les messages dynamiques depuis settings
+        async function loadMessages() {
+            try {
+                if (!supabaseClient) return;
+                const KEYS = ['msg_results_title','msg_results_subtitle','msg_results_refresh','msg_results_novotes'];
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('key, value')
+                    .in('key', KEYS);
+                if (error) throw error;
+                
+                const map = {};
+                (data || []).forEach(row => { map[row.key] = row.value; });
+                
+                const titleEl = document.getElementById('resultsTitle');
+                const subtitleEl = document.getElementById('resultsSubtitle');
+                const refreshEl = document.getElementById('refreshNotice');
+                
+                if (titleEl && map['msg_results_title']) {
+                    titleEl.textContent = map['msg_results_title'];
+                    document.title = map['msg_results_title'];
+                }
+                if (subtitleEl && map['msg_results_subtitle']) {
+                    subtitleEl.innerHTML = map['msg_results_subtitle'].replace(/\n/g, '<br>');
+                }
+                if (refreshEl && map['msg_results_refresh']) {
+                    const icon = '<span class="auto-refresh">🔄</span> ';
+                    refreshEl.innerHTML = icon + map['msg_results_refresh'].replace(/\n/g, '<br>');
+                }
+                if (map['msg_results_novotes']) {
+                    NOVOTES_HTML = map['msg_results_novotes'].replace(/\n/g, '<br>');
+                }
+            } catch (e) {
+                console.warn('loadMessages(): utilisation des valeurs par défaut', e);
+            }
+        }
+
+        // Configurer les mises à jour en temps réel
+        function setupRealtimeUpdates() {
+            realtimeChannel = supabaseClient
+                .channel('votes-changes')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'votes'
+                    },
+                    (payload) => {
+                        console.log('Changement détecté:', payload);
+                        loadResults();
+                    }
+                )
+                .subscribe();
+
+            // Fallback: actualiser toutes les 5 secondes
+            setInterval(loadResults, 5000);
+        }
+        
+        async function loadResults() {
+            if (!supabaseClient) return;
+            
+            try {
+                // Charger le logo
+                await loadLogo();
+                
+                // Charger tous les joueurs
+                const { data: playersData, error: playersError } = await supabaseClient
+                    .from('players')
+                    .select('*')
+                    .order('name', { ascending: true });
+                
+                if (playersError) throw playersError;
+                
+                if (!playersData || playersData.length === 0) {
+                    showNoData();
+                    return;
+                }
+                
+                // Charger tous les votes
+                const { data: votesData, error: votesError } = await supabaseClient
+                    .from('votes')
+                    .select('*');
+                
+                if (votesError) throw votesError;
+                
+                // Compter les votes par joueur
+                const voteCounts = {};
+                let totalVotes = 0;
+                
+                if (votesData) {
+                    votesData.forEach(vote => {
+                        voteCounts[vote.player_id] = (voteCounts[vote.player_id] || 0) + 1;
+                        totalVotes++;
+                    });
+                }
+                
+                // Créer le tableau de résultats
+                const results = playersData.map(player => ({
+                    id: player.id,
+                    name: player.name,
+                    votes: voteCounts[player.id] || 0,
+                    percentage: totalVotes > 0 ? ((voteCounts[player.id] || 0) / totalVotes * 100).toFixed(1) : 0
+                }));
+                
+                // Trier par nombre de votes décroissant
+                results.sort((a, b) => b.votes - a.votes);
+                
+                // Limiter aux 10 premiers
+                const top10 = results.slice(0, 10);
+                
+                // Mettre à jour l'affichage
+                displayResults(top10, totalVotes, playersData.length);
+                
+                // Afficher le contenu principal
+                document.getElementById('loadingMessage').style.display = 'none';
+                const mainContent = document.getElementById('mainContent');
+                mainContent.style.display = 'flex';
+                mainContent.style.flexDirection = 'column';
+                mainContent.style.flex = '1';
+                
+            } catch (error) {
+                showError('Erreur de chargement: ' + error.message);
+            }
+        }
+        
+        // Charger le logo
+        async function loadLogo() {
+            try {
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                const logoContainer = document.getElementById('logoContainer');
+                
+                if (logoError) {
+                    console.log('Pas de logo trouvé:', logoError.message);
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo)</div>';
+                    return;
+                }
+                
+                if (logoData && logoData.value) {
+                    console.log('Logo chargé');
+                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
+                } else {
+                    console.log('Logo vide dans la base');
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
+                }
+            } catch (error) {
+                console.error('Erreur chargement logo:', error);
+                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur logo)</div>';
+            }
+        }
+        
+        function displayResults(results, totalVotes, totalPlayers) {
+            // Mettre à jour les statistiques
+            document.getElementById('totalVotes').textContent = totalVotes;
+            document.getElementById('totalPlayers').textContent = totalPlayers;
+            
+            const resultsGrid = document.getElementById('resultsGrid');
+            
+            // Si aucun vote
+            if (totalVotes === 0) {
+                const html = NOVOTES_HTML ? `<div class="no-votes">${NOVOTES_HTML}</div>` :
+                    '<div class="no-votes">Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋</div>';
+                resultsGrid.innerHTML = html;
+                return;
+            }
+            
+            // Afficher les résultats (top 10 seulement)
+            resultsGrid.innerHTML = results.map((result, index) => {
+                const isFirst = index === 0 && result.votes > 0;
+                return `
+                    <div class="player-result ${isFirst ? 'first-place' : ''}">
+                        <div class="player-header">
+                            <div class="player-name-container">
+                                <div class="rank-badge">${index + 1}</div>
+                                <div class="player-name">${result.name}</div>
+                            </div>
+                            <div class="player-stats">
+                                <div class="vote-count">${result.votes} vote${result.votes > 1 ? 's' : ''}</div>
+                                <div class="percentage">${result.percentage}%</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar ${isFirst ? 'first-place' : ''}" 
+                                 style="width: ${result.percentage}%">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showNoData() {
+            document.getElementById('loadingMessage').style.display = 'none';
+            const mainContent = document.getElementById('mainContent');
+            mainContent.style.display = 'flex';
+            mainContent.style.flexDirection = 'column';
+            mainContent.style.flex = '1';
+            document.getElementById('totalVotes').textContent = '0';
+            document.getElementById('totalPlayers').textContent = '0';
+            const msg = NOVOTES_HTML ? `<div class="no-votes">${NOVOTES_HTML}</div>` :
+                '<div class="no-votes">Aucun candidat configuré.<br>Contactez l\'administrateur.</div>';
+            document.getElementById('resultsGrid').innerHTML = msg;
+        }
+
+        function showError(message) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+        
+        // Initialiser au chargement
+        window.addEventListener('DOMContentLoaded', async () => {
+            const initialized = await initSupabase();
+            if (initialized) {
+                await loadMessages();
+                await loadResults();
+            }
+        });
+        
+        // Nettoyer le canal en temps réel lors de la fermeture
+        window.addEventListener('beforeunload', () => {
+            if (realtimeChannel) {
+                supabaseClient.removeChannel(realtimeChannel);
+            }
+        });
+    </script>
 </body>
 </html>
