@@ -299,6 +299,10 @@
                     Soyez le premier à voter ! 🥋
                 </div>
             </div>
+            
+            <div class="refresh-notice" id="refreshNotice">
+                <span class="auto-refresh">🔄</span> Mise à jour en temps réel
+            </div>
         </div>
 
         <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -384,8 +388,8 @@
                 )
                 .subscribe();
 
-            // Fallback: actualiser toutes les 2 secondes
-            setInterval(loadResults, 2000);
+            // Fallback: actualiser toutes les 5 secondes
+            setInterval(loadResults, 5000);
         }
         
         async function loadResults() {
