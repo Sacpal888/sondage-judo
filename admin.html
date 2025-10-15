@@ -652,6 +652,16 @@
                 currentUser = session.user;
                 console.log('Utilisateur connecté:', currentUser.email);
                 
+                // ✅ VÉRIFICATION EMAIL - MODIFIEZ ICI AVEC VOTRE EMAIL !
+                const allowedEmails = ['pascal@ocelo.be'];  // ← REMPLACEZ PAR VOTRE VRAI EMAIL !
+                if (!allowedEmails.includes(session.user.email)) {
+                    alert('❌ Accès refusé : email non autorisé\n\nSeuls les administrateurs peuvent accéder à cette page.');
+                    await supabaseClient.auth.signOut();
+                    redirectToLogin();
+                    return false;
+                }
+                // ✅ FIN DE LA VÉRIFICATION EMAIL
+                
                 // Afficher l'email de l'utilisateur
                 document.getElementById('userEmail').textContent = currentUser.email;
                 
