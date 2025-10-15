@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PNG → APNG Converter</title>
+    <title>PNG → APNG Converter (Optimisé)</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +25,7 @@
             background: white;
             border-radius: 16px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
@@ -44,86 +44,109 @@
             font-size: 14px;
         }
 
-        .upload-zone {
-            border: 3px dashed #667eea;
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9ff;
             border-radius: 12px;
-            padding: 60px 20px;
+            border: 2px solid #e0e4ff;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 30px 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #f8f9ff;
+            background: white;
         }
 
         .upload-zone:hover {
             border-color: #764ba2;
-            background: #f0f1ff;
+            background: #fafbff;
         }
 
         .upload-zone.dragover {
             border-color: #764ba2;
-            background: #e8eaff;
+            background: #f0f1ff;
             transform: scale(1.02);
         }
 
+        .upload-zone.has-files {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
         .upload-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
         .upload-text {
             color: #667eea;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .upload-hint {
             color: #999;
+            font-size: 12px;
+        }
+
+        .upload-count {
+            color: #4caf50;
             font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
         }
 
         input[type="file"] {
             display: none;
         }
 
-        .files-list {
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .files-list.show {
-            display: block;
-        }
-
-        .file-item {
+        .freeze-controls {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            color: #333;
-            font-size: 14px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
-        .file-item:not(:last-child) {
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .file-name {
+        .freeze-input {
             flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
         }
 
-        .file-size {
-            color: #999;
-            font-size: 12px;
-            margin-left: 10px;
+        .freeze-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .freeze-label {
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .options {
@@ -131,11 +154,6 @@
             padding: 20px;
             background: #f8f9fa;
             border-radius: 8px;
-            display: none;
-        }
-
-        .options.show {
-            display: block;
         }
 
         .option-group {
@@ -340,26 +358,84 @@
             width: 0;
             transition: width 0.3s ease;
         }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎞️ PNG → APNG</h1>
-        <p class="subtitle">Framerate personnalisable • Options de boucle</p>
+        <h1>🎞️ PNG → APNG (Optimisé)</h1>
+        <p class="subtitle">Animation avec freeze optimisé pour économiser la mémoire</p>
 
-        <div class="upload-zone" id="uploadZone">
-            <div class="upload-icon">📁</div>
-            <div class="upload-text">Glissez vos images PNG ici</div>
-            <div class="upload-hint">ou cliquez pour sélectionner</div>
+        <div class="info-box">
+            💡 <strong>Nouveau :</strong> Créez des animations longues sans surcharger la mémoire ! Upload une animation d'entrée, une image à figer, puis une animation de sortie.
         </div>
 
-        <input type="file" id="fileInput" accept="image/png" multiple>
+        <!-- Section 1: Animation d'entrée -->
+        <div class="section">
+            <div class="section-title">
+                <span>🎬</span>
+                <span>Animation d'entrée</span>
+            </div>
+            <div class="section-description">Images qui s'animeront au début (optionnel)</div>
+            <div class="upload-zone" id="uploadZoneIntro">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Glissez vos PNG ici</div>
+                <div class="upload-hint">ou cliquez pour sélectionner</div>
+            </div>
+            <input type="file" id="fileInputIntro" accept="image/png" multiple>
+            <div class="upload-count" id="countIntro"></div>
+        </div>
 
-        <div class="files-list" id="filesList"></div>
+        <!-- Section 2: Image freeze -->
+        <div class="section">
+            <div class="section-title">
+                <span>⏸️</span>
+                <span>Image freeze (pause)</span>
+            </div>
+            <div class="section-description">Une seule image qui restera affichée pendant X secondes</div>
+            <div class="upload-zone" id="uploadZoneFreeze">
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text">1 seule image PNG</div>
+                <div class="upload-hint">Image qui sera figée</div>
+            </div>
+            <input type="file" id="fileInputFreeze" accept="image/png">
+            <div class="upload-count" id="countFreeze"></div>
+            <div class="freeze-controls">
+                <span class="freeze-label">Durée du freeze :</span>
+                <input type="number" class="freeze-input" id="freezeDuration" min="0" max="3600" value="3" step="0.5">
+                <span class="freeze-label">secondes</span>
+            </div>
+        </div>
 
-        <div class="options" id="options">
+        <!-- Section 3: Animation de sortie -->
+        <div class="section">
+            <div class="section-title">
+                <span>🎬</span>
+                <span>Animation de sortie</span>
+            </div>
+            <div class="section-description">Images qui s'animeront à la fin (optionnel)</div>
+            <div class="upload-zone" id="uploadZoneOutro">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Glissez vos PNG ici</div>
+                <div class="upload-hint">ou cliquez pour sélectionner</div>
+            </div>
+            <input type="file" id="fileInputOutro" accept="image/png" multiple>
+            <div class="upload-count" id="countOutro"></div>
+        </div>
+
+        <!-- Options globales -->
+        <div class="options">
             <div class="option-group">
-                <label class="option-label">Frame Rate (FPS)</label>
+                <label class="option-label">Frame Rate (FPS) - pour les animations</label>
                 <div class="framerate-container">
                     <input type="range" class="framerate-slider" id="framerateSlider" min="1" max="120" value="50">
                     <div class="framerate-value"><span id="framerateValue">50</span> fps</div>
@@ -380,7 +456,7 @@
 
         <div class="actions">
             <button class="btn-convert" id="convertBtn" disabled>Convertir en APNG</button>
-            <button class="btn-clear" id="clearBtn">Effacer</button>
+            <button class="btn-clear" id="clearBtn">Effacer tout</button>
         </div>
 
         <div class="progress" id="progress">
@@ -394,10 +470,17 @@
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.min.js"></script>
     <script>
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const filesList = document.getElementById('filesList');
-        const options = document.getElementById('options');
+        // Éléments DOM
+        const uploadZoneIntro = document.getElementById('uploadZoneIntro');
+        const uploadZoneFreeze = document.getElementById('uploadZoneFreeze');
+        const uploadZoneOutro = document.getElementById('uploadZoneOutro');
+        const fileInputIntro = document.getElementById('fileInputIntro');
+        const fileInputFreeze = document.getElementById('fileInputFreeze');
+        const fileInputOutro = document.getElementById('fileInputOutro');
+        const countIntro = document.getElementById('countIntro');
+        const countFreeze = document.getElementById('countFreeze');
+        const countOutro = document.getElementById('countOutro');
+        const freezeDuration = document.getElementById('freezeDuration');
         const framerateSlider = document.getElementById('framerateSlider');
         const framerateValue = document.getElementById('framerateValue');
         const infiniteLoop = document.getElementById('infiniteLoop');
@@ -408,29 +491,78 @@
         const progress = document.getElementById('progress');
         const progressBar = document.getElementById('progressBar');
 
-        let selectedFiles = [];
+        let introFiles = [];
+        let freezeFile = null;
+        let outroFiles = [];
 
-        // Upload zone interactions
-        uploadZone.addEventListener('click', () => fileInput.click());
+        // Setup upload zones
+        setupUploadZone(uploadZoneIntro, fileInputIntro, 'intro');
+        setupUploadZone(uploadZoneFreeze, fileInputFreeze, 'freeze');
+        setupUploadZone(uploadZoneOutro, fileInputOutro, 'outro');
 
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
+        function setupUploadZone(zone, input, type) {
+            zone.addEventListener('click', () => input.click());
 
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
 
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
-        });
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
 
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files, type);
+            });
+
+            input.addEventListener('change', (e) => {
+                handleFiles(e.target.files, type);
+            });
+        }
+
+        function handleFiles(files, type) {
+            const pngFiles = Array.from(files).filter(file => file.type === 'image/png');
+            
+            if (pngFiles.length === 0) {
+                showStatus('Veuillez sélectionner des fichiers PNG uniquement', 'error');
+                return;
+            }
+
+            if (type === 'intro') {
+                introFiles = pngFiles.sort((a, b) => a.name.localeCompare(b.name));
+                updateCount(countIntro, uploadZoneIntro, introFiles.length, 'intro');
+            } else if (type === 'freeze') {
+                freezeFile = pngFiles[0];
+                updateCount(countFreeze, uploadZoneFreeze, 1, 'freeze');
+            } else if (type === 'outro') {
+                outroFiles = pngFiles.sort((a, b) => a.name.localeCompare(b.name));
+                updateCount(countOutro, uploadZoneOutro, outroFiles.length, 'outro');
+            }
+
+            checkCanConvert();
+            hideStatus();
+        }
+
+        function updateCount(element, zone, count, type) {
+            if (count > 0) {
+                const label = type === 'freeze' ? '1 image sélectionnée' : `${count} image${count > 1 ? 's' : ''} sélectionnée${count > 1 ? 's' : ''}`;
+                element.textContent = `✓ ${label}`;
+                element.style.display = 'block';
+                zone.classList.add('has-files');
+            } else {
+                element.textContent = '';
+                element.style.display = 'none';
+                zone.classList.remove('has-files');
+            }
+        }
+
+        function checkCanConvert() {
+            // On peut convertir si on a au moins l'image freeze
+            convertBtn.disabled = !freezeFile;
+        }
 
         // Framerate slider
         framerateSlider.addEventListener('input', (e) => {
@@ -442,55 +574,25 @@
             loopLabel.textContent = e.target.checked ? 'Activée' : 'Désactivée';
         });
 
-        function handleFiles(files) {
-            selectedFiles = Array.from(files).filter(file => file.type === 'image/png');
-            
-            if (selectedFiles.length === 0) {
-                showStatus('Veuillez sélectionner des fichiers PNG uniquement', 'error');
-                return;
-            }
-
-            selectedFiles.sort((a, b) => a.name.localeCompare(b.name));
-            displayFiles();
-            options.classList.add('show');
-            convertBtn.disabled = false;
-            hideStatus();
-        }
-
-        function displayFiles() {
-            filesList.innerHTML = '';
-            filesList.classList.add('show');
-
-            selectedFiles.forEach(file => {
-                const item = document.createElement('div');
-                item.className = 'file-item';
-                item.innerHTML = `
-                    <span class="file-name">${file.name}</span>
-                    <span class="file-size">${formatFileSize(file.size)}</span>
-                `;
-                filesList.appendChild(item);
-            });
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-        }
-
+        // Clear button
         clearBtn.addEventListener('click', () => {
-            selectedFiles = [];
-            filesList.innerHTML = '';
-            filesList.classList.remove('show');
-            options.classList.remove('show');
-            fileInput.value = '';
+            introFiles = [];
+            freezeFile = null;
+            outroFiles = [];
+            fileInputIntro.value = '';
+            fileInputFreeze.value = '';
+            fileInputOutro.value = '';
+            updateCount(countIntro, uploadZoneIntro, 0, 'intro');
+            updateCount(countFreeze, uploadZoneFreeze, 0, 'freeze');
+            updateCount(countOutro, uploadZoneOutro, 0, 'outro');
             convertBtn.disabled = true;
             hideStatus();
             hideProgress();
         });
 
+        // Convert button
         convertBtn.addEventListener('click', async () => {
-            if (selectedFiles.length === 0) return;
+            if (!freezeFile) return;
 
             convertBtn.disabled = true;
             showStatus('Chargement des images...', 'info');
@@ -500,46 +602,91 @@
                 const frames = [];
                 const delays = [];
                 const fps = parseInt(framerateSlider.value);
-                const delayPerFrame = 1000 / fps; // Conversion FPS en millisecondes par frame
-                const loopCount = infiniteLoop.checked ? 0 : 1; // 0 = infini, 1 = une fois
+                const freezeDurationSec = parseFloat(freezeDuration.value);
+                const delayPerFrame = 1000 / fps;
+                const loopCount = infiniteLoop.checked ? 0 : 1;
 
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    updateProgress((i / selectedFiles.length) * 100);
-                    
-                    const imageData = await loadImageData(selectedFiles[i]);
-                    frames.push(imageData.buffer);
-                    delays.push(delayPerFrame);
+                let width = 0;
+                let height = 0;
+                let totalFrames = 0;
+
+                // 1. Charger l'animation d'entrée
+                if (introFiles.length > 0) {
+                    showStatus(`Chargement animation d'entrée (${introFiles.length} images)...`, 'info');
+                    for (let i = 0; i < introFiles.length; i++) {
+                        updateProgress((totalFrames / (introFiles.length + 1 + outroFiles.length)) * 100);
+                        
+                        const imageData = await loadImageData(introFiles[i]);
+                        if (totalFrames === 0) {
+                            width = imageData.width;
+                            height = imageData.height;
+                        }
+                        frames.push(imageData.buffer);
+                        delays.push(delayPerFrame);
+                        totalFrames++;
+                    }
+                }
+
+                // 2. Charger l'image freeze (1 seule fois !)
+                showStatus('Chargement de l\'image freeze...', 'info');
+                updateProgress((totalFrames / (introFiles.length + 1 + outroFiles.length)) * 100);
+                
+                const freezeImageData = await loadImageData(freezeFile);
+                if (totalFrames === 0) {
+                    width = freezeImageData.width;
+                    height = freezeImageData.height;
+                }
+                
+                // Ajouter l'image freeze UNE SEULE FOIS avec le délai total
+                frames.push(freezeImageData.buffer);
+                delays.push(freezeDurationSec * 1000); // Convertir secondes en millisecondes
+                totalFrames++;
+
+                // 3. Charger l'animation de sortie
+                if (outroFiles.length > 0) {
+                    showStatus(`Chargement animation de sortie (${outroFiles.length} images)...`, 'info');
+                    for (let i = 0; i < outroFiles.length; i++) {
+                        updateProgress((totalFrames / (introFiles.length + 1 + outroFiles.length)) * 100);
+                        
+                        const imageData = await loadImageData(outroFiles[i]);
+                        frames.push(imageData.buffer);
+                        delays.push(delayPerFrame);
+                        totalFrames++;
+                    }
                 }
 
                 updateProgress(100);
-                showStatus('Création de l\'APNG...', 'info');
+                showStatus('Création de l\'APNG (compression en cours)...', 'info');
 
-                // Créer l'APNG avec les paramètres choisis
-                const apng = UPNG.encode(frames, frames[0].width, frames[0].height, 0, delays, loopCount);
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // Créer l'APNG
+                const apng = UPNG.encode(frames, width, height, 256, delays, loopCount);
                 
-                // Télécharger le fichier avec une méthode compatible tous navigateurs
+                frames.length = 0;
+                
+                // Télécharger le fichier
                 const blob = new Blob([apng], { type: 'image/apng' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'animation.apng';
                 
-                // Ajouter au DOM pour assurer la compatibilité
                 document.body.appendChild(a);
                 a.click();
                 
-                // Nettoyer après un court délai
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 100);
 
                 const loopText = infiniteLoop.checked ? 'boucle infinie' : 'lecture unique';
-                showStatus(`✅ APNG créé ! (${selectedFiles.length} frames à ${fps}fps, ${loopText})`, 'success');
+                const fileSize = formatFileSize(blob.size);
+                showStatus(`✅ APNG créé ! (${totalFrames} frames, ${width}x${height}px, ${fileSize}, ${loopText})`, 'success');
                 hideProgress();
 
             } catch (error) {
-                showStatus('❌ Erreur lors de la conversion: ' + error.message, 'error');
+                showStatus('❌ Erreur : ' + error.message, 'error');
                 console.error(error);
                 hideProgress();
             } finally {
@@ -567,13 +714,19 @@
                             height: canvas.height
                         });
                     };
-                    img.onerror = reject;
+                    img.onerror = () => reject(new Error('Erreur de chargement de l\'image'));
                     img.src = e.target.result;
                 };
 
-                reader.onerror = reject;
+                reader.onerror = () => reject(new Error('Erreur de lecture du fichier'));
                 reader.readAsDataURL(file);
             });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
         }
 
         function showStatus(message, type) {
