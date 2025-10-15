@@ -62,6 +62,32 @@
             gap: 8px;
         }
 
+        .section-title > span:first-child {
+            flex-shrink: 0;
+        }
+
+        .section-title > span:nth-child(2) {
+            flex: 1;
+        }
+
+        .btn-reset-small {
+            padding: 6px 12px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .btn-reset-small:hover {
+            background: #ee5a52;
+            transform: scale(1.05);
+        }
+
         .section-description {
             font-size: 13px;
             color: #666;
@@ -376,7 +402,7 @@
         <p class="subtitle">Animation avec freeze optimisé pour économiser la mémoire</p>
 
         <div class="info-box">
-            💡 <strong>Nouveau :</strong> Créez des animations longues sans surcharger la mémoire ! Upload une animation d'entrée, une image à figer, puis une animation de sortie.
+            💡 <strong>Astuce :</strong> Toutes les sections sont optionnelles ! Vous pouvez uploader uniquement l'intro, ou intro + freeze, ou toute autre combinaison. La boucle s'applique à l'ensemble sélectionné.
         </div>
 
         <!-- Section 1: Animation d'entrée -->
@@ -384,6 +410,7 @@
             <div class="section-title">
                 <span>🎬</span>
                 <span>Animation d'entrée</span>
+                <button class="btn-reset-small" id="resetIntro" style="display: none;">🗑️ Reset</button>
             </div>
             <div class="section-description">Images qui s'animeront au début (optionnel)</div>
             <div class="upload-zone" id="uploadZoneIntro">
@@ -400,8 +427,9 @@
             <div class="section-title">
                 <span>⏸️</span>
                 <span>Image freeze (pause)</span>
+                <button class="btn-reset-small" id="resetFreeze" style="display: none;">🗑️ Reset</button>
             </div>
-            <div class="section-description">Une seule image qui restera affichée pendant X secondes</div>
+            <div class="section-description">Une seule image qui restera affichée pendant X secondes (optionnel)</div>
             <div class="upload-zone" id="uploadZoneFreeze">
                 <div class="upload-icon">🖼️</div>
                 <div class="upload-text">1 seule image PNG</div>
@@ -421,6 +449,7 @@
             <div class="section-title">
                 <span>🎬</span>
                 <span>Animation de sortie</span>
+                <button class="btn-reset-small" id="resetOutro" style="display: none;">🗑️ Reset</button>
             </div>
             <div class="section-description">Images qui s'animeront à la fin (optionnel)</div>
             <div class="upload-zone" id="uploadZoneOutro">
@@ -487,6 +516,9 @@
         const loopLabel = document.getElementById('loopLabel');
         const convertBtn = document.getElementById('convertBtn');
         const clearBtn = document.getElementById('clearBtn');
+        const resetIntro = document.getElementById('resetIntro');
+        const resetFreeze = document.getElementById('resetFreeze');
+        const resetOutro = document.getElementById('resetOutro');
         const status = document.getElementById('status');
         const progress = document.getElementById('progress');
         const progressBar = document.getElementById('progressBar');
@@ -547,21 +579,28 @@
         }
 
         function updateCount(element, zone, count, type) {
+            let resetBtn;
+            if (type === 'intro') resetBtn = resetIntro;
+            else if (type === 'freeze') resetBtn = resetFreeze;
+            else if (type === 'outro') resetBtn = resetOutro;
+
             if (count > 0) {
                 const label = type === 'freeze' ? '1 image sélectionnée' : `${count} image${count > 1 ? 's' : ''} sélectionnée${count > 1 ? 's' : ''}`;
                 element.textContent = `✓ ${label}`;
                 element.style.display = 'block';
                 zone.classList.add('has-files');
+                if (resetBtn) resetBtn.style.display = 'inline-block';
             } else {
                 element.textContent = '';
                 element.style.display = 'none';
                 zone.classList.remove('has-files');
+                if (resetBtn) resetBtn.style.display = 'none';
             }
         }
 
         function checkCanConvert() {
-            // On peut convertir si on a au moins l'image freeze
-            convertBtn.disabled = !freezeFile;
+            // On peut convertir si on a au moins une section remplie
+            convertBtn.disabled = !(introFiles.length > 0 || freezeFile || outroFiles.length > 0);
         }
 
         // Framerate slider
@@ -574,7 +613,29 @@
             loopLabel.textContent = e.target.checked ? 'Activée' : 'Désactivée';
         });
 
-        // Clear button
+        // Reset buttons individuels
+        resetIntro.addEventListener('click', () => {
+            introFiles = [];
+            fileInputIntro.value = '';
+            updateCount(countIntro, uploadZoneIntro, 0, 'intro');
+            checkCanConvert();
+        });
+
+        resetFreeze.addEventListener('click', () => {
+            freezeFile = null;
+            fileInputFreeze.value = '';
+            updateCount(countFreeze, uploadZoneFreeze, 0, 'freeze');
+            checkCanConvert();
+        });
+
+        resetOutro.addEventListener('click', () => {
+            outroFiles = [];
+            fileInputOutro.value = '';
+            updateCount(countOutro, uploadZoneOutro, 0, 'outro');
+            checkCanConvert();
+        });
+
+        // Clear button - tout effacer
         clearBtn.addEventListener('click', () => {
             introFiles = [];
             freezeFile = null;
@@ -592,7 +653,11 @@
 
         // Convert button
         convertBtn.addEventListener('click', async () => {
-            if (!freezeFile) return;
+            // Vérifier qu'on a au moins une section remplie
+            if (introFiles.length === 0 && !freezeFile && outroFiles.length === 0) {
+                showStatus('Veuillez sélectionner au moins une section (intro, freeze ou outro)', 'error');
+                return;
+            }
 
             convertBtn.disabled = true;
             showStatus('Chargement des images...', 'info');
@@ -604,17 +669,18 @@
                 const fps = parseInt(framerateSlider.value);
                 const freezeDurationSec = parseFloat(freezeDuration.value);
                 const delayPerFrame = 1000 / fps;
-                const loopCount = infiniteLoop.checked ? 0 : 1;
+                const loopCount = infiniteLoop.checked ? 0 : 1; // 0 = boucle infinie, 1 = lecture unique
 
                 let width = 0;
                 let height = 0;
                 let totalFrames = 0;
+                const totalToProcess = introFiles.length + (freezeFile ? 1 : 0) + outroFiles.length;
 
-                // 1. Charger l'animation d'entrée
+                // 1. Charger l'animation d'entrée (si présente)
                 if (introFiles.length > 0) {
                     showStatus(`Chargement animation d'entrée (${introFiles.length} images)...`, 'info');
                     for (let i = 0; i < introFiles.length; i++) {
-                        updateProgress((totalFrames / (introFiles.length + 1 + outroFiles.length)) * 100);
+                        updateProgress((totalFrames / totalToProcess) * 100);
                         
                         const imageData = await loadImageData(introFiles[i]);
                         if (totalFrames === 0) {
@@ -627,28 +693,36 @@
                     }
                 }
 
-                // 2. Charger l'image freeze (1 seule fois !)
-                showStatus('Chargement de l\'image freeze...', 'info');
-                updateProgress((totalFrames / (introFiles.length + 1 + outroFiles.length)) * 100);
-                
-                const freezeImageData = await loadImageData(freezeFile);
-                if (totalFrames === 0) {
-                    width = freezeImageData.width;
-                    height = freezeImageData.height;
+                // 2. Charger l'image freeze (si présente)
+                if (freezeFile) {
+                    showStatus('Chargement de l\'image freeze...', 'info');
+                    updateProgress((totalFrames / totalToProcess) * 100);
+                    
+                    const freezeImageData = await loadImageData(freezeFile);
+                    if (totalFrames === 0) {
+                        width = freezeImageData.width;
+                        height = freezeImageData.height;
+                    }
+                    
+                    // Ajouter l'image freeze avec le délai spécifié
+                    // Si durée = 0, on utilise quand même delayPerFrame pour avoir au moins 1 frame visible
+                    const freezeDelay = freezeDurationSec > 0 ? (freezeDurationSec * 1000) : delayPerFrame;
+                    frames.push(freezeImageData.buffer);
+                    delays.push(freezeDelay);
+                    totalFrames++;
                 }
-                
-                // Ajouter l'image freeze UNE SEULE FOIS avec le délai total
-                frames.push(freezeImageData.buffer);
-                delays.push(freezeDurationSec * 1000); // Convertir secondes en millisecondes
-                totalFrames++;
 
-                // 3. Charger l'animation de sortie
+                // 3. Charger l'animation de sortie (si présente)
                 if (outroFiles.length > 0) {
                     showStatus(`Chargement animation de sortie (${outroFiles.length} images)...`, 'info');
                     for (let i = 0; i < outroFiles.length; i++) {
-                        updateProgress((totalFrames / (introFiles.length + 1 + outroFiles.length)) * 100);
+                        updateProgress((totalFrames / totalToProcess) * 100);
                         
                         const imageData = await loadImageData(outroFiles[i]);
+                        if (totalFrames === 0) {
+                            width = imageData.width;
+                            height = imageData.height;
+                        }
                         frames.push(imageData.buffer);
                         delays.push(delayPerFrame);
                         totalFrames++;
@@ -660,7 +734,7 @@
 
                 await new Promise(resolve => setTimeout(resolve, 100));
 
-                // Créer l'APNG
+                // Créer l'APNG avec boucle sur l'ensemble
                 const apng = UPNG.encode(frames, width, height, 256, delays, loopCount);
                 
                 frames.length = 0;
@@ -682,7 +756,12 @@
 
                 const loopText = infiniteLoop.checked ? 'boucle infinie' : 'lecture unique';
                 const fileSize = formatFileSize(blob.size);
-                showStatus(`✅ APNG créé ! (${totalFrames} frames, ${width}x${height}px, ${fileSize}, ${loopText})`, 'success');
+                const composition = [];
+                if (introFiles.length > 0) composition.push(`${introFiles.length} intro`);
+                if (freezeFile) composition.push(`freeze ${freezeDurationSec}s`);
+                if (outroFiles.length > 0) composition.push(`${outroFiles.length} outro`);
+                
+                showStatus(`✅ APNG créé ! (${composition.join(' + ')}, ${totalFrames} frames, ${width}x${height}px, ${fileSize}, ${loopText})`, 'success');
                 hideProgress();
 
             } catch (error) {
