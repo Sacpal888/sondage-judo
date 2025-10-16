@@ -620,39 +620,45 @@
         // ============================================
         
         async function checkIfAdmin() {
-            try {
-                if (!supabaseClient || !currentUser) {
-                    console.error('Pas de client ou utilisateur');
-                    return false;
-                }
-                
-                // Vérifier si l'utilisateur est dans admin_users
-                const { data, error } = await supabaseClient
-                    .from('admin_users')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .eq('is_active', true)
-                    .single();
-                
-                if (error) {
-                    console.error('Erreur vérification admin:', error);
-                    return false;
-                }
-                
-                if (!data) {
-                    console.log('Utilisateur non admin');
-                    return false;
-                }
-                
-                console.log('✅ Utilisateur admin vérifié');
-                return true;
-                
-            } catch (error) {
-                console.error('Erreur checkIfAdmin:', error);
-                return false;
-            }
+    try {
+        if (!supabaseClient || !currentUser) {
+            console.error('❌ Pas de client ou utilisateur');
+            console.log('supabaseClient:', !!supabaseClient);
+            console.log('currentUser:', currentUser);
+            return false;
         }
         
+        console.log('🔍 Vérification admin pour user_id:', currentUser.id);
+        
+        // Vérifier si l'utilisateur est dans admin_users
+        const { data, error } = await supabaseClient
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .eq('is_active', true);
+        
+        if (error) {
+            console.error('❌ Erreur requête admin_users:', error);
+            console.error('Détails:', error.message, error.details, error.hint);
+            return false;
+        }
+        
+        console.log('📊 Résultat requête admin_users:', data);
+        
+        if (!data || data.length === 0) {
+            console.log('❌ Aucune ligne trouvée dans admin_users pour ce user_id');
+            console.log('Vérifiez que la ligne existe avec user_id:', currentUser.id);
+            return false;
+        }
+        
+        console.log('✅ Utilisateur admin vérifié !');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Exception dans checkIfAdmin:', error);
+        return false;
+    }
+}    
         function showAccessDenied(email) {
             document.getElementById('authLoading').classList.add('hidden');
             document.getElementById('mainContainer').style.display = 'none';
