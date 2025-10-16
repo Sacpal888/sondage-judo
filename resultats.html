@@ -53,15 +53,15 @@
             font-size: 1.3em;
         }
         
-        /* Ligne supérieure avec logo et statistiques - 3 cases horizontales */
+        /* Ligne supérieure avec logo et statistiques - 2 cases alignées avec les colonnes */
         .top-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 30px;
         }
         
-        .stat-box {
+        .stat-box, .logo-container {
             background: rgba(26, 47, 74, 0.6);
             border: 2px solid #d4af37;
             border-radius: 15px;
@@ -71,22 +71,16 @@
             align-items: center;
             padding: 20px;
             height: 140px;
+            /* Pas d'animation au survol */
         }
         
         .logo-container {
-            background: rgba(26, 47, 74, 0.6);
-            border: 2px solid #d4af37;
-            border-radius: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            height: 140px;
+            padding: 5%;  /* Marge de sécurité de 5% */
         }
         
         .logo-container img {
             max-width: 100%;
-            max-height: 110px;
+            max-height: 100%;
             width: auto;
             height: auto;
             border-radius: 8px;
@@ -270,11 +264,6 @@
                 <div class="stat-number" id="totalVotes">0</div>
                 <div class="stat-label">Total des votes</div>
             </div>
-            
-            <div class="stat-box">
-                <div class="stat-number" id="totalPlayers">0</div>
-                <div class="stat-label">Candidats</div>
-            </div>
         </div>
         
         <div id="mainContent" style="display: flex; flex-direction: column; flex: 1;">
@@ -302,37 +291,37 @@
         // Messages personnalisables (chargés depuis la DB)
         let TITLE_HTML = '🏆 Résultats du Vote 🏆';
         let SUBTITLE_HTML = 'Coupe virtuelle du public';
-        let NOVOTES_HTML = 'Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋';
+        let NOVOTES_HTML = 'Aucun vote pour le moment...<br>Soyez le premier à voter !';
         
-        // ============================================
-        // INITIALISATION
-        // ============================================
-        
-        async function initApp() {
+        async function initSupabase() {
             try {
-                // Créer le client Supabase
-                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    console.error('❌ Configuration manquante');
-                    showError('Configuration Supabase manquante dans config.js');
-                    return;
+                if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                    throw new Error('Configuration Supabase manquante (config.js)');
                 }
                 
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Connexion Supabase établie');
-                
-                // Charger les messages personnalisés
-                await loadCustomMessages();
-                
-                // Charger les résultats immédiatement
-                await loadResults();
-                
-                // Actualiser toutes les 3 secondes
-                setInterval(loadResults, 3000);
-                
+                console.log('✅ Supabase initialisé');
+                return true;
             } catch (error) {
-                console.error('❌ Erreur initialisation:', error);
-                showError('Erreur de connexion: ' + error.message);
+                console.error('❌ Erreur initialisation Supabase:', error);
+                showError('Erreur de configuration: ' + error.message);
+                return false;
             }
+        }
+        
+        // ============================================
+        // INITIALISATION DE L'APPLICATION
+        // ============================================
+        
+        async function initApp() {
+            const initialized = await initSupabase();
+            if (!initialized) return;
+            
+            await loadCustomMessages();
+            await loadResults();
+            
+            // Rafraîchissement automatique toutes les 3 secondes
+            setInterval(loadResults, 3000);
         }
         
         // ============================================
@@ -348,9 +337,10 @@
                 
                 if (error) throw error;
                 
-                // Créer un map des messages
                 const map = {};
-                data.forEach(row => { map[row.key] = row.value; });
+                (data || []).forEach(row => {
+                    map[row.key] = row.value;
+                });
                 
                 // Appliquer les messages
                 if (map['msg_results_title']) {
@@ -443,30 +433,22 @@
         
         async function loadLogo() {
             try {
-                const { data: logoData, error: logoError } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
                     .single();
                 
-                const logoContainer = document.getElementById('logoContainer');
+                const container = document.getElementById('logoContainer');
                 
-                if (logoError) {
-                    console.log('ℹ️ Pas de logo trouvé');
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo)</div>';
-                    return;
-                }
-                
-                if (logoData && logoData.value) {
-                    console.log('✅ Logo chargé');
-                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
+                if (data && data.value) {
+                    container.innerHTML = `<img src="${data.value}" alt="Logo">`;
                 } else {
-                    console.log('⚠️ Logo vide dans la base');
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
+                    container.innerHTML = '<div class="logo-placeholder">Logo</div>';
                 }
             } catch (error) {
-                console.error('❌ Erreur chargement logo:', error);
-                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur logo)</div>';
+                console.error('Erreur chargement logo:', error);
+                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">Logo</div>';
             }
         }
         
@@ -475,27 +457,23 @@
         // ============================================
         
         function displayResults(results, totalVotes, totalPlayers) {
-            // Mettre à jour les statistiques
+            // Mettre à jour le total des votes
             document.getElementById('totalVotes').textContent = totalVotes;
-            document.getElementById('totalPlayers').textContent = totalPlayers;
             
             const resultsGrid = document.getElementById('resultsGrid');
             
-            // Si aucun vote
-            if (totalVotes === 0 || results.length === 0) {
-                const html = NOVOTES_HTML 
-                    ? `<div class="no-votes">${NOVOTES_HTML}</div>`
-                    : '<div class="no-votes">Aucun vote pour le moment...<br>Soyez le premier à voter ! 🥋</div>';
-                resultsGrid.innerHTML = html;
+            if (!results || results.length === 0) {
+                resultsGrid.innerHTML = `<div class="no-votes">${NOVOTES_HTML}</div>`;
                 return;
             }
             
-            // Afficher les résultats (top 6)
+            // Afficher les résultats
             resultsGrid.innerHTML = results.map((result, index) => {
-                const isFirst = index === 0 && result.votes > 0;
-                const percentage = Number(result.percentage || 0).toFixed(1);
-                // Utiliser result.rank si disponible, sinon calculer à partir de l'index
-                const rank = result.rank || (index + 1);
+                const rank = index + 1;
+                const percentage = totalVotes > 0 
+                    ? Math.round((result.votes / totalVotes) * 100) 
+                    : 0;
+                const isFirst = rank === 1;
                 
                 return `
                     <div class="player-result ${isFirst ? 'first-place' : ''}">
