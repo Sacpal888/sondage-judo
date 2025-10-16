@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PNG → APNG (Uniform Frames, Ensemble & Boucle)</title>
+<title>PNG → APNG (HD 1920x1080 - Frames Complètes)</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .container{background:#fff;border-radius:16px;padding:28px;max-width:900px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 h1{font-size:24px;margin:0 0 6px;color:#222;text-align:center}
 .subtitle{text-align:center;color:#666;margin-bottom:18px;font-size:14px}
+.warning{background:#fff3cd;border:2px solid #ffc107;border-radius:8px;padding:12px;margin-bottom:16px;color:#856404;font-size:13px}
+.warning strong{color:#d39e00}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .section{padding:14px;background:#f8f9ff;border-radius:12px;border:2px solid #e0e4ff}
 .section h3{font-size:15px;color:#667eea;margin-bottom:6px}
@@ -47,13 +49,18 @@ pre{background:#f7f7f7;border:1px solid #eee;padding:10px;border-radius:6px;whit
 </head>
 <body>
 <div class="container">
-  <h1>🎞️ PNG → APNG</h1>
-  <p class="subtitle">Frames uniformes, ensemble & boucle fiables</p>
+  <h1>🎞️ PNG → APNG (HD 1920x1080)</h1>
+  <p class="subtitle">Toutes les frames restent en résolution complète</p>
+
+  <div class="warning">
+    <strong>⚠️ IMPORTANT:</strong> Toutes vos images PNG doivent être en <strong>1920x1080</strong>. 
+    Toutes les frames de l'APNG seront forcées à cette taille (pas d'optimisation delta).
+  </div>
 
   <div class="grid">
     <div class="section">
-      <h3>1) Animation d’entrée <span class="badge">obligatoire</span></h3>
-      <small>Uploadez vos PNG (triés par nom). Tous les frames seront forcés à la même taille que la <b>1ʳᵉ image</b>.</small>
+      <h3>1) Animation d'entrée <span class="badge">obligatoire</span></h3>
+      <small>Uploadez vos PNG <strong>1920x1080</strong> (triés par nom).</small>
       <div class="upload-zone" id="zoneIntro"><div>📁 Glissez / Cliquez</div></div>
       <input type="file" id="inputIntro" accept="image/png" multiple>
       <div class="upload-count" id="countIntro"></div>
@@ -61,7 +68,7 @@ pre{background:#f7f7f7;border:1px solid #eee;padding:10px;border-radius:6px;whit
 
     <div class="section">
       <h3>2) Pause (freeze) <span class="badge">temps uniquement</span></h3>
-      <small>On fige automatiquement la <b>dernière image de l’intro</b> (aucun upload).</small>
+      <small>On fige automatiquement la <b>dernière image de l'intro</b> (aucun upload).</small>
       <div class="row">
         <div class="grow"><input id="freezeSec" type="number" min="0" max="3600" step="0.5" value="0"></div>
         <div>sec</div>
@@ -71,7 +78,7 @@ pre{background:#f7f7f7;border:1px solid #eee;padding:10px;border-radius:6px;whit
 
     <div class="section">
       <h3>3) Animation de sortie <span class="badge">optionnel</span></h3>
-      <small>Uploadez vos PNG d’outro (triés par nom). Seront redimensionnés à la taille de l’intro.</small>
+      <small>Uploadez vos PNG <strong>1920x1080</strong> d'outro (triés par nom).</small>
       <div class="upload-zone" id="zoneOutro"><div>📁 Glissez / Cliquez</div></div>
       <input type="file" id="inputOutro" accept="image/png" multiple>
       <div class="upload-count" id="countOutro"></div>
@@ -96,7 +103,7 @@ pre{background:#f7f7f7;border:1px solid #eee;padding:10px;border-radius:6px;whit
   </div>
 
   <div class="actions">
-    <button class="btn" id="btnConvert" disabled>Créer APNG</button>
+    <button class="btn" id="btnConvert" disabled>Créer APNG HD</button>
     <button class="btn-secondary" id="btnClear">Effacer</button>
   </div>
 
@@ -113,7 +120,7 @@ pre{background:#f7f7f7;border:1px solid #eee;padding:10px;border-radius:6px;whit
 <script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.min.js"></script>
 <script>
 // ---------- Utils ----------
-function log(msg){const el=document.getElementById('log'); el.textContent += msg + "\\n";}
+function log(msg){const el=document.getElementById('log'); el.textContent += msg + "\n";}
 function showStatus(msg,type){const el=document.getElementById('status'); el.textContent=msg; el.className='status show '+type;}
 function hideStatus(){document.getElementById('status').classList.remove('show');}
 function showProgress(){document.getElementById('progress').classList.add('show');}
@@ -134,12 +141,15 @@ function setApngNumPlays(buf, plays){
       const start=p+4, end=p+8+len;
       const newCrc=crc32(bytes.slice(start,end));
       writeU32(end,newCrc);
+      log(`✓ acTL.num_plays modifié: ${plays} (0=boucle infinie)`);
       return bytes.buffer;
     }
     p+=12+len;
   }
+  log('⚠️ Chunk acTL non trouvé, impossible de modifier num_plays');
   return buf;
 }
+
 function getApngNumPlays(buf){
   const bytes=new Uint8Array(buf); let p=8;
   const readU32=(o)=>(bytes[o]<<24)|(bytes[o+1]<<16)|(bytes[o+2]<<8)|bytes[o+3];
@@ -176,7 +186,8 @@ function setupZone(zoneEl, inputEl, onFiles){
 function sortPngs(files){return [...files].filter(f=>f.type==='image/png').sort((a,b)=>a.name.localeCompare(b.name));}
 
 let introFiles=[], outroFiles=[];
-let targetW=0, targetH=0;
+const HD_WIDTH = 1920;
+const HD_HEIGHT = 1080;
 
 setupZone(zoneIntro, inputIntro, files=>{
   introFiles=sortPngs(files);
@@ -188,6 +199,7 @@ setupZone(zoneIntro, inputIntro, files=>{
   }
   btnConvert.disabled = introFiles.length===0;
 });
+
 setupZone(zoneOutro, inputOutro, files=>{
   outroFiles=sortPngs(files);
   if(outroFiles.length){
@@ -208,8 +220,9 @@ btnClear.onclick=()=>{
 };
 
 btnConvert.onclick=async ()=>{
-  if(!introFiles.length){ showStatus('❌ Ajoutez au moins une image d’intro.', 'error'); return; }
-  showStatus('Préparation des frames (uniformisation)…', 'info'); showProgress(); document.getElementById('log').textContent='';
+  if(!introFiles.length){ showStatus('❌ Ajoutez au moins une image d\'intro.', 'error'); return; }
+  showStatus('Préparation des frames HD 1920x1080...', 'info'); showProgress(); document.getElementById('log').textContent='';
+  log('=== APNG HD 1920x1080 - FRAMES COMPLÈTES (pas d\'optimisation delta) ===\n');
 
   try{
     const fps=Math.min(120, Math.max(1, parseInt(fpsInput.value,10) || 50));
@@ -220,76 +233,121 @@ btnConvert.onclick=async ()=>{
     const frames=[], delays=[];
     let total=0;
 
-    // 1) Charger la 1ère image pour définir la taille cible
-    const first = await loadImage(introFiles[0]);
-    targetW = first.width; targetH = first.height;
-    frames.push(first.buffer); delays.push(delayPer); total++;
-    log(`Frame #${total}: ${targetW}x${targetH} (référence)`);
+    log(`Configuration: FPS=${fps}, délai=${delayPer}ms, freeze=${freezeMs}ms`);
+    log(`Résolution forcée: ${HD_WIDTH}x${HD_HEIGHT}\n`);
 
-    // 2) Intro suite: redessiner toutes les autres images sur un canvas de taille cible (uniformisation)
-    for (let i=1; i<introFiles.length; i++){
+    // 1) Intro: FORCER toutes les images à 1920x1080
+    for (let i=0; i<introFiles.length; i++){
       const img = await loadImage(introFiles[i]);
-      const buf = drawToTarget(img, targetW, targetH);
-      frames.push(buf); delays.push(delayPer); total++;
-      log(`Frame #${total}: source=${img.width}x${img.height} -> target=${targetW}x${targetH}`);
+      
+      // Vérifier la taille source
+      if(img.width !== HD_WIDTH || img.height !== HD_HEIGHT){
+        log(`⚠️ Frame #${total+1}: source=${img.width}x${img.height} → redimensionnée vers ${HD_WIDTH}x${HD_HEIGHT}`);
+      } else {
+        log(`✓ Frame #${total+1}: ${HD_WIDTH}x${HD_HEIGHT} (conforme)`);
+      }
+      
+      const buf = forceHDSize(img, HD_WIDTH, HD_HEIGHT);
+      frames.push(buf); 
+      delays.push(delayPer); 
+      total++;
       updateProgress(Math.min(90, total/(introFiles.length + (hasFreeze?1:0) + outroFiles.length)*100));
     }
 
-    // 3) Freeze : dupliquer le DERNIER frame (déjà en taille cible)
+    // 2) Freeze : dupliquer le DERNIER frame
     if(hasFreeze){
-      frames.push(frames[frames.length-1]); delays.push(freezeMs); total++;
-      log(`Frame #${total}: freeze ${freezeMs}ms (duplique dernier frame)`);
+      frames.push(frames[frames.length-1]); 
+      delays.push(freezeMs); 
+      total++;
+      log(`✓ Frame #${total}: freeze ${freezeMs}ms (duplique dernier frame)`);
     }
 
-    // 4) Outro : uniformiser de la même façon
+    // 3) Outro : FORCER à 1920x1080
     for (let i=0; i<outroFiles.length; i++){
       const img = await loadImage(outroFiles[i]);
-      const buf = drawToTarget(img, targetW, targetH);
-      frames.push(buf); delays.push(delayPer); total++;
-      log(`Frame #${total}: OUTRO source=${img.width}x${img.height} -> target=${targetW}x${targetH}`);
+      
+      if(img.width !== HD_WIDTH || img.height !== HD_HEIGHT){
+        log(`⚠️ Frame #${total+1} (OUTRO): source=${img.width}x${img.height} → redimensionnée vers ${HD_WIDTH}x${HD_HEIGHT}`);
+      } else {
+        log(`✓ Frame #${total+1} (OUTRO): ${HD_WIDTH}x${HD_HEIGHT} (conforme)`);
+      }
+      
+      const buf = forceHDSize(img, HD_WIDTH, HD_HEIGHT);
+      frames.push(buf); 
+      delays.push(delayPer); 
+      total++;
+      updateProgress(Math.min(95, total/(introFiles.length + (hasFreeze?1:0) + outroFiles.length)*100));
     }
 
-    // Encodage APNG
-    showStatus('Encodage APNG…', 'info'); await new Promise(r=>setTimeout(r,30));
-    let apng = UPNG.encode(frames, targetW, targetH, 256, delays);
-    apng = setApngNumPlays(apng, loop.checked?0:1);
+    // Encodage APNG - PARAMÈTRE CRUCIAL: 0 au lieu de 256
+    showStatus('Encodage APNG (frames complètes HD)...', 'info'); 
+    await new Promise(r=>setTimeout(r,30));
+    
+    log(`\nEncodage UPNG: ${frames.length} frames de ${HD_WIDTH}x${HD_HEIGHT}`);
+    log('⚠️ Mode: 0 (RGBA complet, PAS d\'optimisation delta)');
+    
+    // CHANGEMENT CRUCIAL: 0 au lieu de 256 pour désactiver l'optimisation delta
+    let apng = UPNG.encode(frames, HD_WIDTH, HD_HEIGHT, 0, delays);
+    
+    // Forcer la boucle infinie
+    const targetPlays = loop.checked ? 0 : 1;
+    apng = setApngNumPlays(apng, targetPlays);
     const numPlays = getApngNumPlays(apng);
-    log(`acTL.num_plays = ${numPlays}`);
+    
+    log(`Boucle: ${loop.checked?'INFINIE (num_plays=0)':'UNE FOIS (num_plays=1)'}`);
+    log(`Vérification acTL.num_plays = ${numPlays}\n`);
 
     const blob = new Blob([apng], {type:'image/apng'});
-    triggerDownload(blob, 'animation.apng');
+    const sizeMB = (blob.size / (1024*1024)).toFixed(2);
+    
+    triggerDownload(blob, 'animation_HD.apng');
+    
     const ensemble = hasFreeze ? (outroFiles.length? '1+2+3' : '1+2') : (outroFiles.length? '1+3' : '1');
-    showStatus(`✅ APNG créé — ${targetW}x${targetH}, frames=${total}, ensemble=${ensemble}, boucle=${loop.checked?'ON':'OFF'}, num_plays=${numPlays}`, 'success');
+    showStatus(`✅ APNG HD créé — ${HD_WIDTH}x${HD_HEIGHT}, ${total} frames (${sizeMB} MB), ensemble=${ensemble}, boucle=${loop.checked?'ON':'OFF'}`, 'success');
+    log(`✅ SUCCÈS: Fichier créé (${sizeMB} MB)`);
     hideProgress();
   }catch(e){
     console.error(e);
     showStatus('❌ Erreur : '+(e&&e.message||e), 'error');
+    log('❌ ERREUR: ' + (e&&e.message||e));
     hideProgress();
   }
 };
 
-function drawToTarget(img, W, H){
-  const c=document.createElement('canvas'); c.width=W; c.height=H;
+// FONCTION CRITIQUE: Force TOUTES les images à 1920x1080
+function forceHDSize(img, W, H){
+  const c=document.createElement('canvas'); 
+  c.width = W; 
+  c.height = H;
   const ctx=c.getContext('2d');
-  ctx.clearRect(0,0,W,H);
+  
+  // Fond noir (ou transparent selon vos besoins)
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, W, H);
+  
   // Dessin "fit" dans la cible en conservant le ratio, centré (letterbox)
-  const scale=Math.min(W/img.width, H/img.height);
-  const w=Math.round(img.width*scale), h=Math.round(img.height*scale);
-  const x=Math.round((W-w)/2), y=Math.round((H-h)/2);
+  const scale = Math.min(W/img.width, H/img.height);
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const x = Math.round((W - w) / 2);
+  const y = Math.round((H - h) / 2);
+  
   ctx.drawImage(img.element, x, y, w, h);
-  const imageData = ctx.getImageData(0,0,W,H);
+  
+  const imageData = ctx.getImageData(0, 0, W, H);
   return imageData.data.buffer;
 }
 
 function loadImage(file){
   return new Promise((resolve,reject)=>{
     const img=new Image(), rdr=new FileReader();
-    rdr.onload=e=>{img.onload=()=>{
-      const c=document.createElement('canvas'); c.width=img.width; c.height=img.height;
-      const ctx=c.getContext('2d'); ctx.drawImage(img,0,0);
-      const imageData=ctx.getImageData(0,0,c.width,c.height);
-      resolve({buffer:imageData.data.buffer, width:c.width, height:c.height, element:img});
-    }; img.onerror=()=>reject(new Error('Image invalide')); img.src=e.target.result;};
+    rdr.onload=e=>{
+      img.onload=()=>{
+        resolve({width:img.width, height:img.height, element:img});
+      }; 
+      img.onerror=()=>reject(new Error('Image invalide')); 
+      img.src=e.target.result;
+    };
     rdr.onerror=()=>reject(new Error('Lecture fichier échouée'));
     rdr.readAsDataURL(file);
   });
@@ -297,7 +355,11 @@ function loadImage(file){
 
 function triggerDownload(blob, name){
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  const a=document.createElement('a'); 
+  a.href=url; 
+  a.download=name; 
+  document.body.appendChild(a); 
+  a.click();
   setTimeout(()=>{document.body.removeChild(a); URL.revokeObjectURL(url);},100);
 }
 </script>
