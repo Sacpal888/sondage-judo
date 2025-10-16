@@ -674,57 +674,109 @@
         // AUTHENTIFICATION (MODIFIÉE)
         // ============================================
         
-        async function checkAuth() {
-            try {
-                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    console.error('Configuration Supabase manquante');
-                    redirectToLogin();
-                    return false;
-                }
-                
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
-                // Vérifier la session
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                
-                if (error) {
-                    console.error('Erreur vérification session:', error);
-                    redirectToLogin();
-                    return false;
-                }
-                
-                if (!session) {
-                    console.log('Pas de session active');
-                    redirectToLogin();
-                    return false;
-                }
-                
-                // Session valide !
-                currentUser = session.user;
-                console.log('Utilisateur connecté:', currentUser.email);
-                
-                // 🔒 NOUVEAU : Vérifier si c'est un admin
-                const isAdmin = await checkIfAdmin();
-                
-                if (!isAdmin) {
-                    console.error('❌ Utilisateur non autorisé');
-                    showAccessDenied(currentUser.email);
-                    return false;
-                }
-                
-                // ✅ Admin vérifié, afficher l'interface
-                document.getElementById('userEmail').textContent = currentUser.email;
-                document.getElementById('authLoading').classList.add('hidden');
-                document.getElementById('mainContainer').style.display = 'block';
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Erreur authentification:', error);
-                redirectToLogin();
-                return false;
-            }
-        }
+		async function checkAuth() {
+			try {
+				// ✅ VÉRIFIER QUE SUPABASE EST CHARGÉ
+				if (typeof window.supabase === 'undefined') {
+					console.error('❌ Bibliothèque Supabase non chargée');
+					
+					// Attendre un peu et réessayer
+					await new Promise(resolve => setTimeout(resolve, 1000));
+					
+					if (typeof window.supabase === 'undefined') {
+						const authLoading = document.getElementById('authLoading');
+						if (authLoading) {
+							authLoading.innerHTML = `
+								<div style="text-align: center; color: white;">
+									<div style="font-size: 3em; margin-bottom: 20px;">❌</div>
+									<div style="font-size: 1.2em; margin-bottom: 15px;">Erreur de chargement</div>
+									<div style="font-size: 0.9em; opacity: 0.8;">Veuillez rafraîchir la page</div>
+								</div>
+							`;
+						}
+						return false;
+					}
+				}
+				
+				if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+					console.error('Configuration Supabase manquante');
+					redirectToLogin();
+					return false;
+				}
+				
+				supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+				
+				// ✅ VÉRIFIER QUE LE CLIENT EST CRÉÉ
+				if (!supabaseClient || !supabaseClient.auth) {
+					console.error('❌ Impossible de créer le client Supabase');
+					const authLoading = document.getElementById('authLoading');
+					if (authLoading) {
+						authLoading.innerHTML = `
+							<div style="text-align: center; color: white;">
+								<div style="font-size: 3em; margin-bottom: 20px;">❌</div>
+								<div style="font-size: 1.2em; margin-bottom: 15px;">Erreur de connexion</div>
+								<div style="font-size: 0.9em; opacity: 0.8;">Veuillez rafraîchir la page</div>
+							</div>
+						`;
+					}
+					return false;
+				}
+				
+				// Vérifier la session
+				const { data: { session }, error } = await supabaseClient.auth.getSession();
+				
+				if (error) {
+					console.error('Erreur vérification session:', error);
+					redirectToLogin();
+					return false;
+				}
+				
+				if (!session) {
+					console.log('Pas de session active');
+					redirectToLogin();
+					return false;
+				}
+				
+				// Session valide !
+				currentUser = session.user;
+				console.log('Utilisateur connecté:', currentUser.email);
+				
+				// 🔒 Vérifier si c'est un admin
+				const isAdmin = await checkIfAdmin();
+				
+				if (!isAdmin) {
+					console.error('❌ Utilisateur non autorisé');
+					showAccessDenied(currentUser.email);
+					return false;
+				}
+				
+				// ✅ Admin vérifié, afficher l'interface
+				document.getElementById('userEmail').textContent = currentUser.email;
+				document.getElementById('authLoading').classList.add('hidden');
+				document.getElementById('mainContainer').style.display = 'block';
+				
+				return true;
+				
+			} catch (error) {
+				console.error('Erreur authentification:', error);
+				const authLoading = document.getElementById('authLoading');
+				if (authLoading) {
+					authLoading.innerHTML = `
+						<div style="text-align: center; color: white;">
+							<div style="font-size: 3em; margin-bottom: 20px;">❌</div>
+							<div style="font-size: 1.2em; margin-bottom: 15px;">Erreur: ${error.message}</div>
+							<div style="font-size: 0.9em; opacity: 0.8;">Redirection vers la connexion...</div>
+						</div>
+					`;
+				}
+				
+				setTimeout(() => {
+					redirectToLogin();
+				}, 3000);
+				
+				return false;
+			}
+		}
         
         function redirectToLogin() {
             window.location.href = 'login.html';
