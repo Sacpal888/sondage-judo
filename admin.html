@@ -54,6 +54,29 @@
             to { transform: rotate(360deg); }
         }
         
+        /* 🔒 NOUVEAU : Écran d'accès refusé */
+        .access-denied {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .access-denied-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -372,15 +395,6 @@
         .modal-buttons button {
             flex: 1;
         }
-        
-        .design-btn {
-            background: #ff6b6b;
-            margin-bottom: 20px;
-        }
-        
-        .design-btn:hover {
-            background: #ff5252;
-        }
     </style>
 </head>
 <body>
@@ -389,6 +403,24 @@
         <div style="text-align: center;">
             <div class="spinner"></div>
             <div>Vérification de l'authentification...</div>
+        </div>
+    </div>
+
+    <!-- 🔒 NOUVEAU : Écran d'accès refusé -->
+    <div id="accessDenied" class="access-denied" style="display: none;">
+        <div class="access-denied-content">
+            <div style="font-size: 4em; margin-bottom: 20px;">🚫</div>
+            <h2 style="color: #dc3545; margin-bottom: 15px;">Accès Refusé</h2>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+                Vous n'avez pas les permissions nécessaires pour accéder à cette page.<br><br>
+                Seuls les administrateurs autorisés peuvent accéder au panneau d'administration.
+            </p>
+            <p style="font-size: 0.9em; color: #999;">
+                Connecté en tant que : <strong id="deniedUserEmail"></strong>
+            </p>
+            <button onclick="handleLogout()" style="background: #667eea; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
+                Retour à la connexion
+            </button>
         </div>
     </div>
 
@@ -406,11 +438,6 @@
                 </button>
             </div>
         </div>
-        
-        <!-- Bouton vers la page Design -->
-        <button class="design-btn" onclick="goToDesign()">
-            🎨 Personnaliser les couleurs et polices
-        </button>
         
         <div id="configNotice" class="config-notice" style="display: none;">
             ⚠️ Configuration Supabase requise dans config.js
@@ -568,37 +595,6 @@
                 • Respectez les demandes de suppression des utilisateurs
             </div>
         </div>
-        
-        <!-- Section Configuration Overlay QR Code -->
-        <div class="section">
-            <h2>📱 Configuration Overlay QR Code (pour OBS)</h2>
-            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                Configurez le QR code et le texte affichés dans l'overlay pour OBS (fichier qr.html)
-            </p>
-            
-            <label for="overlayUrl">URL de la page de vote :</label>
-            <input type="text" id="overlayUrl" placeholder="https://sacpal888.github.io/sondage-judo/sondage.html">
-            
-            <label for="overlayText">Texte de l'overlay :</label>
-            <textarea id="overlayText" placeholder="le·la joueur·euse&#10;préféré·e du public !" rows="3"></textarea>
-            
-            <button onclick="saveOverlaySettings()" style="background: #28a745; margin-top: 15px;">💾 Enregistrer les paramètres overlay</button>
-            <button onclick="resetOverlayToDefaults()" style="background: #6c757d;">🔄 Restaurer par défaut</button>
-            
-            <div id="overlayStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
-            
-            <div class="info-box" style="margin-top: 15px;">
-                <strong>💡 Pour utiliser dans OBS :</strong><br>
-                1. Configurez l'URL et le texte ci-dessus<br>
-                2. Cliquez sur "Enregistrer"<br>
-                3. Dans OBS → Ajouter une source → <strong>"Source navigateur"</strong><br>
-                4. URL : <strong>https://votre-domaine/qr.html</strong><br>
-                5. Largeur : <strong>1920</strong> / Hauteur : <strong>1080</strong><br>
-                6. ✅ <strong>Décochez "Contrôler l'audio via OBS"</strong><br>
-                7. ✅ Le fond est transparent automatiquement !<br>
-                8. Les modifications sont appliquées en temps réel sur l'overlay
-            </div>
-        </div>
     </div>
 
     <!-- Modal d'édition -->
@@ -620,7 +616,62 @@
         let currentUser = null;
         
         // ============================================
-        // AUTHENTIFICATION
+        // 🔒 NOUVELLES FONCTIONS DE SÉCURITÉ
+        // ============================================
+        
+        async function checkIfAdmin() {
+            try {
+                if (!supabaseClient || !currentUser) {
+                    console.error('Pas de client ou utilisateur');
+                    return false;
+                }
+                
+                // Vérifier si l'utilisateur est dans admin_users
+                const { data, error } = await supabaseClient
+                    .from('admin_users')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('is_active', true)
+                    .single();
+                
+                if (error) {
+                    console.error('Erreur vérification admin:', error);
+                    return false;
+                }
+                
+                if (!data) {
+                    console.log('Utilisateur non admin');
+                    return false;
+                }
+                
+                console.log('✅ Utilisateur admin vérifié');
+                return true;
+                
+            } catch (error) {
+                console.error('Erreur checkIfAdmin:', error);
+                return false;
+            }
+        }
+        
+        function showAccessDenied(email) {
+            document.getElementById('authLoading').classList.add('hidden');
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('deniedUserEmail').textContent = email;
+            document.getElementById('accessDenied').style.display = 'flex';
+        }
+        
+        async function validateAdminBeforeAction() {
+            const isAdmin = await checkIfAdmin();
+            if (!isAdmin) {
+                alert('⚠️ Accès refusé : Vous n\'êtes pas administrateur');
+                await handleLogout();
+                return false;
+            }
+            return true;
+        }
+        
+        // ============================================
+        // AUTHENTIFICATION (MODIFIÉE)
         // ============================================
         
         async function checkAuth() {
@@ -652,20 +703,17 @@
                 currentUser = session.user;
                 console.log('Utilisateur connecté:', currentUser.email);
                 
-                // ✅ VÉRIFICATION EMAIL - MODIFIEZ ICI AVEC VOTRE EMAIL !
-                const allowedEmails = ['pascal@ocelo.be'];  // ← REMPLACEZ PAR VOTRE VRAI EMAIL !
-                if (!allowedEmails.includes(session.user.email)) {
-                    alert('❌ Accès refusé : email non autorisé\n\nSeuls les administrateurs peuvent accéder à cette page.');
-                    await supabaseClient.auth.signOut();
-                    redirectToLogin();
+                // 🔒 NOUVEAU : Vérifier si c'est un admin
+                const isAdmin = await checkIfAdmin();
+                
+                if (!isAdmin) {
+                    console.error('❌ Utilisateur non autorisé');
+                    showAccessDenied(currentUser.email);
                     return false;
                 }
-                // ✅ FIN DE LA VÉRIFICATION EMAIL
                 
-                // Afficher l'email de l'utilisateur
+                // ✅ Admin vérifié, afficher l'interface
                 document.getElementById('userEmail').textContent = currentUser.email;
-                
-                // Masquer le loading et afficher le contenu
                 document.getElementById('authLoading').classList.add('hidden');
                 document.getElementById('mainContainer').style.display = 'block';
                 
@@ -679,7 +727,6 @@
         }
         
         function redirectToLogin() {
-            // Rediriger vers la page de login
             window.location.href = 'login.html';
         }
         
@@ -695,17 +742,12 @@
                     throw error;
                 }
                 
-                // Rediriger vers la page de login
                 window.location.href = 'login.html';
                 
             } catch (error) {
                 console.error('Erreur déconnexion:', error);
                 alert('Erreur lors de la déconnexion: ' + error.message);
             }
-        }
-        
-        function goToDesign() {
-            window.location.href = 'design.html';
         }
         
         // ============================================
@@ -721,7 +763,6 @@
                     return false;
                 }
                 
-                // Supabase client déjà initialisé dans checkAuth()
                 showStatus('✅ Connecté à Supabase', 'success');
                 return true;
             } catch (error) {
@@ -780,7 +821,6 @@
                 await loadCustomMessages();
                 await loadResultsMessages();
                 await loadRGPDStats();
-                await loadOverlaySettings();
                 
                 showStatus('✅ Données chargées', 'success');
             } catch (error) {
@@ -825,10 +865,13 @@
         }
         
         // ============================================
-        // GESTION DES CANDIDATS
+        // GESTION DES CANDIDATS (SÉCURISÉES)
         // ============================================
         
         async function addPlayer() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             if (!supabaseClient) return;
             
             const input = document.getElementById('playerName');
@@ -896,6 +939,9 @@
         }
         
         async function saveEdit() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             if (!supabaseClient || !editingPlayerId) return;
             
             const newName = document.getElementById('editPlayerName').value.trim();
@@ -929,6 +975,9 @@
         }
         
         async function deletePlayer(playerId) {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             if (!confirm('Supprimer ce joueur ?')) return;
             if (!supabaseClient) return;
             
@@ -950,6 +999,9 @@
         }
         
         async function clearAll() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             if (!confirm('Êtes-vous sûr de vouloir tout effacer (joueurs, votes, logo) ?')) return;
             if (!supabaseClient) return;
             
@@ -975,7 +1027,7 @@
         }
         
         // ============================================
-        // GESTION DU LOGO
+        // GESTION DU LOGO (SÉCURISÉE)
         // ============================================
         
         document.getElementById('logoUpload').addEventListener('change', async function(e) {
@@ -1103,6 +1155,9 @@
         }
         
         async function deleteLogo() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             if (!confirm('Êtes-vous sûr de vouloir supprimer le logo ?')) return;
             if (!supabaseClient) return;
             
@@ -1127,7 +1182,7 @@
         }
         
         // ============================================
-        // GESTION DES VOTES
+        // GESTION DES VOTES (SÉCURISÉE)
         // ============================================
         
         async function toggleSingleVote() {
@@ -1181,6 +1236,9 @@
         }
         
         async function resetVotes() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             if (!confirm('⚠️ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservés, seuls les votes seront effacés.')) {
                 return;
             }
@@ -1205,7 +1263,7 @@
         }
         
         // ============================================
-        // MESSAGES DU SONDAGE
+        // MESSAGES DU SONDAGE (SÉCURISÉS)
         // ============================================
         
         const DEFAULT_MESSAGES = {
@@ -1246,6 +1304,9 @@
         }
         
         async function saveMessages() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             const statusDiv = document.getElementById('messagesStatus');
             
             try {
@@ -1309,7 +1370,7 @@
         }
         
         // ============================================
-        // MESSAGES DES RÉSULTATS
+        // MESSAGES DES RÉSULTATS (SÉCURISÉS)
         // ============================================
         
         const DEFAULT_RESULTS_MESSAGES = {
@@ -1350,6 +1411,9 @@
         }
         
         async function saveResultsMessages() {
+            // 🔒 Vérifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
             const statusDiv = document.getElementById('resultsMessagesStatus');
             
             try {
@@ -1526,100 +1590,6 @@
         }
         
         // ============================================
-        // CONFIGURATION OVERLAY QR CODE
-        // ============================================
-        
-        const DEFAULT_OVERLAY = {
-            url: 'https://sacpal888.github.io/sondage-judo/sondage.html',
-            text: 'le·la joueur·euse\npréféré·e du public !'
-        };
-        
-        async function loadOverlaySettings() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .in('key', ['overlay_url', 'overlay_text']);
-                
-                if (error) throw error;
-                
-                const settings = {};
-                if (data) {
-                    data.forEach(item => {
-                        settings[item.key] = item.value;
-                    });
-                }
-                
-                document.getElementById('overlayUrl').value = settings.overlay_url || DEFAULT_OVERLAY.url;
-                document.getElementById('overlayText').value = settings.overlay_text || DEFAULT_OVERLAY.text;
-                
-            } catch (error) {
-                console.error('Erreur chargement paramètres overlay:', error);
-                document.getElementById('overlayUrl').value = DEFAULT_OVERLAY.url;
-                document.getElementById('overlayText').value = DEFAULT_OVERLAY.text;
-            }
-        }
-        
-        async function saveOverlaySettings() {
-            const statusDiv = document.getElementById('overlayStatus');
-            
-            try {
-                statusDiv.style.display = 'block';
-                statusDiv.style.background = '#fff3cd';
-                statusDiv.style.color = '#856404';
-                statusDiv.textContent = '⏳ Enregistrement des paramètres...';
-                
-                const settings = [
-                    { key: 'overlay_url', value: document.getElementById('overlayUrl').value || DEFAULT_OVERLAY.url },
-                    { key: 'overlay_text', value: document.getElementById('overlayText').value || DEFAULT_OVERLAY.text }
-                ];
-                
-                for (const setting of settings) {
-                    const { data: existing } = await supabaseClient
-                        .from('settings')
-                        .select('*')
-                        .eq('key', setting.key)
-                        .single();
-                    
-                    if (existing) {
-                        await supabaseClient
-                            .from('settings')
-                            .update({ value: setting.value })
-                            .eq('key', setting.key);
-                    } else {
-                        await supabaseClient
-                            .from('settings')
-                            .insert({ key: setting.key, value: setting.value });
-                    }
-                }
-                
-                statusDiv.style.background = '#d4edda';
-                statusDiv.style.color = '#155724';
-                statusDiv.textContent = '✅ Paramètres overlay enregistrés ! L\'overlay se met à jour automatiquement.';
-                
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 3000);
-                
-            } catch (error) {
-                statusDiv.style.background = '#f8d7da';
-                statusDiv.style.color = '#721c24';
-                statusDiv.textContent = '❌ Erreur: ' + error.message;
-            }
-        }
-        
-        async function resetOverlayToDefaults() {
-            if (!confirm('Restaurer les paramètres overlay par défaut ?')) {
-                return;
-            }
-            
-            document.getElementById('overlayUrl').value = DEFAULT_OVERLAY.url;
-            document.getElementById('overlayText').value = DEFAULT_OVERLAY.text;
-            
-            await saveOverlaySettings();
-        }
-        
-        // ============================================
         // INITIALISATION
         // ============================================
         
@@ -1628,7 +1598,7 @@
             const authenticated = await checkAuth();
             
             if (authenticated) {
-                // Si authentifié, initialiser et charger les données
+                // Si authentifié ET admin, initialiser et charger les données
                 const initialized = await initSupabase();
                 if (initialized) {
                     await loadData();
