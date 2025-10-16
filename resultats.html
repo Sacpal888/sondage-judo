@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1920, height=1080">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Résultats - Coupe virtuelle du public</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -14,14 +14,9 @@
         }
         
         body {
-            width: 1920px;
-            height: 1080px;
             background: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            overflow: hidden; /* browser-source canvas, no scrollbars */
         }
         
         .container {
@@ -34,6 +29,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
+            overflow: visible; /* keep full shadow */
         }
         
         .header {
@@ -264,19 +260,37 @@
             font-style: italic;
         }
     </style>
-</head>
+
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+      }
+      .overlay-container {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none; /* overlay is display-only */
+      }
+      .overlay-container .interactive { pointer-events: auto; }
+    </style>
+    </head>
+        
 <body>
+    <div class="overlay-container">
     <div class="container">
         <div class="header">
             <h1 id="resultsTitle">🏆 Résultats du Vote 🏆</h1>
             <p class="subtitle" id="resultsSubtitle">Coupe virtuelle du public</p>
         </div>
         
-        <div id="loadingMessage" class="loading">
+        <div id="loadingMessage" class="loading" style="display:none">
             ⏳ Chargement des résultats...
         </div>
 
-        <div id="mainContent" style="display: none; flex-direction: column; flex: 1;">
+        <div id="mainContent" style="display: flex; flex-direction: column; flex: 1;">
             <!-- Ligne supérieure : Logo + Stats -->
             <div class="top-row">
                 <div class="logo-container" id="logoContainer">
@@ -445,11 +459,8 @@
                 displayResults(top10, totalVotes, playersData.length);
                 
                 // Afficher le contenu principal
-                document.getElementById('loadingMessage').style.display = 'none';
-                const mainContent = document.getElementById('mainContent');
-                mainContent.style.display = 'flex';
-                mainContent.style.flexDirection = 'column';
-                mainContent.style.flex = '1';
+                /* loading hidden by default */
+                /* mainContent visible by default */
                 
             } catch (error) {
                 showError('Erreur de chargement: ' + error.message);
@@ -527,7 +538,7 @@
         }
 
         function showNoData() {
-            document.getElementById('loadingMessage').style.display = 'none';
+            /* loading hidden by default */
             const mainContent = document.getElementById('mainContent');
             mainContent.style.display = 'flex';
             mainContent.style.flexDirection = 'column';
@@ -540,8 +551,8 @@
         }
 
         function showError(message) {
-            document.getElementById('loadingMessage').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
+            /* loading hidden by default */
+            /* keep mainContent visible */
             document.getElementById('errorMessage').textContent = message;
             document.getElementById('errorMessage').style.display = 'block';
         }
@@ -562,5 +573,15 @@
             }
         });
     </script>
+    </div>
+
+    <script>
+      (function(){
+        const params = new URLSearchParams(window.location.search);
+        const bg = params.get('bgcolor');
+        if (bg) document.body.style.background = bg;
+      })();
+    </script>
+
 </body>
 </html>
