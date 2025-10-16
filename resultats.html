@@ -385,10 +385,12 @@
                 }
                 
                 // Charger les résultats depuis la vue v_results
+                // On trie par votes DESC pour avoir le classement même sans colonne rank
                 const { data: resultsData, error: resultsError } = await supabaseClient
                     .from('v_results')
                     .select('*')
-                    .order('rank', { ascending: true })
+                    .order('votes', { ascending: false })
+                    .order('name', { ascending: true })
                     .limit(10);
                 
                 if (resultsError) {
@@ -492,12 +494,14 @@
             resultsGrid.innerHTML = results.map((result, index) => {
                 const isFirst = index === 0 && result.votes > 0;
                 const percentage = Number(result.percentage || 0).toFixed(1);
+                // Utiliser result.rank si disponible, sinon calculer à partir de l'index
+                const rank = result.rank || (index + 1);
                 
                 return `
                     <div class="player-result ${isFirst ? 'first-place' : ''}">
                         <div class="player-header">
                             <div class="player-name-container">
-                                <div class="rank-badge">${result.rank || index + 1}</div>
+                                <div class="rank-badge">${rank}</div>
                                 <div class="player-name">${result.name || 'Joueur ' + result.player_id}</div>
                             </div>
                             <div class="player-stats">
