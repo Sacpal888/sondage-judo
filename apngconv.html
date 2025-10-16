@@ -499,7 +499,36 @@
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.min.js"></script>
     <script>
-        // Éléments DOM
+        // ==== Utilitaire : forcer le nombre de lectures APNG (patch du chunk acTL) ====
+        function setApngNumPlays(buf, plays) {
+            const bytes = new Uint8Array(buf);
+            let p = 8; // signature PNG (8 octets)
+
+            const readU32 = (o) => (bytes[o] << 24) | (bytes[o+1] << 16) | (bytes[o+2] << 8) | bytes[o+3];
+            const writeU32 = (o, v) => { bytes[o] = v >>> 24; bytes[o+1] = (v >>> 16) & 255; bytes[o+2] = (v >>> 8) & 255; bytes[o+3] = v & 255; };
+
+            // CRC32 table
+            const table = (() => { let t = [], c; for (let n = 0; n < 256; n++) { c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; } return t; })();
+            const crc32 = (arr) => { let c = ~0; for (let i = 0; i < arr.length; i++) c = (c >>> 8) ^ table[(c ^ arr[i]) & 0xFF]; return (~c) >>> 0; };
+
+            while (p < bytes.length) {
+                const len = readU32(p);
+                const type = String.fromCharCode(bytes[p+4], bytes[p+5], bytes[p+6], bytes[p+7]);
+                if (type === 'acTL') {
+                    // acTL: [num_frames(4)][num_plays(4)]
+                    writeU32(p + 8 + 4, plays); // num_plays
+                    const start = p + 4;  // type + data
+                    const end   = p + 8 + len;
+                    const newCrc = crc32(bytes.slice(start, end));
+                    writeU32(end, newCrc);
+                    return bytes.buffer;
+                }
+                p += 12 + len; // len(4)+type(4)+data(len)+crc(4)
+            }
+            return buf; // pas d'acTL → PNG non animé
+        }
+
+        // ==== Éléments DOM ====
         const uploadZoneIntro = document.getElementById('uploadZoneIntro');
         const uploadZoneFreeze = document.getElementById('uploadZoneFreeze');
         const uploadZoneOutro = document.getElementById('uploadZoneOutro');
@@ -651,6 +680,33 @@
             hideProgress();
         });
 
+        // Outil de téléchargement générique
+        function triggerDownloadFromBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function triggerDownloadFromFile(file, filename) {
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
         // Convert button
         convertBtn.addEventListener('click', async () => {
             // Vérifier qu'on a au moins une section remplie
@@ -669,7 +725,6 @@
                 const fps = parseInt(framerateSlider.value);
                 const freezeDurationSec = parseFloat(freezeDuration.value);
                 const delayPerFrame = 1000 / fps;
-                const loopCount = infiniteLoop.checked ? 0 : 1; // 0 = boucle infinie, 1 = lecture unique
 
                 let width = 0;
                 let height = 0;
@@ -705,7 +760,6 @@
                     }
                     
                     // Ajouter l'image freeze avec le délai spécifié
-                    // Si durée = 0, on utilise quand même delayPerFrame pour avoir au moins 1 frame visible
                     const freezeDelay = freezeDurationSec > 0 ? (freezeDurationSec * 1000) : delayPerFrame;
                     frames.push(freezeImageData.buffer);
                     delays.push(freezeDelay);
@@ -730,29 +784,35 @@
                 }
 
                 updateProgress(100);
-                showStatus('Création de l\'APNG (compression en cours)...', 'info');
 
+                // === Cas spécial : seulement un freeze sans intro/outro → PNG statique (pas d'APNG) ===
+                if (introFiles.length === 0 && outroFiles.length === 0 && freezeFile && totalFrames === 1) {
+                    showStatus('Export PNG statique (aucune animation)...', 'info');
+                    // On réutilise directement le fichier PNG fourni par l'utilisateur
+                    triggerDownloadFromFile(freezeFile, 'freeze.png');
+                    const composition = [`freeze ${freezeDurationSec}s`];
+                    showStatus(`✅ PNG exporté (statique). (${composition.join(' + ')}, ${width}x${height}px)`, 'success');
+                    hideProgress();
+                    convertBtn.disabled = false;
+                    return;
+                }
+
+                showStatus('Création de l\'APNG (compression en cours)...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 100));
 
-                // Créer l'APNG avec boucle sur l'ensemble
-                const apng = UPNG.encode(frames, width, height, 256, delays, loopCount);
-                
-                frames.length = 0;
+                // Créer l'APNG (upng-js n'accepte pas "loopCount" en 6ème paramètre)
+                let apng = UPNG.encode(frames, width, height, 256, delays);
+
+                // Forcer le nombre de lectures dans le chunk acTL
+                if (infiniteLoop.checked) {
+                    apng = setApngNumPlays(apng, 0); // 0 = boucle infinie (spécification APNG)
+                } else {
+                    apng = setApngNumPlays(apng, 1); // 1 = lecture unique
+                }
                 
                 // Télécharger le fichier
                 const blob = new Blob([apng], { type: 'image/apng' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'animation.apng';
-                
-                document.body.appendChild(a);
-                a.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
+                triggerDownloadFromBlob(blob, 'animation.apng');
 
                 const loopText = infiniteLoop.checked ? 'boucle infinie' : 'lecture unique';
                 const fileSize = formatFileSize(blob.size);
@@ -760,7 +820,7 @@
                 if (introFiles.length > 0) composition.push(`${introFiles.length} intro`);
                 if (freezeFile) composition.push(`freeze ${freezeDurationSec}s`);
                 if (outroFiles.length > 0) composition.push(`${outroFiles.length} outro`);
-                
+
                 showStatus(`✅ APNG créé ! (${composition.join(' + ')}, ${totalFrames} frames, ${width}x${height}px, ${fileSize}, ${loopText})`, 'success');
                 hideProgress();
 
