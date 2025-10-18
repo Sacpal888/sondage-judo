@@ -1,1 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results - Tractebel Survey</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config-tractebel.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #FFFFFF;
+    }
+
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
+      border: 4px solid #FFFFFF;
+      border-radius: 30px;
+      padding: 50px 60px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-top {
+      max-width: 500px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 30px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .separator {
+      width: 100%;
+      height: 3px;
+      background: #FFFFFF;
+      margin: 30px 0;
+    }
+
+    .logo-bottom {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 40px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      gap: 30px;
+    }
+
+    .result-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+      flex: 1;
+    }
+
+    .total-votes {
+      background: rgba(255, 237, 0, 0.2);
+      border: 3px solid #FFED00;
+      border-radius: 15px;
+      padding: 15px 30px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #FFED00;
+      white-space: nowrap;
+    }
+
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .result-item {
+      background: rgba(255, 255, 255, 0.1);
+      border: 3px solid #FFFFFF;
+      border-radius: 15px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .result-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+    }
+
+    .result-bar-container {
+      width: 100%;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .result-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00AAFF, #FFED00);
+      border-radius: 12px;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 20px;
+    }
+
+    .result-percentage {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #0066B3;
+      text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .result-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-text {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #FFFFFF;
+      flex: 1;
+    }
+
+    .result-count {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #FFED00;
+      white-space: nowrap;
+      margin-left: 20px;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .error-message h2 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFED00;
+      margin-bottom: 15px;
+    }
+
+    .error-message p {
+      font-size: 1.2rem;
+      color: #FFFFFF;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px 25px;
+      }
+
+      .title-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .result-title {
+        font-size: 2rem;
+      }
+
+      .total-votes {
+        font-size: 1.2rem;
+        padding: 12px 25px;
+      }
+
+      .result-text {
+        font-size: 1.1rem;
+      }
+
+      .result-count {
+        font-size: 1.1rem;
+      }
+
+      .logo-top {
+        max-width: 350px;
+      }
+
+      .logo-bottom {
+        max-width: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="mainContent">
+      <div class="header">
+        <img class="logo-top" id="logoTop" src="" alt="Logo Top">
+        <div class="separator"></div>
+        <img class="logo-bottom" id="logoBottom" src="" alt="Logo Bottom">
+      </div>
+
+      <div class="title-row" id="titleRow" style="display: none;">
+        <h1 class="result-title" id="resultTitle"></h1>
+        <div class="total-votes" id="totalVotes">0 votes</div>
+      </div>
+
+      <div class="results-list" id="resultsList"></div>
+    </div>
+
+    <div id="errorMessage" class="error-message hidden">
+      <h2>⚠️ No active survey</h2>
+      <p>Please check back later or contact the administrator.</p>
+    </div>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      CONFIG_TRACTEBEL.supabase.url,
+      CONFIG_TRACTEBEL.supabase.anon_key
+    );
+
+    let activePage = null;
+    let refreshInterval = null;
+
+    function formatMarkdown(text) {
+      if (!text) return text;
+      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      return text;
+    }
+
+    async function loadActivePage() {
+      try {
+        const { data: pages } = await sb
+          .from(CONFIG_TRACTEBEL.tables.pages)
+          .select('*')
+          .eq('active', true)
+          .limit(1);
+
+        if (!pages || pages.length === 0) {
+          showError();
+          stopRefresh();
+          return;
+        }
+
+        activePage = pages[0];
+
+        // Appliquer les logos
+        document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
+        document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
+
+        // Afficher le titre si défini
+        if (activePage.result_title && activePage.result_title.trim()) {
+          document.getElementById('titleRow').style.display = 'flex';
+          document.getElementById('resultTitle').textContent = activePage.result_title;
+        } else {
+          document.getElementById('titleRow').style.display = 'none';
+        }
+
+        await loadResults();
+        startRefresh();
+
+      } catch (error) {
+        console.error('Error loading page:', error);
+        showError();
+        stopRefresh();
+      }
+    }
+
+    async function loadResults() {
+      if (!activePage) return;
+
+      try {
+        const { data: votes } = await sb
+          .from(CONFIG_TRACTEBEL.tables.votes)
+          .select('choix_id')
+          .eq('page_id', activePage.id);
+
+        const { data: choix } = await sb
+          .from(CONFIG_TRACTEBEL.tables.choix)
+          .select('*')
+          .eq('page_id', activePage.id)
+          .order('ordre');
+
+        if (!choix) return;
+
+        // Compter les votes
+        const voteCounts = {};
+        choix.forEach(c => voteCounts[c.id] = 0);
+        votes?.forEach(v => {
+          if (voteCounts[v.choix_id] !== undefined) {
+            voteCounts[v.choix_id]++;
+          }
+        });
+
+        const totalVotes = votes?.length || 0;
+
+        // Trier par nombre de votes (décroissant)
+        const sortedChoices = choix.sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0));
+
+        // Afficher le total
+        document.getElementById('totalVotes').textContent = `${totalVotes} vote${totalVotes !== 1 ? 's' : ''}`;
+
+        // Afficher les résultats
+        const resultsList = document.getElementById('resultsList');
+        resultsList.innerHTML = '';
+
+        if (totalVotes === 0) {
+          resultsList.innerHTML = '<div class="no-data">No votes yet. Results will appear here once voting begins.</div>';
+          return;
+        }
+
+        sortedChoices.forEach(choice => {
+          const count = voteCounts[choice.id] || 0;
+          const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
+
+          const item = document.createElement('div');
+          item.className = 'result-item';
+          item.innerHTML = `
+            <div class="result-bar-container">
+              <div class="result-bar" style="width: ${percentage}%">
+                <span class="result-percentage">${percentage}%</span>
+              </div>
+            </div>
+            <div class="result-footer">
+              <div class="result-text">${formatMarkdown(choice.texte)}</div>
+              <div class="result-count">${count} vote${count !== 1 ? 's' : ''}</div>
+            </div>
+          `;
+          resultsList.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error('Error loading results:', error);
+      }
+    }
+
+    function showError() {
+      document.getElementById('mainContent').classList.add('hidden');
+      document.getElementById('errorMessage').classList.remove('hidden');
+    }
+
+    function startRefresh() {
+      stopRefresh();
+      refreshInterval = setInterval(loadResults, 2000); // Refresh every 2 seconds
+    }
+
+    function stopRefresh() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+      }
+    }
+
+    // Charger au démarrage
+    loadActivePage();
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', stopRefresh);
+  </script>
+</body>
+</html>
