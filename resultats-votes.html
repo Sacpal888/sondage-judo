@@ -34,37 +34,50 @@
       box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
     }
 
-    /* Layout Desktop - INCHANGÉ */
+    /* Layout Desktop */
     @media (min-width: 769px) {
       .header {
         margin-bottom: 15px;
       }
 
       .logos-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
         align-items: center;
+        gap: 0;
+        margin-bottom: 15px;
       }
 
       .logo-column {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 200px;
       }
 
-      .logo-top, .logo-bottom {
+      .logo-top {
         max-width: 400px;
         max-height: 200px;
         width: 100%;
         height: auto;
         object-fit: contain;
+        margin-bottom: 20px;
       }
 
       .separator {
-        display: none;
+        width: 60%;
+        height: 3px;
+        background: #FFFFFF;
+        margin: 20px 0;
+        display: block;
+      }
+
+      .logo-bottom {
+        max-width: 400px;
+        max-height: 200px;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        margin-top: 20px;
       }
 
       .title-row {
