@@ -27,7 +27,7 @@
     .container {
       max-width: 1600px;
       width: 95%;
-      background: linear-gradient(180deg, #0066B3 0%, #00AAFF 100%);
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
       border: 4px solid #FFFFFF;
       border-radius: 30px;
       padding: 30px 40px;
@@ -100,8 +100,8 @@
       }
 
       .results-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 15px;
       }
 
@@ -169,7 +169,7 @@
       }
     }
 
-    /* Layout Mobile - OPTIMISÉ */
+    /* Layout Mobile */
     @media (max-width: 768px) {
       .container {
         max-width: 100%;
@@ -319,7 +319,6 @@
       }
     }
 
-    /* Extra petit écran (<400px) */
     @media (max-width: 400px) {
       .container {
         padding: 15px 10px;
@@ -470,6 +469,63 @@
       if (!activePage) return;
 
       try {
+        // ⚡ OPTIMISATION: Lire directement depuis tractebel_stats
+        const { data: stats, error: statsError } = await sb
+          .from(CONFIG_TRACTEBEL.tables.stats)
+          .select(`
+            *,
+            choix:tractebel_choix!inner(texte, ordre)
+          `)
+          .eq('page_id', activePage.id)
+          .order('rang', { ascending: true });
+
+        if (statsError) {
+          console.error('Stats error:', statsError);
+          // Fallback: calculer manuellement si pas de stats
+          await loadResultsFallback();
+          return;
+        }
+
+        if (!stats || stats.length === 0) {
+          // Pas encore de stats, afficher "No votes yet"
+          document.getElementById('totalVotes').textContent = '0 votes';
+          document.getElementById('resultsList').innerHTML = '<div class="no-data">No votes yet. Results will appear here once voting begins.</div>';
+          return;
+        }
+
+        // Calculer le total de votes
+        const totalVotes = stats.reduce((sum, s) => sum + (s.nb_votes || 0), 0);
+        document.getElementById('totalVotes').textContent = `${totalVotes} vote${totalVotes !== 1 ? 's' : ''}`;
+
+        // Afficher les résultats
+        const resultsList = document.getElementById('resultsList');
+        resultsList.innerHTML = '';
+
+        stats.forEach(stat => {
+          const item = document.createElement('div');
+          item.className = 'result-item';
+          item.innerHTML = `
+            <div class="result-bar-container">
+              <div class="result-bar" style="width: ${stat.pourcentage || 0}%">
+                <span class="result-percentage">${(stat.pourcentage || 0).toFixed(1)}%</span>
+              </div>
+            </div>
+            <div class="result-footer">
+              <div class="result-text">${formatMarkdown(stat.choix.texte)}</div>
+              <div class="result-count">${stat.nb_votes || 0} vote${stat.nb_votes !== 1 ? 's' : ''}</div>
+            </div>
+          `;
+          resultsList.appendChild(item);
+        });
+
+      } catch (error) {
+        console.error('Error loading results:', error);
+      }
+    }
+
+    // Fallback si tractebel_stats est vide (calcul manuel)
+    async function loadResultsFallback() {
+      try {
         const { data: votes } = await sb
           .from(CONFIG_TRACTEBEL.tables.votes)
           .select('choix_id')
@@ -492,7 +548,6 @@
         });
 
         const totalVotes = votes?.length || 0;
-
         const sortedChoices = choix.sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0));
 
         document.getElementById('totalVotes').textContent = `${totalVotes} vote${totalVotes !== 1 ? 's' : ''}`;
@@ -526,7 +581,7 @@
         });
 
       } catch (error) {
-        console.error('Error loading results:', error);
+        console.error('Error in fallback:', error);
       }
     }
 
