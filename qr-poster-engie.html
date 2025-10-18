@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ENGIE Survey - Scan to Participate</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 210mm;
+      height: 297mm;
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30mm;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .logo-nmar {
+      max-width: 500px;
+      margin-bottom: 30px;
+    }
+
+    .logo-tractebel {
+      max-width: 300px;
+      margin-bottom: 50px;
+    }
+
+    h1 {
+      font-size: 48pt;
+      text-align: center;
+      margin-bottom: 40px;
+      color: white;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .qr-container {
+      background: white;
+      padding: 40px;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      margin-bottom: 40px;
+    }
+
+    .qr-container img {
+      display: block;
+      width: 350px;
+      height: 350px;
+    }
+
+    .instructions {
+      text-align: center;
+      font-size: 28pt;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 30px 50px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 3px solid white;
+    }
+
+    .url {
+      margin-top: 30px;
+      font-size: 18pt;
+      color: #FFED00;
+      text-align: center;
+    }
+
+    @media print {
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <img class="logo-nmar" src="assets/logo-nmar.png" alt="No Mind at Risk">
+  <img class="logo-tractebel" src="assets/logo-tractebel.png" alt="Tractebel ENGIE">
+  
+  <h1>How do you feel today?</h1>
+  
+  <div class="qr-container">
+    <!-- ⚠️ REMPLACE PAR TON QR CODE -->
+    <img src="assets/qr-engie.png" alt="QR Code">
+  </div>
+  
+  <div class="instructions">
+    📱 Scan to participate
+  </div>
+  
+  <div class="url">
+    tonsite.com/sondage-engie
+  </div>
+</body>
+</html>
