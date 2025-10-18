@@ -202,12 +202,23 @@
       padding: 10px;
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
+      align-items: center;
+      justify-content: center;
     }
 
     .logo-preview {
-      max-width: 80px;
-      max-height: 40px;
+      max-width: 100px;
+      max-height: 50px;
       object-fit: contain;
+    }
+
+    .page-result-title {
+      background: rgba(255, 237, 0, 0.2);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      color: #FFED00;
     }
 
     .page-choices {
@@ -335,6 +346,53 @@
       border-color: #FFED00;
     }
 
+    .logo-upload-zone {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .logo-preview-modal {
+      max-width: 150px;
+      max-height: 80px;
+      border: 2px solid #00AAFF;
+      border-radius: 8px;
+      padding: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      object-fit: contain;
+    }
+
+    .btn-upload {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .btn-upload:hover {
+      background: #218838;
+    }
+
+    .btn-reset {
+      background: #ff9800;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .btn-reset:hover {
+      background: #e68900;
+    }
+
     .choices-editor {
       margin-bottom: 15px;
     }
@@ -386,63 +444,6 @@
       margin-top: 30px;
     }
 
-    .results-list {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .result-item {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 20px;
-      border-left: 5px solid #FFED00;
-    }
-
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .result-text {
-      font-size: 1.2rem;
-      font-weight: bold;
-      flex: 1;
-      padding-right: 20px;
-    }
-
-    .result-count {
-      font-size: 1.5rem;
-      color: #FFED00;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .result-bar-container {
-      width: 100%;
-      height: 35px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 15px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .result-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #00AAFF, #FFED00);
-      border-radius: 15px;
-      transition: width 0.5s ease;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding-right: 15px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #0066B3;
-    }
-
     .no-data {
       text-align: center;
       padding: 40px;
@@ -480,6 +481,10 @@
       .btn-small {
         flex: 1;
       }
+
+      .logo-upload-zone {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -499,11 +504,6 @@
       <h3 class="section-title">Survey Pages (Ordered: Left → Right, Top → Bottom)</h3>
       <div class="pages-grid" id="pagesGrid"></div>
     </div>
-
-    <div class="section" id="resultsSection" style="display: none;">
-      <h3 class="section-title">Live Results - <span id="activePageTitle"></span></h3>
-      <div class="results-list" id="resultsList"></div>
-    </div>
   </div>
 
   <div class="modal" id="pageModal">
@@ -522,15 +522,33 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Top Logo URL (e.g., No Mind at Risk)</label>
-          <input type="text" class="form-input" id="logoTop" placeholder="assets/logo-nmar.png" value="assets/logo-nmar.png">
-          <span class="form-help">💡 Enter the path or URL to the top logo image</span>
+          <label class="form-label">Results Page Title (optional)</label>
+          <input type="text" class="form-input" id="resultTitle" placeholder="e.g., Live Results">
+          <span class="form-help">💡 Title shown on the results page. Leave empty for no title.</span>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Bottom Logo URL (e.g., Tractebel)</label>
-          <input type="text" class="form-input" id="logoBottom" placeholder="assets/logo-tractebel.png" value="assets/logo-tractebel.png">
-          <span class="form-help">💡 Enter the path or URL to the bottom logo image</span>
+          <label class="form-label">Top Logo (e.g., No Mind at Risk)</label>
+          <input type="text" class="form-input" id="logoTopUrl" placeholder="URL or path" value="assets/logo-nmar.png">
+          <div class="logo-upload-zone">
+            <img id="logoTopPreview" class="logo-preview-modal" src="assets/logo-nmar.png" alt="Top Logo">
+            <input type="file" id="logoTopFile" accept="image/*" style="display: none;">
+            <button type="button" class="btn-upload" id="btnUploadTop">📤 Upload</button>
+            <button type="button" class="btn-reset" id="btnResetTop">🔄 Reset</button>
+          </div>
+          <span class="form-help">💡 Upload an image or paste a URL</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bottom Logo (e.g., Tractebel)</label>
+          <input type="text" class="form-input" id="logoBottomUrl" placeholder="URL or path" value="assets/logo-tractebel.png">
+          <div class="logo-upload-zone">
+            <img id="logoBottomPreview" class="logo-preview-modal" src="assets/logo-tractebel.png" alt="Bottom Logo">
+            <input type="file" id="logoBottomFile" accept="image/*" style="display: none;">
+            <button type="button" class="btn-upload" id="btnUploadBottom">📤 Upload</button>
+            <button type="button" class="btn-reset" id="btnResetBottom">🔄 Reset</button>
+          </div>
+          <span class="form-help">💡 Upload an image or paste a URL</span>
         </div>
 
         <div class="form-group">
@@ -558,9 +576,9 @@
     );
 
     let allPages = [];
-    let activePage = null;
     let editingPageId = null;
-    let resultsInterval = null;
+    let logoTopBase64 = '';
+    let logoBottomBase64 = '';
 
     function formatMarkdown(text) {
       if (!text) return text;
@@ -584,16 +602,6 @@
 
         allPages = pages || [];
         await displayPages();
-
-        const activePageData = allPages.find(p => p.active);
-        if (activePageData) {
-          activePage = activePageData;
-          await loadResults();
-          startResultsRefresh();
-        } else {
-          stopResultsRefresh();
-          document.getElementById('resultsSection').style.display = 'none';
-        }
 
       } catch (error) {
         console.error('Error:', error);
@@ -620,6 +628,11 @@
 
         const card = document.createElement('div');
         card.className = 'page-card' + (page.active ? ' active' : '');
+
+        let resultTitleHtml = '';
+        if (page.result_title) {
+          resultTitleHtml = `<div class="page-result-title">📊 Result Title: "${page.result_title}"</div>`;
+        }
 
         let choicesHtml = '';
         if (choix && choix.length > 0) {
@@ -654,6 +667,7 @@
           </div>
           ${page.description ? `<div class="page-description">${page.description}</div>` : ''}
           ${logosHtml}
+          ${resultTitleHtml}
           ${choicesHtml}
           <div class="page-actions">
             ${!page.active ?
@@ -695,74 +709,17 @@
       }
     }
 
-    async function loadResults() {
-      if (!activePage) return;
-
-      try {
-        const { data: votes } = await sb.from(CONFIG_TRACTEBEL.tables.votes).select('choix_id').eq('page_id', activePage.id);
-        const { data: choix } = await sb.from(CONFIG_TRACTEBEL.tables.choix).select('*').eq('page_id', activePage.id).order('ordre');
-
-        if (!choix) return;
-
-        const voteCounts = {};
-        choix.forEach(c => voteCounts[c.id] = 0);
-        votes?.forEach(v => { if (voteCounts[v.choix_id] !== undefined) voteCounts[v.choix_id]++; });
-
-        const totalVotes = votes?.length || 0;
-        const sortedChoices = choix.sort((a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0));
-
-        document.getElementById('resultsSection').style.display = 'block';
-        document.getElementById('activePageTitle').textContent = activePage.titre;
-
-        const resultsList = document.getElementById('resultsList');
-        resultsList.innerHTML = '';
-
-        if (totalVotes === 0) {
-          resultsList.innerHTML = '<div class="no-data">No votes yet</div>';
-          return;
-        }
-
-        sortedChoices.forEach(choice => {
-          const count = voteCounts[choice.id] || 0;
-          const percentage = totalVotes > 0 ? ((count / totalVotes) * 100).toFixed(1) : 0;
-
-          const item = document.createElement('div');
-          item.className = 'result-item';
-          item.innerHTML = `
-            <div class="result-bar-container">
-              <div class="result-bar" style="width: ${percentage}%">${percentage}%</div>
-            </div>
-            <div class="result-header">
-              <div class="result-text">${formatMarkdown(choice.texte)}</div>
-              <div class="result-count">${count} vote${count !== 1 ? 's' : ''}</div>
-            </div>
-          `;
-          resultsList.appendChild(item);
-        });
-
-      } catch (error) {
-        console.error('Error loading results:', error);
-      }
-    }
-
-    function startResultsRefresh() {
-      stopResultsRefresh();
-      resultsInterval = setInterval(loadResults, 3000);
-    }
-
-    function stopResultsRefresh() {
-      if (resultsInterval) {
-        clearInterval(resultsInterval);
-        resultsInterval = null;
-      }
-    }
-
     function openCreateModal() {
       editingPageId = null;
+      logoTopBase64 = '';
+      logoBottomBase64 = '';
+      
       document.getElementById('modalTitle').textContent = 'Create New Page';
       document.getElementById('pageForm').reset();
-      document.getElementById('logoTop').value = 'assets/logo-nmar.png';
-      document.getElementById('logoBottom').value = 'assets/logo-tractebel.png';
+      document.getElementById('logoTopUrl').value = 'assets/logo-nmar.png';
+      document.getElementById('logoBottomUrl').value = 'assets/logo-tractebel.png';
+      document.getElementById('logoTopPreview').src = 'assets/logo-nmar.png';
+      document.getElementById('logoBottomPreview').src = 'assets/logo-tractebel.png';
       document.getElementById('choicesEditor').innerHTML = '';
       document.getElementById('errorContainer').innerHTML = '';
 
@@ -773,14 +730,20 @@
 
     async function editPage(pageId) {
       editingPageId = pageId;
+      logoTopBase64 = '';
+      logoBottomBase64 = '';
+      
       const page = allPages.find(p => p.id === pageId);
       if (!page) return;
 
       document.getElementById('modalTitle').textContent = 'Edit Page';
       document.getElementById('pageTitle').value = page.titre;
       document.getElementById('pageDescription').value = page.description || '';
-      document.getElementById('logoTop').value = page.logo_top || 'assets/logo-nmar.png';
-      document.getElementById('logoBottom').value = page.logo_bottom || 'assets/logo-tractebel.png';
+      document.getElementById('resultTitle').value = page.result_title || '';
+      document.getElementById('logoTopUrl').value = page.logo_top || 'assets/logo-nmar.png';
+      document.getElementById('logoBottomUrl').value = page.logo_bottom || 'assets/logo-tractebel.png';
+      document.getElementById('logoTopPreview').src = page.logo_top || 'assets/logo-nmar.png';
+      document.getElementById('logoBottomPreview').src = page.logo_bottom || 'assets/logo-tractebel.png';
       document.getElementById('errorContainer').innerHTML = '';
 
       const { data: choix } = await sb.from(CONFIG_TRACTEBEL.tables.choix).select('*').eq('page_id', pageId).order('ordre');
@@ -790,6 +753,69 @@
 
       document.getElementById('pageModal').classList.add('active');
     }
+
+    // Upload Logo Top
+    document.getElementById('btnUploadTop').addEventListener('click', () => {
+      document.getElementById('logoTopFile').click();
+    });
+
+    document.getElementById('logoTopFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          logoTopBase64 = event.target.result;
+          document.getElementById('logoTopPreview').src = logoTopBase64;
+          document.getElementById('logoTopUrl').value = 'Uploaded file';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('btnResetTop').addEventListener('click', () => {
+      logoTopBase64 = '';
+      document.getElementById('logoTopUrl').value = 'assets/logo-nmar.png';
+      document.getElementById('logoTopPreview').src = 'assets/logo-nmar.png';
+      document.getElementById('logoTopFile').value = '';
+    });
+
+    // Upload Logo Bottom
+    document.getElementById('btnUploadBottom').addEventListener('click', () => {
+      document.getElementById('logoBottomFile').click();
+    });
+
+    document.getElementById('logoBottomFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          logoBottomBase64 = event.target.result;
+          document.getElementById('logoBottomPreview').src = logoBottomBase64;
+          document.getElementById('logoBottomUrl').value = 'Uploaded file';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('btnResetBottom').addEventListener('click', () => {
+      logoBottomBase64 = '';
+      document.getElementById('logoBottomUrl').value = 'assets/logo-tractebel.png';
+      document.getElementById('logoBottomPreview').src = 'assets/logo-tractebel.png';
+      document.getElementById('logoBottomFile').value = '';
+    });
+
+    // Update preview on URL change
+    document.getElementById('logoTopUrl').addEventListener('input', (e) => {
+      if (!logoTopBase64) {
+        document.getElementById('logoTopPreview').src = e.target.value;
+      }
+    });
+
+    document.getElementById('logoBottomUrl').addEventListener('input', (e) => {
+      if (!logoBottomBase64) {
+        document.getElementById('logoBottomPreview').src = e.target.value;
+      }
+    });
 
     function addChoiceField(value = '') {
       const editor = document.getElementById('choicesEditor');
@@ -842,10 +868,14 @@
 
       const titre = document.getElementById('pageTitle').value.trim();
       const description = document.getElementById('pageDescription').value.trim();
-      const logoTop = document.getElementById('logoTop').value.trim();
-      const logoBottom = document.getElementById('logoBottom').value.trim();
+      const resultTitle = document.getElementById('resultTitle').value.trim();
+      const logoTopUrl = document.getElementById('logoTopUrl').value.trim();
+      const logoBottomUrl = document.getElementById('logoBottomUrl').value.trim();
       const choiceInputs = document.querySelectorAll('.choice-item input');
       const choices = Array.from(choiceInputs).map(input => input.value.trim()).filter(v => v);
+
+      const logoTop = logoTopBase64 || logoTopUrl;
+      const logoBottom = logoBottomBase64 || logoBottomUrl;
 
       if (!titre) {
         showError('Please enter a title');
@@ -862,6 +892,7 @@
           const { error: updateError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ 
             titre, 
             description,
+            result_title: resultTitle,
             logo_top: logoTop,
             logo_bottom: logoBottom
           }).eq('id', editingPageId);
@@ -877,7 +908,8 @@
         } else {
           const { data: newPage, error: createError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).insert({ 
             titre, 
-            description, 
+            description,
+            result_title: resultTitle,
             active: false,
             logo_top: logoTop,
             logo_bottom: logoBottom
@@ -902,8 +934,6 @@
     });
 
     loadPages();
-
-    window.addEventListener('beforeunload', stopResultsRefresh);
   </script>
 </body>
 </html>
