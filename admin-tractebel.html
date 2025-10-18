@@ -21,7 +21,6 @@
       min-height: 100vh;
     }
 
-    /* LOGIN SCREEN */
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -113,7 +112,6 @@
       color: #00AAFF;
       text-decoration: none;
       font-size: 0.95rem;
-      transition: color 0.3s ease;
     }
 
     .forgot-password a:hover {
@@ -160,7 +158,6 @@
       display: none !important;
     }
 
-    /* DASHBOARD */
     .header {
       max-width: 1400px;
       margin: 0 auto 40px;
@@ -245,6 +242,15 @@
 
     .btn-danger:hover {
       background: #cc0000;
+    }
+
+    .btn-warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e68900;
     }
 
     .main-content {
@@ -377,6 +383,27 @@
       margin-bottom: 15px;
       font-size: 0.95rem;
       color: #FFED00;
+    }
+
+    .page-stats {
+      background: rgba(255, 237, 0, 0.1);
+      border: 2px solid #FFED00;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .page-stats-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFED00;
+      margin-bottom: 5px;
+    }
+
+    .page-stats-label {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
     }
 
     .page-choices {
@@ -647,7 +674,6 @@
   </style>
 </head>
 <body>
-  <!-- LOGIN SCREEN -->
   <div id="loginScreen" class="login-container">
     <div class="login-box">
       <div class="login-header">
@@ -672,7 +698,6 @@
     </div>
   </div>
 
-  <!-- FORGOT PASSWORD SCREEN -->
   <div id="forgotPasswordScreen" class="login-container hidden">
     <div class="login-box">
       <div class="login-header">
@@ -694,7 +719,6 @@
     </div>
   </div>
 
-  <!-- DASHBOARD -->
   <div id="dashboard" class="hidden">
     <div class="header">
       <button class="logout-btn" id="btnLogout">🚪 Logout</button>
@@ -718,24 +742,20 @@
   <div class="modal" id="pageModal">
     <div class="modal-content">
       <h2 class="modal-header" id="modalTitle">Create New Page</h2>
-
       <form id="pageForm">
         <div class="form-group">
           <label class="form-label">Question / Title *</label>
           <input type="text" class="form-input" id="pageTitle" placeholder="e.g., How are you feeling today?" required>
         </div>
-
         <div class="form-group">
           <label class="form-label">Description (optional)</label>
           <textarea class="form-textarea" id="pageDescription" placeholder="Optional subtitle"></textarea>
         </div>
-
         <div class="form-group">
           <label class="form-label">Results Page Title (optional)</label>
           <input type="text" class="form-input" id="resultTitle" placeholder="e.g., Live Results">
           <span class="form-help">💡 Title shown on the results page. Leave empty for no title.</span>
         </div>
-
         <div class="form-group">
           <label class="form-label">Top Logo (e.g., No Mind at Risk)</label>
           <input type="text" class="form-input" id="logoTopUrl" placeholder="URL or path" value="assets/logo-nmar.png">
@@ -745,9 +765,7 @@
             <button type="button" class="btn-upload" id="btnUploadTop">📤 Upload</button>
             <button type="button" class="btn-reset" id="btnResetTop">🔄 Reset</button>
           </div>
-          <span class="form-help">💡 Upload an image or paste a URL</span>
         </div>
-
         <div class="form-group">
           <label class="form-label">Bottom Logo (e.g., Tractebel)</label>
           <input type="text" class="form-input" id="logoBottomUrl" placeholder="URL or path" value="assets/logo-tractebel.png">
@@ -757,18 +775,14 @@
             <button type="button" class="btn-upload" id="btnUploadBottom">📤 Upload</button>
             <button type="button" class="btn-reset" id="btnResetBottom">🔄 Reset</button>
           </div>
-          <span class="form-help">💡 Upload an image or paste a URL</span>
         </div>
-
         <div class="form-group">
           <label class="form-label">Answer Choices (minimum 2) *</label>
           <span class="form-help">💡 Use **text** for bold, *text* for italic</span>
           <div class="choices-editor" id="choicesEditor"></div>
           <button type="button" class="btn-add-choice" id="btnAddChoice">+ Add Choice</button>
         </div>
-
         <div id="errorContainer"></div>
-
         <div class="modal-actions">
           <button type="submit" class="btn btn-success" style="flex: 1;">💾 Save</button>
           <button type="button" class="btn btn-danger" style="flex: 1;" id="btnCancel">✖ Cancel</button>
@@ -779,29 +793,12 @@
 
   <script>
     const { createClient } = supabase;
-    const sb = createClient(
-      CONFIG_TRACTEBEL.supabase.url,
-      CONFIG_TRACTEBEL.supabase.anon_key
-    );
-
-    let allPages = [];
-    let editingPageId = null;
-    let logoTopBase64 = '';
-    let logoBottomBase64 = '';
-    let currentUser = null;
-
-    // ============================================
-    // AUTHENTICATION
-    // ============================================
+    const sb = createClient(CONFIG_TRACTEBEL.supabase.url, CONFIG_TRACTEBEL.supabase.anon_key);
+    let allPages = [], editingPageId = null, logoTopBase64 = '', logoBottomBase64 = '', currentUser = null;
 
     async function checkAuth() {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) {
-        currentUser = session.user;
-        showDashboard();
-      } else {
-        showLogin();
-      }
+      session ? (currentUser = session.user, showDashboard()) : showLogin();
     }
 
     function showLogin() {
@@ -823,112 +820,70 @@
       loadPages();
     }
 
-    // Login form
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
       const errorDiv = document.getElementById('loginError');
-
       try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        
+        const { data, error } = await sb.auth.signInWithPassword({
+          email: document.getElementById('loginEmail').value,
+          password: document.getElementById('loginPassword').value
+        });
         if (error) throw error;
-        
         currentUser = data.user;
         showDashboard();
-        
       } catch (error) {
-        errorDiv.textContent = '❌ Invalid credentials. Please try again.';
+        errorDiv.textContent = '❌ Invalid credentials';
         errorDiv.classList.remove('hidden');
-        console.error('Login error:', error);
       }
     });
 
-    // Forgot password link
-    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      showForgotPassword();
-    });
+    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => { e.preventDefault(); showForgotPassword(); });
+    document.getElementById('backToLoginLink').addEventListener('click', (e) => { e.preventDefault(); showLogin(); });
 
-    // Back to login link
-    document.getElementById('backToLoginLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      showLogin();
-    });
-
-    // Forgot password form
     document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('resetEmail').value;
-      const errorDiv = document.getElementById('resetError');
-      const successDiv = document.getElementById('resetSuccess');
-
+      const errorDiv = document.getElementById('resetError'), successDiv = document.getElementById('resetSuccess');
       errorDiv.classList.add('hidden');
       successDiv.classList.add('hidden');
-
       try {
-        const { error } = await sb.auth.resetPasswordForEmail(email, {
+        const { error } = await sb.auth.resetPasswordForEmail(document.getElementById('resetEmail').value, {
           redirectTo: window.location.origin + '/admin-tractebel.html'
         });
-        
         if (error) throw error;
-        
-        successDiv.textContent = '✅ Password reset email sent! Check your inbox.';
+        successDiv.textContent = '✅ Password reset email sent!';
         successDiv.classList.remove('hidden');
         document.getElementById('resetEmail').value = '';
-        
       } catch (error) {
-        errorDiv.textContent = '❌ Error sending reset email. Please try again.';
+        errorDiv.textContent = '❌ Error sending reset email';
         errorDiv.classList.remove('hidden');
-        console.error('Reset password error:', error);
       }
     });
 
-    // Logout
     document.getElementById('btnLogout').addEventListener('click', async () => {
       await sb.auth.signOut();
       currentUser = null;
       showLogin();
     });
 
-    // ============================================
-    // PAGE MANAGEMENT
-    // ============================================
-
     function formatMarkdown(text) {
       if (!text) return text;
-      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      return text;
+      return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
     }
 
     async function loadPages() {
       try {
-        const { data: pages, error } = await sb
-          .from(CONFIG_TRACTEBEL.tables.pages)
-          .select('*')
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('Error loading pages:', error);
-          showError('Error loading pages: ' + error.message);
-          return;
-        }
-
+        const { data: pages, error } = await sb.from(CONFIG_TRACTEBEL.tables.pages).select('*').order('created_at', { ascending: true });
+        if (error) throw error;
         allPages = pages || [];
         await displayPages();
-
       } catch (error) {
         console.error('Error:', error);
-        alert('Error loading pages. Check console (F12)');
       }
     }
 
     async function displayPages() {
       const grid = document.getElementById('pagesGrid');
       grid.innerHTML = '';
-
       if (allPages.length === 0) {
         grid.innerHTML = '<div class="no-data">No pages yet. Create your first survey page!</div>';
         return;
@@ -936,88 +891,57 @@
 
       for (let index = 0; index < allPages.length; index++) {
         const page = allPages[index];
-        const { data: choix } = await sb
-          .from(CONFIG_TRACTEBEL.tables.choix)
-          .select('*')
-          .eq('page_id', page.id)
-          .order('ordre');
+        const { data: choix } = await sb.from(CONFIG_TRACTEBEL.tables.choix).select('*').eq('page_id', page.id).order('ordre');
+        const { count: voteCount } = await sb.from(CONFIG_TRACTEBEL.tables.votes).select('*', { count: 'exact', head: true }).eq('page_id', page.id);
 
         const card = document.createElement('div');
         card.className = 'page-card' + (page.active ? ' active' : '');
-
-        let resultTitleHtml = '';
-        if (page.result_title) {
-          resultTitleHtml = `<div class="page-result-title">📊 Result Title: "${page.result_title}"</div>`;
-        }
-
-        let choicesHtml = '';
-        if (choix && choix.length > 0) {
-          choicesHtml = `
-            <div class="page-choices">
-              <div class="page-choices-title">Choices (${choix.length}):</div>
-              <ul class="choice-list">
-                ${choix.map(c => `<li>• ${formatMarkdown(c.texte)}</li>`).join('')}
-              </ul>
-            </div>
-          `;
-        }
-
-        let logosHtml = '';
-        if (page.logo_top || page.logo_bottom) {
-          logosHtml = `
-            <div class="page-logos">
-              ${page.logo_top ? `<img src="${page.logo_top}" class="logo-preview" alt="Top Logo">` : ''}
-              ${page.logo_bottom ? `<img src="${page.logo_bottom}" class="logo-preview" alt="Bottom Logo">` : ''}
-            </div>
-          `;
-        }
-
         card.innerHTML = `
           <div class="page-order">${index + 1}</div>
           <div class="page-header">
             <div class="page-title">${page.titre}</div>
-            ${page.active ?
-              '<div class="active-badge">✓ ACTIVE</div>' :
-              '<div class="inactive-badge">○ INACTIVE</div>'
-            }
+            ${page.active ? '<div class="active-badge">✓ ACTIVE</div>' : '<div class="inactive-badge">○ INACTIVE</div>'}
           </div>
           ${page.description ? `<div class="page-description">${page.description}</div>` : ''}
-          ${logosHtml}
-          ${resultTitleHtml}
-          ${choicesHtml}
+          ${page.logo_top || page.logo_bottom ? `
+            <div class="page-logos">
+              ${page.logo_top ? `<img src="${page.logo_top}" class="logo-preview" alt="Top Logo">` : ''}
+              ${page.logo_bottom ? `<img src="${page.logo_bottom}" class="logo-preview" alt="Bottom Logo">` : ''}
+            </div>` : ''}
+          ${page.result_title ? `<div class="page-result-title">📊 Result Title: "${page.result_title}"</div>` : ''}
+          <div class="page-stats">
+            <div class="page-stats-number">${voteCount || 0}</div>
+            <div class="page-stats-label">Total Votes</div>
+          </div>
+          ${choix && choix.length > 0 ? `
+            <div class="page-choices">
+              <div class="page-choices-title">Choices (${choix.length}):</div>
+              <ul class="choice-list">${choix.map(c => `<li>• ${formatMarkdown(c.texte)}</li>`).join('')}</ul>
+            </div>` : ''}
           <div class="page-actions">
-            ${!page.active ?
-              `<button class="btn btn-small btn-success" data-activate="${page.id}">🟢 Activate</button>` :
-              `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`
-            }
+            ${!page.active ? `<button class="btn btn-small btn-success" data-activate="${page.id}">🟢 Activate</button>` : 
+              `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`}
             <button class="btn btn-small" data-edit="${page.id}">✏️ Edit</button>
+            <button class="btn btn-small btn-warning" data-reset="${page.id}">🔄 Reset Votes</button>
             <button class="btn btn-small btn-danger" data-delete="${page.id}">🗑️ Delete</button>
           </div>
         `;
-
         grid.appendChild(card);
       }
 
-      document.querySelectorAll('[data-activate]').forEach(btn => {
-        btn.addEventListener('click', () => activatePage(btn.dataset.activate));
-      });
-
-      document.querySelectorAll('[data-edit]').forEach(btn => {
-        btn.addEventListener('click', () => editPage(btn.dataset.edit));
-      });
-
-      document.querySelectorAll('[data-delete]').forEach(btn => {
-        btn.addEventListener('click', () => deletePage(btn.dataset.delete));
-      });
+      document.querySelectorAll('[data-activate]').forEach(btn => btn.addEventListener('click', () => activatePage(btn.dataset.activate)));
+      document.querySelectorAll('[data-edit]').forEach(btn => btn.addEventListener('click', () => editPage(btn.dataset.edit)));
+      document.querySelectorAll('[data-reset]').forEach(btn => btn.addEventListener('click', () => resetVotes(btn.dataset.reset)));
+      document.querySelectorAll('[data-delete]').forEach(btn => btn.addEventListener('click', () => deletePage(btn.dataset.delete)));
     }
 
-    async function activatePage(pageId) {
-      if (!confirm('Activate this page?\n\nThis will deactivate the current active page.')) return;
-
+    async function resetVotes(pageId) {
+      const page = allPages.find(p => p.id === pageId);
+      if (!confirm(`Reset ALL votes for "${page.titre}"?\n\nThis will delete all votes and statistics. This cannot be undone.`)) return;
       try {
-        await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ active: false }).neq('id', '00000000-0000-0000-0000-000000000000');
-        await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ active: true }).eq('id', pageId);
-        alert('✅ Page activated!');
+        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
+        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
+        alert('✅ All votes have been reset!');
         await loadPages();
       } catch (error) {
         console.error('Error:', error);
@@ -1025,11 +949,21 @@
       }
     }
 
+    async function activatePage(pageId) {
+      if (!confirm('Activate this page?\n\nThis will deactivate the current active page.')) return;
+      try {
+        await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ active: false }).neq('id', '00000000-0000-0000-0000-000000000000');
+        await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ active: true }).eq('id', pageId);
+        alert('✅ Page activated!');
+        await loadPages();
+      } catch (error) {
+        alert('❌ Error: ' + error.message);
+      }
+    }
+
     function openCreateModal() {
       editingPageId = null;
-      logoTopBase64 = '';
-      logoBottomBase64 = '';
-      
+      logoTopBase64 = logoBottomBase64 = '';
       document.getElementById('modalTitle').textContent = 'Create New Page';
       document.getElementById('pageForm').reset();
       document.getElementById('logoTopUrl').value = 'assets/logo-nmar.png';
@@ -1038,20 +972,15 @@
       document.getElementById('logoBottomPreview').src = 'assets/logo-tractebel.png';
       document.getElementById('choicesEditor').innerHTML = '';
       document.getElementById('errorContainer').innerHTML = '';
-
       for (let i = 0; i < 3; i++) addChoiceField();
-
       document.getElementById('pageModal').classList.add('active');
     }
 
     async function editPage(pageId) {
       editingPageId = pageId;
-      logoTopBase64 = '';
-      logoBottomBase64 = '';
-      
+      logoTopBase64 = logoBottomBase64 = '';
       const page = allPages.find(p => p.id === pageId);
       if (!page) return;
-
       document.getElementById('modalTitle').textContent = 'Edit Page';
       document.getElementById('pageTitle').value = page.titre;
       document.getElementById('pageDescription').value = page.description || '';
@@ -1061,102 +990,54 @@
       document.getElementById('logoTopPreview').src = page.logo_top || 'assets/logo-nmar.png';
       document.getElementById('logoBottomPreview').src = page.logo_bottom || 'assets/logo-tractebel.png';
       document.getElementById('errorContainer').innerHTML = '';
-
       const { data: choix } = await sb.from(CONFIG_TRACTEBEL.tables.choix).select('*').eq('page_id', pageId).order('ordre');
-
       document.getElementById('choicesEditor').innerHTML = '';
       choix?.forEach(choice => addChoiceField(choice.texte));
-
       document.getElementById('pageModal').classList.add('active');
     }
 
-    document.getElementById('btnUploadTop').addEventListener('click', () => {
-      document.getElementById('logoTopFile').click();
-    });
-
-    document.getElementById('logoTopFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          logoTopBase64 = event.target.result;
-          document.getElementById('logoTopPreview').src = logoTopBase64;
-          document.getElementById('logoTopUrl').value = 'Uploaded file';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    document.getElementById('btnResetTop').addEventListener('click', () => {
-      logoTopBase64 = '';
-      document.getElementById('logoTopUrl').value = 'assets/logo-nmar.png';
-      document.getElementById('logoTopPreview').src = 'assets/logo-nmar.png';
-      document.getElementById('logoTopFile').value = '';
-    });
-
-    document.getElementById('btnUploadBottom').addEventListener('click', () => {
-      document.getElementById('logoBottomFile').click();
-    });
-
-    document.getElementById('logoBottomFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          logoBottomBase64 = event.target.result;
-          document.getElementById('logoBottomPreview').src = logoBottomBase64;
-          document.getElementById('logoBottomUrl').value = 'Uploaded file';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    document.getElementById('btnResetBottom').addEventListener('click', () => {
-      logoBottomBase64 = '';
-      document.getElementById('logoBottomUrl').value = 'assets/logo-tractebel.png';
-      document.getElementById('logoBottomPreview').src = 'assets/logo-tractebel.png';
-      document.getElementById('logoBottomFile').value = '';
-    });
-
-    document.getElementById('logoTopUrl').addEventListener('input', (e) => {
-      if (!logoTopBase64) {
-        document.getElementById('logoTopPreview').src = e.target.value;
-      }
-    });
-
-    document.getElementById('logoBottomUrl').addEventListener('input', (e) => {
-      if (!logoBottomBase64) {
-        document.getElementById('logoBottomPreview').src = e.target.value;
-      }
+    ['Top', 'Bottom'].forEach(pos => {
+      document.getElementById(`btnUpload${pos}`).addEventListener('click', () => document.getElementById(`logo${pos}File`).click());
+      document.getElementById(`logo${pos}File`).addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            window[`logo${pos}Base64`] = event.target.result;
+            document.getElementById(`logo${pos}Preview`).src = event.target.result;
+            document.getElementById(`logo${pos}Url`).value = 'Uploaded file';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      document.getElementById(`btnReset${pos}`).addEventListener('click', () => {
+        window[`logo${pos}Base64`] = '';
+        document.getElementById(`logo${pos}Url`).value = `assets/logo-${pos === 'Top' ? 'nmar' : 'tractebel'}.png`;
+        document.getElementById(`logo${pos}Preview`).src = `assets/logo-${pos === 'Top' ? 'nmar' : 'tractebel'}.png`;
+        document.getElementById(`logo${pos}File`).value = '';
+      });
+      document.getElementById(`logo${pos}Url`).addEventListener('input', (e) => {
+        if (!window[`logo${pos}Base64`]) document.getElementById(`logo${pos}Preview`).src = e.target.value;
+      });
     });
 
     function addChoiceField(value = '') {
-      const editor = document.getElementById('choicesEditor');
-      const item = document.createElement('div');
+      const editor = document.getElementById('choicesEditor'), item = document.createElement('div');
       item.className = 'choice-item';
       item.innerHTML = `
         <input type="text" class="form-input" placeholder="Choice text (use **bold** or *italic*)" value="${value.replace(/"/g, '&quot;')}" required>
         <button type="button" class="btn-remove">✕</button>
       `;
       editor.appendChild(item);
-
-      item.querySelector('.btn-remove').addEventListener('click', function() {
-        this.parentElement.remove();
-      });
+      item.querySelector('.btn-remove').addEventListener('click', function() { this.parentElement.remove(); });
     }
 
-    function closeModal() {
-      document.getElementById('pageModal').classList.remove('active');
-    }
-
-    function showError(message) {
-      document.getElementById('errorContainer').innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
-    }
+    function closeModal() { document.getElementById('pageModal').classList.remove('active'); }
+    function showError(message) { document.getElementById('errorContainer').innerHTML = `<div class="error-message">⚠️ ${message}</div>`; }
 
     async function deletePage(pageId) {
       const page = allPages.find(p => p.id === pageId);
       if (!confirm(`Delete "${page.titre}"?\n\nThis will delete all votes and cannot be undone.`)) return;
-
       try {
         await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
         await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
@@ -1165,7 +1046,6 @@
         alert('✅ Page deleted');
         await loadPages();
       } catch (error) {
-        console.error('Error:', error);
         alert('❌ Error: ' + error.message);
       }
     }
@@ -1178,75 +1058,39 @@
     document.getElementById('pageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       document.getElementById('errorContainer').innerHTML = '';
-
-      const titre = document.getElementById('pageTitle').value.trim();
-      const description = document.getElementById('pageDescription').value.trim();
-      const resultTitle = document.getElementById('resultTitle').value.trim();
-      const logoTopUrl = document.getElementById('logoTopUrl').value.trim();
-      const logoBottomUrl = document.getElementById('logoBottomUrl').value.trim();
-      const choiceInputs = document.querySelectorAll('.choice-item input');
-      const choices = Array.from(choiceInputs).map(input => input.value.trim()).filter(v => v);
-
-      const logoTop = logoTopBase64 || logoTopUrl;
-      const logoBottom = logoBottomBase64 || logoBottomUrl;
-
-      if (!titre) {
-        showError('Please enter a title');
-        return;
-      }
-
-      if (choices.length < 2) {
-        showError('Please add at least 2 choices');
-        return;
-      }
+      const titre = document.getElementById('pageTitle').value.trim(),
+            description = document.getElementById('pageDescription').value.trim(),
+            resultTitle = document.getElementById('resultTitle').value.trim(),
+            logoTop = logoTopBase64 || document.getElementById('logoTopUrl').value.trim(),
+            logoBottom = logoBottomBase64 || document.getElementById('logoBottomUrl').value.trim(),
+            choices = Array.from(document.querySelectorAll('.choice-item input')).map(input => input.value.trim()).filter(v => v);
+      
+      if (!titre) { showError('Please enter a title'); return; }
+      if (choices.length < 2) { showError('Please add at least 2 choices'); return; }
 
       try {
         if (editingPageId) {
-          const { error: updateError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ 
-            titre, 
-            description,
-            result_title: resultTitle,
-            logo_top: logoTop,
-            logo_bottom: logoBottom
-          }).eq('id', editingPageId);
+          const { error: updateError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ titre, description, result_title: resultTitle, logo_top: logoTop, logo_bottom: logoBottom }).eq('id', editingPageId);
           if (updateError) throw updateError;
-
           await sb.from(CONFIG_TRACTEBEL.tables.choix).delete().eq('page_id', editingPageId);
-
-          const choixData = choices.map((texte, index) => ({ page_id: editingPageId, texte, ordre: index + 1 }));
-          const { error: insertError } = await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choixData);
+          const { error: insertError } = await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choices.map((texte, index) => ({ page_id: editingPageId, texte, ordre: index + 1 })));
           if (insertError) throw insertError;
-
           alert('✅ Page updated!');
         } else {
-          const { data: newPage, error: createError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).insert({ 
-            titre, 
-            description,
-            result_title: resultTitle,
-            active: false,
-            logo_top: logoTop,
-            logo_bottom: logoBottom
-          }).select().single();
+          const { data: newPage, error: createError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).insert({ titre, description, result_title: resultTitle, active: false, logo_top: logoTop, logo_bottom: logoBottom }).select().single();
           if (createError) throw createError;
           if (!newPage) throw new Error('Failed to create page');
-
-          const choixData = choices.map((texte, index) => ({ page_id: newPage.id, texte, ordre: index + 1 }));
-          const { error: insertError } = await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choixData);
+          const { error: insertError } = await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choices.map((texte, index) => ({ page_id: newPage.id, texte, ordre: index + 1 })));
           if (insertError) throw insertError;
-
           alert('✅ Page created!');
         }
-
         closeModal();
         await loadPages();
-
       } catch (error) {
-        console.error('Error saving:', error);
-        showError('Error: ' + (error.message || 'Unknown error. Check console (F12)'));
+        showError('Error: ' + (error.message || 'Unknown error'));
       }
     });
 
-    // Initialize
     checkAuth();
   </script>
 </body>
