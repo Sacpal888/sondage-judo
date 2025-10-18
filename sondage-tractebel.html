@@ -21,17 +21,17 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      color: #fff;
+      color: #FFFFFF;
     }
 
     .container {
       max-width: 960px;
       width: 100%;
-      background: rgba(0, 102, 179, 0.95);
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
       border: 4px solid #FFFFFF;
       border-radius: 30px;
       padding: 50px 60px;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
     }
 
     .header {
@@ -39,16 +39,15 @@
       margin-bottom: 40px;
     }
 
-    .logo-nmar {
-      max-width: 400px;
+    /* Hiérarchie des logos selon instructions */
+    .logo-top {
+      max-width: 500px;
+      width: 100%;
       height: auto;
       margin-bottom: 30px;
-    }
-
-    .logo-tractebel {
-      max-width: 250px;
-      height: auto;
-      margin-bottom: 40px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .separator {
@@ -58,22 +57,35 @@
       margin: 30px 0;
     }
 
+    .logo-bottom {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 40px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Question principale : Bold, ~2.5rem */
     .question-title {
       font-size: 2.5rem;
       font-weight: bold;
       text-align: center;
       margin-bottom: 20px;
       color: #FFFFFF;
+      font-family: Arial, sans-serif;
     }
 
+    /* Sous-titres/descriptions : ~1.1rem */
     .question-description {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       text-align: center;
       margin-bottom: 40px;
-      opacity: 0.9;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
     }
 
-    /* Layout vertical */
     .choices-vertical {
       display: flex;
       flex-direction: column;
@@ -82,8 +94,9 @@
       margin: 0 auto;
     }
 
+    /* Boutons : Bold, ~1.3rem */
     .choice-btn {
-      background: rgba(0, 102, 179, 1);
+      background: #00AAFF;
       border: 3px solid #FFFFFF;
       border-radius: 15px;
       padding: 20px 25px;
@@ -96,18 +109,18 @@
       text-align: left;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       min-height: 70px;
     }
 
     .choice-btn:hover {
-      background: rgba(0, 170, 255, 0.9);
+      background: rgba(0, 170, 255, 0.85);
       transform: translateX(10px);
       box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
     }
 
+    /* Bouton activé : #0066B3 */
     .choice-btn.selected {
-      background: #00AAFF;
+      background: #0066B3;
       border-color: #FFED00;
       border-width: 4px;
       box-shadow: 0 0 20px rgba(255, 237, 0, 0.5);
@@ -118,25 +131,62 @@
       opacity: 0.6;
     }
 
-    .success-message, .error-message {
+    .success-message, .error-message, .already-voted {
       text-align: center;
       padding: 60px 40px;
     }
 
     .success-message h2 {
       font-size: 3rem;
+      font-weight: bold;
       margin-bottom: 20px;
       color: #FFED00;
+      font-family: Arial, sans-serif;
+    }
+
+    .success-message p {
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+    }
+
+    .already-voted h2 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #FFED00;
+      font-family: Arial, sans-serif;
+    }
+
+    .already-voted p {
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
     }
 
     .error-message h2 {
       font-size: 2rem;
-      color: #ff4444;
+      font-weight: bold;
+      color: #FFED00;
+      font-family: Arial, sans-serif;
+    }
+
+    .error-message p {
+      font-size: 1.2rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
     }
 
     .submitting {
       text-align: center;
       padding: 40px;
+    }
+
+    .submitting p {
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
     }
 
     .spinner {
@@ -169,6 +219,12 @@
       .container {
         padding: 30px 25px;
       }
+      .logo-top {
+        max-width: 350px;
+      }
+      .logo-bottom {
+        max-width: 280px;
+      }
     }
   </style>
 </head>
@@ -177,9 +233,9 @@
     <!-- Formulaire -->
     <div id="surveyForm">
       <div class="header">
-        <img class="logo-nmar" id="logoNMAR" src="" alt="No Mind at Risk">
+        <img class="logo-top" id="logoTop" src="" alt="Logo Top">
         <div class="separator"></div>
-        <img class="logo-tractebel" id="logoTractebel" src="" alt="Tractebel">
+        <img class="logo-bottom" id="logoBottom" src="" alt="Logo Bottom">
       </div>
 
       <h1 class="question-title" id="questionTitle"></h1>
@@ -191,19 +247,25 @@
     <!-- Chargement -->
     <div id="submitting" class="submitting hidden">
       <div class="spinner"></div>
-      <p style="font-size: 1.3rem;">Submitting your vote...</p>
+      <p style="font-size: 1.3rem; color: #FFFFFF;">Submitting your vote...</p>
     </div>
 
     <!-- Succès -->
     <div id="successMessage" class="success-message hidden">
       <h2>✓ Thank you!</h2>
-      <p>Your vote has been recorded.</p>
+      <p style="font-size: 1.3rem; color: #FFFFFF;">Your vote has been recorded.</p>
+    </div>
+
+    <!-- Déjà voté -->
+    <div id="alreadyVoted" class="already-voted hidden">
+      <h2>Already voted!</h2>
+      <p>Thank you for your participation.</p>
     </div>
 
     <!-- Erreur -->
     <div id="errorMessage" class="error-message hidden">
       <h2>⚠️ No active survey</h2>
-      <p>Please check back later.</p>
+      <p style="color: #FFFFFF;">Please check back later.</p>
     </div>
   </div>
 
@@ -218,14 +280,9 @@
     let choices = [];
     const sessionId = generateSessionId();
 
-    // Appliquer les logos
-    document.getElementById('logoNMAR').src = CONFIG_TRACTEBEL.branding.logoNMAR;
-    document.getElementById('logoTractebel').src = CONFIG_TRACTEBEL.branding.logoTractebel;
-
     // Charger la page active
     async function loadActivePage() {
       try {
-        // Récupérer la page active
         const { data: pages } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
           .select('*')
@@ -238,6 +295,16 @@
         }
 
         activePage = pages[0];
+
+        // Vérifier le cookie AVANT d'afficher le sondage
+        if (hasVoted(activePage.id)) {
+          showAlreadyVoted();
+          return;
+        }
+
+        // Appliquer les logos
+        document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
+        document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
 
         // Récupérer les choix
         const { data: choicesData } = await sb
@@ -265,7 +332,7 @@
       choices.forEach(choice => {
         const btn = document.createElement('button');
         btn.className = 'choice-btn';
-        btn.textContent = choice.texte;
+        btn.innerHTML = formatMarkdown(choice.texte);
         btn.onclick = () => selectChoice(choice, btn);
         container.appendChild(btn);
       });
@@ -298,8 +365,8 @@
         // Recalculer les stats
         await sb.rpc('calculer_stats_page', { page_uuid: activePage.id });
 
-        // Cookie
-        document.cookie = `voted_tractebel_${activePage.id}=true; max-age=${CONFIG_TRACTEBEL.settings.cookieDuree * 86400}; path=/`;
+        // Définir le cookie (1 vote par page)
+        setCookie(`voted_tractebel_${activePage.id}`, 'true', CONFIG_TRACTEBEL.settings.cookieDuree);
 
         setTimeout(() => {
           document.getElementById('submitting').classList.add('hidden');
@@ -325,25 +392,42 @@
       document.getElementById('errorMessage').classList.remove('hidden');
     }
 
+    function showAlreadyVoted() {
+      document.getElementById('surveyForm').classList.add('hidden');
+      document.getElementById('alreadyVoted').classList.remove('hidden');
+    }
+
     function generateSessionId() {
       return 'tractebel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    // Vérifier si déjà voté (après avoir chargé la page active)
-    loadActivePage().then(() => {
-      if (activePage && document.cookie.includes(`voted_tractebel_${activePage.id}=true`)) {
-        document.getElementById('surveyForm').innerHTML = `
-          <div style="text-align: center; padding: 60px 20px;">
-            <h2 style="color: #FFED00; font-size: 2.5rem; margin-bottom: 20px;">
-              Already voted!
-            </h2>
-            <p style="font-size: 1.3rem;">
-              Thank you for your participation in "${activePage.titre}".
-            </p>
-          </div>
-        `;
-      }
-    });
+    // Gestion des cookies
+    function setCookie(name, value, days) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+    }
+
+    function getCookie(name) {
+      return document.cookie.split('; ').reduce((r, v) => {
+        const parts = v.split('=');
+        return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+      }, '');
+    }
+
+    function hasVoted(pageId) {
+      return getCookie(`voted_tractebel_${pageId}`) === 'true';
+    }
+
+    // Formatage markdown
+    function formatMarkdown(text) {
+      if (!text) return text;
+      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      return text;
+    }
+
+    // Charger au démarrage
+    loadActivePage();
   </script>
 </body>
 </html>
