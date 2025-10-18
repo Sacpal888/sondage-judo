@@ -1,8 +1,8 @@
 const CONFIG_TRACTEBEL = {
   // Connexion Supabase
   supabase: {
-    url: 'https://TON-PROJET.supabase.co',
-    anon_key: 'TA_CLE_PUBLIQUE_SUPABASE'
+    url: 'https://mtgwnqzobxvnducxpuww.supabase.co',
+    anon_key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10Z3ducXpvYnh2bmR1Y3hwdXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4ODM5MjQsImV4cCI6MjA3NTQ1OTkyNH0.iB6xGRvZsA5Dcjq0vTfoUB1Rhk6cW7HV4yF9-yew8DM'
   },
   
   // Tables dédiées
