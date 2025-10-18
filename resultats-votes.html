@@ -41,43 +41,30 @@
       }
 
       .logos-grid {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
         margin-bottom: 15px;
+        align-items: center;
       }
 
       .logo-column {
         display: flex;
         justify-content: center;
         align-items: center;
+        min-height: 200px;
       }
 
-      .logo-top {
+      .logo-top, .logo-bottom {
         max-width: 400px;
         max-height: 200px;
         width: 100%;
         height: auto;
         object-fit: contain;
-        margin-bottom: 20px;
       }
 
       .separator {
-        width: 60%;
-        height: 3px;
-        background: #FFFFFF;
-        margin: 20px 0;
-        display: block;
-      }
-
-      .logo-bottom {
-        max-width: 400px;
-        max-height: 200px;
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        margin-top: 20px;
+        display: none;
       }
 
       .title-row {
@@ -109,9 +96,9 @@
       }
 
       .results-list {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
 
       .result-item {
@@ -178,17 +165,16 @@
       }
     }
 
-    /* Layout Mobile - OPTIMISÉ */
+    /* Layout Mobile */
     @media (max-width: 768px) {
       .container {
-        max-width: 100%;
-        width: 95%;
-        padding: 20px 15px;
+        max-width: 960px;
+        padding: 30px 25px;
       }
 
       .header {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
       }
 
       .logos-grid {
@@ -200,28 +186,28 @@
       }
 
       .logo-top {
-        max-width: 200px;
-        width: 80%;
+        max-width: 350px;
+        width: 100%;
         height: auto;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
         display: block;
         margin-left: auto;
         margin-right: auto;
       }
 
       .separator {
-        width: 80%;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.5);
-        margin: 15px auto;
+        width: 100%;
+        height: 3px;
+        background: #FFFFFF;
+        margin: 20px 0;
         display: block;
       }
 
       .logo-bottom {
-        max-width: 150px;
-        width: 70%;
+        max-width: 280px;
+        width: 100%;
         height: auto;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
         display: block;
         margin-left: auto;
         margin-right: auto;
@@ -231,25 +217,24 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
+        gap: 15px;
+        margin-bottom: 30px;
       }
 
       .result-title {
-        font-size: 1.5rem;
+        font-size: 2rem;
         font-weight: bold;
         color: #FFED00;
         font-family: Arial, sans-serif;
         text-align: center;
-        line-height: 1.3;
       }
 
       .total-votes {
         background: rgba(255, 237, 0, 0.2);
         border: 3px solid #FFED00;
-        border-radius: 12px;
-        padding: 10px 20px;
-        font-size: 1.2rem;
+        border-radius: 15px;
+        padding: 12px 25px;
+        font-size: 1.4rem;
         font-weight: bold;
         color: #FFED00;
         text-align: center;
@@ -258,47 +243,47 @@
       .results-list {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        max-width: 100%;
+        gap: 15px;
+        max-width: 800px;
         margin: 0 auto;
       }
 
       .result-item {
         background: rgba(255, 255, 255, 0.1);
         border: 3px solid #FFFFFF;
-        border-radius: 12px;
-        padding: 12px 15px;
+        border-radius: 15px;
+        padding: 15px 20px;
         transition: all 0.3s ease;
       }
 
       .result-item:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
       }
 
       .result-bar-container {
         width: 100%;
-        height: 40px;
+        height: 45px;
         background: rgba(0, 0, 0, 0.3);
-        border-radius: 8px;
+        border-radius: 10px;
         overflow: hidden;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         position: relative;
       }
 
       .result-bar {
         height: 100%;
         background: linear-gradient(90deg, #00AAFF, #FFED00);
-        border-radius: 8px;
+        border-radius: 10px;
         transition: width 0.5s ease;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        padding-right: 10px;
+        padding-right: 12px;
       }
 
       .result-percentage {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         font-weight: bold;
         color: #0066B3;
         text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
@@ -312,79 +297,43 @@
       }
 
       .result-text {
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: bold;
         color: #FFFFFF;
         flex: 1;
-        line-height: 1.4;
+        line-height: 1.3;
         text-align: center;
       }
 
       .result-count {
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: bold;
         color: #FFED00;
         white-space: nowrap;
       }
     }
 
-    /* Extra petit écran (<400px) */
-    @media (max-width: 400px) {
-      .container {
-        padding: 15px 10px;
-      }
-
-      .logo-top {
-        max-width: 180px;
-      }
-
-      .logo-bottom {
-        max-width: 130px;
-      }
-
-      .result-title {
-        font-size: 1.3rem;
-      }
-
-      .total-votes {
-        font-size: 1.1rem;
-        padding: 8px 15px;
-      }
-
-      .result-percentage {
-        font-size: 1.1rem;
-      }
-
-      .result-text {
-        font-size: 0.95rem;
-      }
-
-      .result-count {
-        font-size: 0.95rem;
-      }
-    }
-
     .no-data {
       text-align: center;
-      padding: 40px 20px;
-      font-size: 1.2rem;
+      padding: 60px 20px;
+      font-size: 1.5rem;
       color: rgba(255, 255, 255, 0.7);
     }
 
     .error-message {
       text-align: center;
-      padding: 40px 20px;
+      padding: 60px 40px;
     }
 
     .error-message h2 {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: bold;
       color: #FFED00;
       margin-bottom: 15px;
     }
 
     .error-message p {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: #FFFFFF;
     }
 
