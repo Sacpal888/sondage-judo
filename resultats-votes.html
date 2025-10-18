@@ -24,6 +24,7 @@
       color: #FFFFFF;
     }
 
+    /* Desktop par défaut */
     .container {
       max-width: 1600px;
       width: 95%;
@@ -61,6 +62,7 @@
       white-space: nowrap;
     }
 
+    /* Desktop: logos côte à côte */
     .logos-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -84,6 +86,11 @@
       object-fit: contain;
     }
 
+    .separator-mobile {
+      display: none;
+    }
+
+    /* Desktop: résultats en 2 colonnes */
     .results-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -280,6 +287,7 @@
         <div class="logo-column">
           <img class="logo-item" id="logoTop" src="" alt="Logo Top">
         </div>
+        <div class="separator-mobile"></div>
         <div class="logo-column">
           <img class="logo-item" id="logoBottom" src="" alt="Logo Bottom">
         </div>
