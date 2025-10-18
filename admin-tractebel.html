@@ -109,10 +109,10 @@
       text-align: center;
     }
 
-    .pages-list {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
       margin-bottom: 30px;
     }
 
@@ -139,33 +139,23 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 20px;
-      gap: 20px;
-    }
-
-    .page-info {
-      flex: 1;
+      margin-bottom: 15px;
+      gap: 15px;
     }
 
     .page-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: bold;
       color: #FFED00;
-      margin-bottom: 10px;
-    }
-
-    .page-description {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 1rem;
-      font-style: italic;
+      flex: 1;
     }
 
     .active-badge {
       background: #28a745;
       color: white;
-      padding: 8px 20px;
+      padding: 5px 15px;
       border-radius: 20px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: bold;
       white-space: nowrap;
     }
@@ -173,18 +163,25 @@
     .inactive-badge {
       background: #666;
       color: white;
-      padding: 8px 20px;
+      padding: 5px 15px;
       border-radius: 20px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: bold;
       white-space: nowrap;
+    }
+
+    .page-description {
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      font-style: italic;
     }
 
     .page-choices {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
       padding: 15px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .page-choices-title {
@@ -202,20 +199,11 @@
     .choice-list li {
       padding: 8px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
     }
 
     .choice-list li:last-child {
       border-bottom: none;
-    }
-
-    .choice-list li strong {
-      font-weight: bold;
-      color: #FFED00;
-    }
-
-    .choice-list li em {
-      font-style: italic;
-      color: #00AAFF;
     }
 
     .page-actions {
@@ -225,20 +213,10 @@
     }
 
     .btn-small {
-      padding: 10px 25px;
-      font-size: 1rem;
-    }
-
-    .btn-activate {
-      background: #28a745;
-      color: white;
-      font-size: 1.1rem;
-      padding: 12px 30px;
-    }
-
-    .btn-activate:hover {
-      background: #218838;
-      transform: scale(1.05);
+      padding: 8px 20px;
+      font-size: 0.95rem;
+      flex: 1;
+      min-width: 100px;
     }
 
     .modal {
@@ -266,7 +244,7 @@
       border-radius: 20px;
       padding: 40px;
       max-width: 700px;
-      width: 100%;
+      width: 90%;
       max-height: 90vh;
       overflow-y: auto;
     }
@@ -309,15 +287,17 @@
     }
 
     .form-textarea {
-      min-height: 80px;
+      min-height: 100px;
       resize: vertical;
     }
 
-    .form-input::placeholder, .form-textarea::placeholder {
+    .form-input::placeholder,
+    .form-textarea::placeholder {
       color: rgba(255, 255, 255, 0.5);
     }
 
-    .form-input:focus, .form-textarea:focus {
+    .form-input:focus,
+    .form-textarea:focus {
       outline: none;
       border-color: #FFED00;
     }
@@ -360,6 +340,7 @@
       cursor: pointer;
       font-weight: bold;
       width: 100%;
+      margin-top: 10px;
     }
 
     .btn-add-choice:hover {
@@ -385,6 +366,27 @@
       border-left: 5px solid #FFED00;
     }
 
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .result-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+      flex: 1;
+      padding-right: 20px;
+    }
+
+    .result-count {
+      font-size: 1.5rem;
+      color: #FFED00;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
     .result-bar-container {
       width: 100%;
       height: 35px;
@@ -408,26 +410,6 @@
       color: #0066B3;
     }
 
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .result-text {
-      font-size: 1.2rem;
-      font-weight: bold;
-      flex: 1;
-      padding-right: 20px;
-    }
-
-    .result-count {
-      font-size: 1.4rem;
-      color: #FFED00;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
     .no-data {
       text-align: center;
       padding: 40px;
@@ -446,6 +428,10 @@
     }
 
     @media (max-width: 768px) {
+      .pages-grid {
+        grid-template-columns: 1fr;
+      }
+
       .modal-content {
         padding: 25px;
       }
@@ -467,18 +453,18 @@
 <body>
   <div class="header">
     <h1>📊 TRACTEBEL Survey Dashboard</h1>
-    <p class="subtitle">No Mind at Risk - Page Management</p>
+    <p class="subtitle">No Mind at Risk - Multi-Page Management</p>
   </div>
 
   <div class="controls">
-    <button class="btn btn-success" onclick="openCreateModal()">➕ Create New Page</button>
-    <button class="btn" onclick="loadPages()">🔄 Refresh</button>
+    <button class="btn btn-success" id="btnCreate">➕ Create New Page</button>
+    <button class="btn" id="btnRefresh">🔄 Refresh</button>
   </div>
 
   <div class="main-content">
     <div class="section">
       <h3 class="section-title">Survey Pages</h3>
-      <div class="pages-list" id="pagesList"></div>
+      <div class="pages-grid" id="pagesGrid"></div>
     </div>
 
     <div class="section" id="resultsSection" style="display: none;">
@@ -490,7 +476,7 @@
   <div class="modal" id="pageModal">
     <div class="modal-content">
       <h2 class="modal-header" id="modalTitle">Create New Page</h2>
-      
+
       <form id="pageForm">
         <div class="form-group">
           <label class="form-label">Question / Title *</label>
@@ -506,20 +492,21 @@
           <label class="form-label">Answer Choices (minimum 2) *</label>
           <span class="form-help">💡 Use **text** for bold, *text* for italic</span>
           <div class="choices-editor" id="choicesEditor"></div>
-          <button type="button" class="btn-add-choice" onclick="addChoiceField()">+ Add Choice</button>
+          <button type="button" class="btn-add-choice" id="btnAddChoice">+ Add Choice</button>
         </div>
 
         <div id="errorContainer"></div>
 
         <div class="modal-actions">
           <button type="submit" class="btn btn-success" style="flex: 1;">💾 Save</button>
-          <button type="button" class="btn btn-danger" style="flex: 1;" onclick="closeModal()">✖ Cancel</button>
+          <button type="button" class="btn btn-danger" style="flex: 1;" id="btnCancel">✖ Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
+    // Variables globales
     const { createClient } = supabase;
     const sb = createClient(
       CONFIG_TRACTEBEL.supabase.url,
@@ -531,6 +518,7 @@
     let editingPageId = null;
     let resultsInterval = null;
 
+    // Fonction de formatage markdown
     function formatMarkdown(text) {
       if (!text) return text;
       text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -538,12 +526,13 @@
       return text;
     }
 
+    // Charger les pages
     async function loadPages() {
       try {
         const { data: pages, error } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
           .select('*')
-          .order('created_at', { ascending: true });
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error loading pages:', error);
@@ -553,7 +542,7 @@
 
         allPages = pages || [];
         await displayPages();
-        
+
         const activePageData = allPages.find(p => p.active);
         if (activePageData) {
           activePage = activePageData;
@@ -570,12 +559,13 @@
       }
     }
 
+    // Afficher les pages
     async function displayPages() {
-      const list = document.getElementById('pagesList');
-      list.innerHTML = '';
+      const grid = document.getElementById('pagesGrid');
+      grid.innerHTML = '';
 
       if (allPages.length === 0) {
-        list.innerHTML = '<div class="no-data">No pages yet. Create your first survey page!</div>';
+        grid.innerHTML = '<div class="no-data">No pages yet. Create your first survey page!</div>';
         return;
       }
 
@@ -588,7 +578,7 @@
 
         const card = document.createElement('div');
         card.className = 'page-card' + (page.active ? ' active' : '');
-        
+
         let choicesHtml = '';
         if (choix && choix.length > 0) {
           choicesHtml = `
@@ -603,30 +593,42 @@
 
         card.innerHTML = `
           <div class="page-header">
-            <div class="page-info">
-              <div class="page-title">${page.titre}</div>
-              ${page.description ? `<div class="page-description">${page.description}</div>` : ''}
-            </div>
-            ${page.active ? 
-              '<div class="active-badge">✓ ACTIVE</div>' : 
+            <div class="page-title">${page.titre}</div>
+            ${page.active ?
+              '<div class="active-badge">✓ ACTIVE</div>' :
               '<div class="inactive-badge">○ INACTIVE</div>'
             }
           </div>
+          ${page.description ? `<div class="page-description">${page.description}</div>` : ''}
           ${choicesHtml}
           <div class="page-actions">
-            ${!page.active ? 
-              `<button class="btn btn-small btn-activate" onclick="activatePage('${page.id}')">🟢 Activate This Page</button>` : 
+            ${!page.active ?
+              `<button class="btn btn-small btn-success" data-activate="${page.id}">🟢 Activate</button>` :
               `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`
             }
-            <button class="btn btn-small" onclick="editPage('${page.id}')">✏️ Edit</button>
-            <button class="btn btn-small btn-danger" onclick="deletePage('${page.id}')">🗑️ Delete</button>
+            <button class="btn btn-small" data-edit="${page.id}">✏️ Edit</button>
+            <button class="btn btn-small btn-danger" data-delete="${page.id}">🗑️ Delete</button>
           </div>
         `;
-        
-        list.appendChild(card);
+
+        grid.appendChild(card);
       }
+
+      // Attacher les événements
+      document.querySelectorAll('[data-activate]').forEach(btn => {
+        btn.addEventListener('click', () => activatePage(btn.dataset.activate));
+      });
+
+      document.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => editPage(btn.dataset.edit));
+      });
+
+      document.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deletePage(btn.dataset.delete));
+      });
     }
 
+    // Activer une page
     async function activatePage(pageId) {
       if (!confirm('Activate this page?\n\nThis will deactivate the current active page.')) return;
 
@@ -641,6 +643,7 @@
       }
     }
 
+    // Charger les résultats
     async function loadResults() {
       if (!activePage) return;
 
@@ -691,6 +694,7 @@
       }
     }
 
+    // Rafraîchir les résultats
     function startResultsRefresh() {
       stopResultsRefresh();
       resultsInterval = setInterval(loadResults, 3000);
@@ -703,18 +707,20 @@
       }
     }
 
+    // Ouvrir modal création
     function openCreateModal() {
       editingPageId = null;
       document.getElementById('modalTitle').textContent = 'Create New Page';
       document.getElementById('pageForm').reset();
       document.getElementById('choicesEditor').innerHTML = '';
       document.getElementById('errorContainer').innerHTML = '';
-      
+
       for (let i = 0; i < 3; i++) addChoiceField();
-      
+
       document.getElementById('pageModal').classList.add('active');
     }
 
+    // Éditer une page
     async function editPage(pageId) {
       editingPageId = pageId;
       const page = allPages.find(p => p.id === pageId);
@@ -733,24 +739,55 @@
       document.getElementById('pageModal').classList.add('active');
     }
 
+    // Ajouter un champ de choix
     function addChoiceField(value = '') {
       const editor = document.getElementById('choicesEditor');
       const item = document.createElement('div');
       item.className = 'choice-item';
       item.innerHTML = `
         <input type="text" class="form-input" placeholder="Choice text (use **bold** or *italic*)" value="${value.replace(/"/g, '&quot;')}" required>
-        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+        <button type="button" class="btn-remove">✕</button>
       `;
       editor.appendChild(item);
+
+      item.querySelector('.btn-remove').addEventListener('click', function() {
+        this.parentElement.remove();
+      });
     }
 
+    // Fermer modal
     function closeModal() {
       document.getElementById('pageModal').classList.remove('active');
     }
 
+    // Afficher erreur
     function showError(message) {
       document.getElementById('errorContainer').innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
     }
+
+    // Supprimer une page
+    async function deletePage(pageId) {
+      const page = allPages.find(p => p.id === pageId);
+      if (!confirm(`Delete "${page.titre}"?\n\nThis will delete all votes and cannot be undone.`)) return;
+
+      try {
+        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
+        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
+        await sb.from(CONFIG_TRACTEBEL.tables.choix).delete().eq('page_id', pageId);
+        await sb.from(CONFIG_TRACTEBEL.tables.pages).delete().eq('id', pageId);
+        alert('✅ Page deleted');
+        await loadPages();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error: ' + error.message);
+      }
+    }
+
+    // Gestionnaires d'événements
+    document.getElementById('btnCreate').addEventListener('click', openCreateModal);
+    document.getElementById('btnRefresh').addEventListener('click', loadPages);
+    document.getElementById('btnCancel').addEventListener('click', closeModal);
+    document.getElementById('btnAddChoice').addEventListener('click', () => addChoiceField());
 
     document.getElementById('pageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -772,8 +809,6 @@
       }
 
       try {
-        console.log('Saving...', { titre, description, choices: choices.length });
-
         if (editingPageId) {
           const { error: updateError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ titre, description }).eq('id', editingPageId);
           if (updateError) throw updateError;
@@ -806,24 +841,10 @@
       }
     });
 
-    async function deletePage(pageId) {
-      const page = allPages.find(p => p.id === pageId);
-      if (!confirm(`Delete "${page.titre}"?\n\nThis will delete all votes and cannot be undone.`)) return;
-
-      try {
-        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.choix).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.pages).delete().eq('id', pageId);
-        alert('✅ Page deleted');
-        await loadPages();
-      } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error: ' + error.message);
-      }
-    }
-
+    // Charger au démarrage
     loadPages();
+
+    // Cleanup
     window.addEventListener('beforeunload', stopResultsRefresh);
   </script>
 </body>
