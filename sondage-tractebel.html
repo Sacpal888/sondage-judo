@@ -34,17 +34,17 @@
       box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
     }
 
-    /* Layout Desktop : logos côte à côte + 2 colonnes */
+    /* Layout Desktop : identique à la page résultats */
     @media (min-width: 769px) {
       .header {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
       }
 
       .logos-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 30px;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
         align-items: center;
       }
 
@@ -68,22 +68,23 @@
       }
 
       .question-section {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+        text-align: center;
       }
 
       .question-title {
-        font-size: 2.5rem;
+        font-size: 2.3rem;
         font-weight: bold;
         text-align: center;
-        margin-bottom: 15px;
-        color: #FFFFFF;
+        margin-bottom: 10px;
+        color: #FFED00;
         font-family: Arial, sans-serif;
       }
 
       .question-description {
         font-size: 1.4rem;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 0;
         color: #FFFFFF;
         font-family: Arial, sans-serif;
       }
@@ -98,7 +99,7 @@
         background: #00AAFF;
         border: 3px solid #FFFFFF;
         border-radius: 15px;
-        padding: 15px 20px;
+        padding: 10px 16px;
         font-size: 1.4rem;
         font-weight: bold;
         color: #FFFFFF;
@@ -109,6 +110,12 @@
         display: flex;
         align-items: center;
         min-height: 70px;
+      }
+
+      .choice-btn:hover {
+        background: #0066B3;
+        transform: translateX(5px);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
       }
     }
 
@@ -201,15 +208,15 @@
         align-items: center;
         min-height: 70px;
       }
+
+      .choice-btn:hover {
+        background: rgba(0, 170, 255, 0.85);
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+      }
     }
 
     /* Styles communs pour les boutons */
-    .choice-btn:hover {
-      background: rgba(0, 170, 255, 0.85);
-      transform: translateX(10px);
-      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
-    }
-
     .choice-btn.selected {
       background: #0066B3;
       border-color: #FFED00;
@@ -306,15 +313,23 @@
     <!-- Formulaire -->
     <div id="surveyForm">
       <div class="header">
-        <img class="logo-top" id="logoTop" src="" alt="Logo Top">
+        <div class="logos-grid">
+          <div class="logo-column">
+            <img class="logo-top" id="logoTop" src="" alt="Logo Top">
+          </div>
+          <div class="logo-column">
+            <img class="logo-bottom" id="logoBottom" src="" alt="Logo Bottom">
+          </div>
+        </div>
         <div class="separator"></div>
-        <img class="logo-bottom" id="logoBottom" src="" alt="Logo Bottom">
       </div>
 
-      <h1 class="question-title" id="questionTitle"></h1>
-      <p class="question-description" id="questionDescription"></p>
+      <div class="question-section">
+        <h1 class="question-title" id="questionTitle"></h1>
+        <p class="question-description" id="questionDescription"></p>
+      </div>
 
-      <div class="choices-vertical" id="choicesContainer"></div>
+      <div class="choices-grid" id="choicesContainer"></div>
     </div>
 
     <!-- Chargement -->
