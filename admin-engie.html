@@ -375,4 +375,140 @@
             y: {
               beginAtZero: true,
               ticks: { color: '#FFFFFF' },
-              grid: { color: 'rgba(255
+        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            x: {
+              ticks: { color: '#FFFFFF' },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { 
+                color: '#FFFFFF',
+                font: { size: 16 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateResponsesList(reponses) {
+      const list = document.getElementById('responsesList');
+      list.innerHTML = '';
+
+      // Afficher les 50 dernières réponses
+      const recent = reponses.slice(0, 50);
+
+      recent.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'response-item';
+        
+        const date = new Date(r.created_at);
+        const timeStr = date.toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        item.innerHTML = `
+          <div class="response-time">${timeStr}</div>
+          <div class="response-answer">${r.reponse}</div>
+          <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 5px;">
+            Session: ${r.session_id.substring(0, 20)}...
+          </div>
+        `;
+        
+        list.appendChild(item);
+      });
+
+      if (recent.length === 0) {
+        list.innerHTML = '<p style="text-align:center; padding: 40px; font-size: 1.2rem;">No responses yet</p>';
+      }
+    }
+
+    async function exportData() {
+      try {
+        const { data: reponses } = await sb
+          .from(CONFIG_ENGIE.tables.reponses)
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!reponses || reponses.length === 0) {
+          alert('No data to export');
+          return;
+        }
+
+        // Créer le CSV
+        let csv = 'Date,Time,Answer,Session ID\n';
+        
+        reponses.forEach(r => {
+          const date = new Date(r.created_at);
+          const dateStr = date.toISOString().split('T')[0];
+          const timeStr = date.toTimeString().split(' ')[0];
+          csv += `${dateStr},${timeStr},"${r.reponse}",${r.session_id}\n`;
+        });
+
+        // Télécharger le fichier
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `engie-survey-export-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        alert('✅ Data exported successfully!');
+      } catch (error) {
+        console.error('Export error:', error);
+        alert('Error exporting data');
+      }
+    }
+
+    function confirmReset() {
+      const confirmed = confirm(
+        '⚠️ WARNING: This will permanently delete ALL survey responses.\n\n' +
+        'This action cannot be undone.\n\n' +
+        'Type "DELETE" in the next prompt to confirm.'
+      );
+
+      if (!confirmed) return;
+
+      const verification = prompt('Type DELETE to confirm deletion:');
+      
+      if (verification === 'DELETE') {
+        resetAllData();
+      } else {
+        alert('Reset cancelled - verification text did not match');
+      }
+    }
+
+    async function resetAllData() {
+      try {
+        const { error } = await sb
+          .from(CONFIG_ENGIE.tables.reponses)
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+        if (error) throw error;
+
+        alert('✅ All data has been reset successfully');
+        loadData();
+      } catch (error) {
+        console.error('Reset error:', error);
+        alert('Error resetting data. You may need admin privileges.');
+      }
+    }
+
+    // Auto-refresh toutes les 30 secondes
+    setInterval(loadData, 30000);
+
+    // Charger les données au démarrage
+    loadData();
+  </script>
+</body>
+</html>
