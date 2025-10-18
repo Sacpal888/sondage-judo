@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - ENGIE Survey</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="config-engie.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0066B3 0%, #003d6b 100%);
+      color: #fff;
+      padding: 30px;
+      min-height: 100vh;
+    }
+
+    .header {
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      text-align: center;
+      padding: 40px;
+      background: rgba(0, 170, 255, 0.1);
+      border: 3px solid #00AAFF;
+      border-radius: 20px;
+    }
+
+    h1 {
+      color: #FFED00;
+      font-size: 2.8rem;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: #00AAFF;
+    }
+
+    .stats-grid {
+      max-width: 1400px;
+      margin: 0 auto 50px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .stat-card {
+      background: rgba(0, 170, 255, 0.15);
+      border: 3px solid #00AAFF;
+      border-radius: 20px;
+      padding: 35px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 170, 255, 0.4);
+    }
+
+    .stat-number {
+      font-size: 3.5rem;
+      color: #FFED00;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-label {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      color: #FFFFFF;
+    }
+
+    .controls {
+      max-width: 1400px;
+      margin: 0 auto 40px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: #00AAFF;
+      color: #0066B3;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 170, 255, 0.3);
+    }
+
+    .btn:hover {
+      background: #FFED00;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 237, 0, 0.4);
+    }
+
+    .btn-danger {
+      background: #ff4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #cc0000;
+    }
+
+    .charts-section {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .chart-container {
+      background: rgba(0, 170, 255, 0.1);
+      border: 3px solid #00AAFF;
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 40px;
+    }
+
+    .chart-title {
+      font-size: 1.8rem;
+      color: #FFED00;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    canvas {
+      max-height: 500px;
+    }
+
+    .responses-list {
+      background: rgba(0, 170, 255, 0.1);
+      border: 3px solid #00AAFF;
+      border-radius: 20px;
+      padding: 30px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .response-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 4px solid #FFED00;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+
+    .response-time {
+      color: #00AAFF;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    .response-answer {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 ENGIE Survey Dashboard</h1>
+    <p class="subtitle">No Mind at Risk - Real-time Analytics</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number" id="totalResponses">0</div>
+      <div class="stat-label">Total Responses</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="todayCount">0</div>
+      <div class="stat-label">Today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="thisWeekCount">0</div>
+      <div class="stat-label">This Week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="thisMonthCount">0</div>
+      <div class="stat-label">This Month</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
+    <button class="btn" onclick="exportData()">📥 Export CSV</button>
+    <button class="btn btn-danger" onclick="confirmReset()">🗑️ Reset All Data</button>
+  </div>
+
+  <div class="charts-section">
+    <div class="chart-container">
+      <h3 class="chart-title">Response Distribution</h3>
+      <canvas id="mainChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <h3 class="chart-title">Responses Over Time (Last 30 Days)</h3>
+      <canvas id="timelineChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <h3 class="chart-title">Recent Responses</h3>
+      <div class="responses-list" id="responsesList"></div>
+    </div>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      CONFIG_ENGIE.supabase.url,
+      CONFIG_ENGIE.supabase.anon_key
+    );
+
+    let mainChart, timelineChart;
+
+    async function loadData() {
+      try {
+        // Charger toutes les réponses
+        const { data: reponses } = await sb
+          .from(CONFIG_ENGIE.tables.reponses)
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        // Charger la question
+        const { data: questions } = await sb
+          .from(CONFIG_ENGIE.tables.questions)
+          .select('*')
+          .limit(1);
+
+        if (!reponses || !questions) return;
+
+        updateStats(reponses);
+        updateMainChart(questions[0], reponses);
+        updateTimelineChart(reponses);
+        updateResponsesList(reponses);
+
+      } catch (error) {
+        console.error('Error loading data:', error);
+        alert('Error loading data. Check console for details.');
+      }
+    }
+
+    function updateStats(reponses) {
+      const uniqueSessions = new Set(reponses.map(r => r.session_id));
+      document.getElementById('totalResponses').textContent = uniqueSessions.size;
+
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+      const todayCount = reponses.filter(r => r.created_at.startsWith(today)).length;
+      const weekCount = reponses.filter(r => new Date(r.created_at) >= weekAgo).length;
+      const monthCount = reponses.filter(r => new Date(r.created_at) >= monthAgo).length;
+
+      document.getElementById('todayCount').textContent = todayCount;
+      document.getElementById('thisWeekCount').textContent = weekCount;
+      document.getElementById('thisMonthCount').textContent = monthCount;
+    }
+
+    function updateMainChart(question, reponses) {
+      const options = JSON.parse(question.options);
+      const counts = {};
+      options.forEach(opt => counts[opt] = 0);
+      reponses.forEach(r => {
+        if (counts.hasOwnProperty(r.reponse)) {
+          counts[r.reponse]++;
+        }
+      });
+
+      const ctx = document.getElementById('mainChart').getContext('2d');
+      
+      if (mainChart) mainChart.destroy();
+
+      mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(counts),
+          datasets: [{
+            label: 'Number of Responses',
+            data: Object.values(counts),
+            backgroundColor: '#FFED00',
+            borderColor: '#00AAFF',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { 
+                color: '#FFFFFF',
+                font: { size: 14 }
+              },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            },
+            x: {
+              ticks: { 
+                color: '#FFFFFF',
+                font: { size: 14 }
+              },
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { 
+                color: '#FFFFFF',
+                font: { size: 16 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTimelineChart(reponses) {
+      const last30Days = {};
+      const now = new Date();
+      
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dateStr = date.toISOString().split('T')[0];
+        last30Days[dateStr] = 0;
+      }
+
+      reponses.forEach(r => {
+        const dateStr = r.created_at.split('T')[0];
+        if (last30Days.hasOwnProperty(dateStr)) {
+          last30Days[dateStr]++;
+        }
+      });
+
+      const ctx = document.getElementById('timelineChart').getContext('2d');
+      
+      if (timelineChart) timelineChart.destroy();
+
+      timelineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Object.keys(last30Days).map(d => {
+            const date = new Date(d);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+          }),
+          datasets: [{
+            label: 'Daily Responses',
+            data: Object.values(last30Days),
+            borderColor: '#FFED00',
+            backgroundColor: 'rgba(255, 237, 0, 0.2)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#FFFFFF' },
+              grid: { color: 'rgba(255
