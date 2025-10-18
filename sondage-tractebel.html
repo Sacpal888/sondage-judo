@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>No Mind at Risk - Survey</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config-engie.js"></script>
+  <script src="config-tractebel.js"></script>
   <style>
     * {
       margin: 0;
@@ -183,7 +183,7 @@
       <div class="header">
         <img class="logo-nmar" id="logoNMAR" src="" alt="No Mind at Risk">
         <div class="separator"></div>
-        <img class="logo-tractebel" id="logoTractebel" src="" alt="Tractebel ENGIE">
+        <img class="logo-tractebel" id="logoTractebel" src="" alt="Tractebel">
       </div>
 
       <h1 class="question-title" id="questionTitle">How do you feel today?</h1>
@@ -208,8 +208,8 @@
     // Initialisation Supabase
     const { createClient } = supabase;
     const sb = createClient(
-      CONFIG_ENGIE.supabase.url,
-      CONFIG_ENGIE.supabase.anon_key
+      CONFIG_TRACTEBEL.supabase.url,
+      CONFIG_TRACTEBEL.supabase.anon_key
     );
 
     // Variables globales
@@ -218,14 +218,14 @@
     const sessionId = generateSessionId();
 
     // Appliquer les logos
-    document.getElementById('logoNMAR').src = CONFIG_ENGIE.branding.logoNMAR;
-    document.getElementById('logoTractebel').src = CONFIG_ENGIE.branding.logoTractebel;
+    document.getElementById('logoNMAR').src = CONFIG_TRACTEBEL.branding.logoNMAR;
+    document.getElementById('logoTractebel').src = CONFIG_TRACTEBEL.branding.logoTractebel;
 
     // Charger la question
     async function loadQuestion() {
       try {
         const { data: questions } = await sb
-          .from(CONFIG_ENGIE.tables.questions)
+          .from(CONFIG_TRACTEBEL.tables.questions)
           .select('*')
           .eq('active', true)
           .order('ordre')
@@ -287,14 +287,14 @@
       document.getElementById('submitting').classList.remove('hidden');
 
       try {
-        await sb.from(CONFIG_ENGIE.tables.reponses).insert({
+        await sb.from(CONFIG_TRACTEBEL.tables.reponses).insert({
           question_id: currentQuestion.id,
           reponse: selectedAnswer,
           session_id: sessionId
         });
 
         // Enregistrer un cookie
-        document.cookie = `voted_engie=true; max-age=${CONFIG_ENGIE.settings.cookieDuree * 86400}; path=/`;
+        document.cookie = `voted_tractebel=true; max-age=${CONFIG_TRACTEBEL.settings.cookieDuree * 86400}; path=/`;
 
         // Afficher le message de succès
         setTimeout(() => {
@@ -320,11 +320,11 @@
 
     // Générer un ID de session
     function generateSessionId() {
-      return 'engie_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      return 'tractebel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
     // Vérifier si déjà voté
-    if (document.cookie.includes('voted_engie=true')) {
+    if (document.cookie.includes('voted_tractebel=true')) {
       document.getElementById('surveyForm').innerHTML = `
         <div style="text-align: center; padding: 60px 20px;">
           <h2 style="color: #FFED00; font-size: 2.5rem; margin-bottom: 20px;">
