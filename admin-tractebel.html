@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - ENGIE Survey</title>
+  <title>Admin Dashboard - TRACTEBEL Survey</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-  <script src="config-engie.js"></script>
+  <script src="config-tractebel.js"></script>
   <style>
     * {
       margin: 0;
@@ -168,11 +168,17 @@
       font-size: 1.2rem;
       font-weight: bold;
     }
+
+    .response-session {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>📊 ENGIE Survey Dashboard</h1>
+    <h1>📊 TRACTEBEL Survey Dashboard</h1>
     <p class="subtitle">No Mind at Risk - Real-time Analytics</p>
   </div>
 
@@ -213,7 +219,7 @@
     </div>
 
     <div class="chart-container">
-      <h3 class="chart-title">Recent Responses</h3>
+      <h3 class="chart-title">Recent Responses (Last 50)</h3>
       <div class="responses-list" id="responsesList"></div>
     </div>
   </div>
@@ -221,8 +227,8 @@
   <script>
     const { createClient } = supabase;
     const sb = createClient(
-      CONFIG_ENGIE.supabase.url,
-      CONFIG_ENGIE.supabase.anon_key
+      CONFIG_TRACTEBEL.supabase.url,
+      CONFIG_TRACTEBEL.supabase.anon_key
     );
 
     let mainChart, timelineChart;
@@ -231,13 +237,13 @@
       try {
         // Charger toutes les réponses
         const { data: reponses } = await sb
-          .from(CONFIG_ENGIE.tables.reponses)
+          .from(CONFIG_TRACTEBEL.tables.reponses)
           .select('*')
           .order('created_at', { ascending: false });
 
         // Charger la question
         const { data: questions } = await sb
-          .from(CONFIG_ENGIE.tables.questions)
+          .from(CONFIG_TRACTEBEL.tables.questions)
           .select('*')
           .limit(1);
 
@@ -375,7 +381,7 @@
             y: {
               beginAtZero: true,
               ticks: { color: '#FFFFFF' },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+              grid: { color: 'rgba(255, 255, 255, 0.1)' }
             },
             x: {
               ticks: { color: '#FFFFFF' },
@@ -416,9 +422,7 @@
         item.innerHTML = `
           <div class="response-time">${timeStr}</div>
           <div class="response-answer">${r.reponse}</div>
-          <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 5px;">
-            Session: ${r.session_id.substring(0, 20)}...
-          </div>
+          <div class="response-session">Session: ${r.session_id.substring(0, 20)}...</div>
         `;
         
         list.appendChild(item);
@@ -432,7 +436,7 @@
     async function exportData() {
       try {
         const { data: reponses } = await sb
-          .from(CONFIG_ENGIE.tables.reponses)
+          .from(CONFIG_TRACTEBEL.tables.reponses)
           .select('*')
           .order('created_at', { ascending: false });
 
@@ -456,7 +460,7 @@
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `engie-survey-export-${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `tractebel-survey-export-${new Date().toISOString().split('T')[0]}.csv`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -490,7 +494,7 @@
     async function resetAllData() {
       try {
         const { error } = await sb
-          .from(CONFIG_ENGIE.tables.reponses)
+          .from(CONFIG_TRACTEBEL.tables.reponses)
           .delete()
           .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
 
