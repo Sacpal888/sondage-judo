@@ -170,6 +170,16 @@
       white-space: nowrap;
     }
 
+    .inactive-badge {
+      background: #666;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
     .page-choices {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 10px;
@@ -198,6 +208,17 @@
       border-bottom: none;
     }
 
+    /* Support formatage Markdown dans l'affichage */
+    .choice-list li strong {
+      font-weight: bold;
+      color: #FFED00;
+    }
+
+    .choice-list li em {
+      font-style: italic;
+      color: #00AAFF;
+    }
+
     .page-actions {
       display: flex;
       gap: 10px;
@@ -207,6 +228,18 @@
     .btn-small {
       padding: 10px 25px;
       font-size: 1rem;
+    }
+
+    .btn-activate {
+      background: #28a745;
+      color: white;
+      font-size: 1.1rem;
+      padding: 12px 30px;
+    }
+
+    .btn-activate:hover {
+      background: #218838;
+      transform: scale(1.05);
     }
 
     .modal {
@@ -255,6 +288,14 @@
       margin-bottom: 10px;
       font-size: 1.1rem;
       color: #FFED00;
+    }
+
+    .form-help {
+      display: block;
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: #00AAFF;
+      font-style: italic;
     }
 
     .form-input, .form-textarea {
@@ -332,6 +373,27 @@
       margin-top: 30px;
     }
 
+    .formatting-toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .format-btn {
+      background: rgba(0, 170, 255, 0.3);
+      border: 1px solid #00AAFF;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .format-btn:hover {
+      background: rgba(0, 170, 255, 0.6);
+    }
+
     /* Résultats */
     .results-list {
       display: flex;
@@ -396,6 +458,16 @@
       opacity: 0.7;
     }
 
+    .error-message {
+      background: rgba(255, 68, 68, 0.2);
+      border: 2px solid #ff4444;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      color: #ff4444;
+      font-weight: bold;
+    }
+
     @media (max-width: 768px) {
       .modal-content {
         padding: 25px;
@@ -458,9 +530,12 @@
 
         <div class="form-group">
           <label class="form-label">Answer Choices (minimum 2) *</label>
+          <span class="form-help">💡 Use **text** for bold, *text* for italic</span>
           <div class="choices-editor" id="choicesEditor"></div>
           <button type="button" class="btn-add-choice" onclick="addChoiceField()">+ Add Choice</button>
         </div>
+
+        <div id="errorContainer"></div>
 
         <div class="modal-actions">
           <button type="submit" class="btn btn-success" style="flex: 1;">💾 Save</button>
@@ -482,13 +557,29 @@
     let editingPageId = null;
     let resultsInterval = null;
 
+    // Fonction pour formater le texte Markdown simple
+    function formatMarkdown(text) {
+      if (!text) return text;
+      // **texte** → <strong>texte</strong>
+      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // *texte* → <em>texte</em>
+      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      return text;
+    }
+
     // Charger toutes les pages
     async function loadPages() {
       try {
-        const { data: pages } = await sb
+        const { data: pages, error } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
           .select('*')
           .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('Error loading pages:', error);
+          showError('Error loading pages: ' + error.message);
+          return;
+        }
 
         allPages = pages || [];
         await displayPages();
@@ -506,7 +597,7 @@
 
       } catch (error) {
         console.error('Error loading pages:', error);
-        alert('Error loading pages. Check console.');
+        showError('Error loading pages. Check console.');
       }
     }
 
@@ -521,11 +612,16 @@
 
       for (const page of allPages) {
         // Charger les choix
-        const { data: choix } = await sb
+        const { data: choix, error } = await sb
           .from(CONFIG_TRACTEBEL.tables.choix)
           .select('*')
           .eq('page_id', page.id)
           .order('ordre');
+
+        if (error) {
+          console.error('Error loading choices:', error);
+          continue;
+        }
 
         const card = document.createElement('div');
         card.className = 'page-card' + (page.active ? ' active' : '');
@@ -536,7 +632,7 @@
             <div class="page-choices">
               <div class="page-choices-title">Choices (${choix.length}):</div>
               <ul class="choice-list">
-                ${choix.map(c => `<li>• ${c.texte}</li>`).join('')}
+                ${choix.map(c => `<li>• ${formatMarkdown(c.texte)}</li>`).join('')}
               </ul>
             </div>
           `;
@@ -548,11 +644,17 @@
               <div class="page-title">${page.titre}</div>
               ${page.description ? `<div class="page-description">${page.description}</div>` : ''}
             </div>
-            ${page.active ? '<div class="active-badge">✓ ACTIVE</div>' : ''}
+            ${page.active ? 
+              '<div class="active-badge">✓ ACTIVE</div>' : 
+              '<div class="inactive-badge">○ INACTIVE</div>'
+            }
           </div>
           ${choicesHtml}
           <div class="page-actions">
-            ${!page.active ? `<button class="btn btn-small btn-success" onclick="activatePage('${page.id}')">Activate</button>` : ''}
+            ${!page.active ? 
+              `<button class="btn btn-small btn-activate" onclick="activatePage('${page.id}')">🟢 Activate This Page</button>` : 
+              `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`
+            }
             <button class="btn btn-small" onclick="editPage('${page.id}')">✏️ Edit</button>
             <button class="btn btn-small btn-danger" onclick="deletePage('${page.id}')">🗑️ Delete</button>
           </div>
@@ -564,27 +666,31 @@
 
     // Activer une page
     async function activatePage(pageId) {
-      if (!confirm('Activate this page? This will deactivate the currently active page.')) return;
+      if (!confirm('Activate this page?\n\nThis will:\n• Deactivate the currently active page\n• Show this page on the survey\n• Display results for this page only')) return;
 
       try {
         // Désactiver toutes
-        await sb
+        const { error: deactivateError } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
           .update({ active: false })
           .neq('id', '00000000-0000-0000-0000-000000000000');
 
+        if (deactivateError) throw deactivateError;
+
         // Activer celle-ci
-        await sb
+        const { error: activateError } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
           .update({ active: true })
           .eq('id', pageId);
 
-        alert('✅ Page activated!');
+        if (activateError) throw activateError;
+
+        alert('✅ Page activated successfully!');
         await loadPages();
 
       } catch (error) {
         console.error('Error:', error);
-        alert('Error activating page');
+        alert('❌ Error activating page: ' + error.message);
       }
     }
 
@@ -594,18 +700,21 @@
 
       try {
         // Charger votes
-        const { data: votes } = await sb
+        const { data: votes, error: votesError } = await sb
           .from(CONFIG_TRACTEBEL.tables.votes)
           .select('choix_id')
           .eq('page_id', activePage.id);
 
+        if (votesError) throw votesError;
+
         // Charger choix
-        const { data: choix } = await sb
+        const { data: choix, error: choixError } = await sb
           .from(CONFIG_TRACTEBEL.tables.choix)
           .select('*')
           .eq('page_id', activePage.id)
           .order('ordre');
 
+        if (choixError) throw choixError;
         if (!choix) return;
 
         // Compter votes par choix
@@ -649,7 +758,7 @@
               </div>
             </div>
             <div class="result-header">
-              <div class="result-text">${choice.texte}</div>
+              <div class="result-text">${formatMarkdown(choice.texte)}</div>
               <div class="result-count">${count} vote${count !== 1 ? 's' : ''}</div>
             </div>
           `;
@@ -680,6 +789,7 @@
       document.getElementById('modalTitle').textContent = 'Create New Page';
       document.getElementById('pageForm').reset();
       document.getElementById('choicesEditor').innerHTML = '';
+      document.getElementById('errorContainer').innerHTML = '';
       
       // 3 champs par défaut
       for (let i = 0; i < 3; i++) {
@@ -698,12 +808,18 @@
       document.getElementById('modalTitle').textContent = 'Edit Page';
       document.getElementById('pageTitle').value = page.titre;
       document.getElementById('pageDescription').value = page.description || '';
+      document.getElementById('errorContainer').innerHTML = '';
 
-      const { data: choix } = await sb
+      const { data: choix, error } = await sb
         .from(CONFIG_TRACTEBEL.tables.choix)
         .select('*')
         .eq('page_id', pageId)
         .order('ordre');
+
+      if (error) {
+        showError('Error loading choices: ' + error.message);
+        return;
+      }
 
       document.getElementById('choicesEditor').innerHTML = '';
       choix?.forEach(choice => {
@@ -719,7 +835,7 @@
       const item = document.createElement('div');
       item.className = 'choice-item';
       item.innerHTML = `
-        <input type="text" class="form-input" placeholder="Choice text" value="${value}" required>
+        <input type="text" class="form-input" placeholder="Choice text (use **bold** or *italic*)" value="${value.replace(/"/g, '&quot;')}" required>
         <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
       `;
       editor.appendChild(item);
@@ -727,11 +843,18 @@
 
     function closeModal() {
       document.getElementById('pageModal').classList.remove('active');
+      document.getElementById('errorContainer').innerHTML = '';
+    }
+
+    function showError(message) {
+      const container = document.getElementById('errorContainer');
+      container.innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
     }
 
     // Sauvegarder
     document.getElementById('pageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      document.getElementById('errorContainer').innerHTML = '';
 
       const titre = document.getElementById('pageTitle').value.trim();
       const description = document.getElementById('pageDescription').value.trim();
@@ -739,24 +862,34 @@
       const choiceInputs = document.querySelectorAll('.choice-item input');
       const choices = Array.from(choiceInputs).map(input => input.value.trim()).filter(v => v);
 
+      // Validation
+      if (!titre) {
+        showError('Please enter a question/title');
+        return;
+      }
+
       if (choices.length < 2) {
-        alert('Please add at least 2 choices');
+        showError('Please add at least 2 choices');
         return;
       }
 
       try {
         if (editingPageId) {
           // Update
-          await sb
+          const { error: updateError } = await sb
             .from(CONFIG_TRACTEBEL.tables.pages)
             .update({ titre, description })
             .eq('id', editingPageId);
 
+          if (updateError) throw updateError;
+
           // Supprimer anciens choix
-          await sb
+          const { error: deleteError } = await sb
             .from(CONFIG_TRACTEBEL.tables.choix)
             .delete()
             .eq('page_id', editingPageId);
+
+          if (deleteError) throw deleteError;
 
           // Recréer
           const choixData = choices.map((texte, index) => ({
@@ -765,19 +898,24 @@
             ordre: index + 1
           }));
 
-          await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choixData);
+          const { error: insertError } = await sb
+            .from(CONFIG_TRACTEBEL.tables.choix)
+            .insert(choixData);
 
-          alert('✅ Page updated!');
+          if (insertError) throw insertError;
+
+          alert('✅ Page updated successfully!');
 
         } else {
           // Create
-          const { data: newPage } = await sb
+          const { data: newPage, error: createError } = await sb
             .from(CONFIG_TRACTEBEL.tables.pages)
             .insert({ titre, description, active: false })
             .select()
             .single();
 
-          if (!newPage) throw new Error('Failed to create');
+          if (createError) throw createError;
+          if (!newPage) throw new Error('Failed to create page');
 
           const choixData = choices.map((texte, index) => ({
             page_id: newPage.id,
@@ -785,17 +923,21 @@
             ordre: index + 1
           }));
 
-          await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choixData);
+          const { error: insertError } = await sb
+            .from(CONFIG_TRACTEBEL.tables.choix)
+            .insert(choixData);
 
-          alert('✅ Page created!');
+          if (insertError) throw insertError;
+
+          alert('✅ Page created successfully!');
         }
 
         closeModal();
         await loadPages();
 
       } catch (error) {
-        console.error('Error:', error);
-        alert('Error saving page');
+        console.error('Error saving:', error);
+        showError('Error saving page: ' + (error.message || 'Unknown error'));
       }
     });
 
@@ -803,31 +945,10 @@
     async function deletePage(pageId) {
       const page = allPages.find(p => p.id === pageId);
       
-      if (!confirm(`Delete "${page.titre}"?\n\nThis will delete all votes. Cannot be undone.`)) {
+      if (!confirm(`Delete "${page.titre}"?\n\nThis will delete all votes and cannot be undone.`)) {
         return;
       }
 
       try {
-        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.choix).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.pages).delete().eq('id', pageId);
-
-        alert('✅ Page deleted');
-        await loadPages();
-
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error deleting page');
-      }
-    }
-
-    // Init
-    loadPages();
-
-    window.addEventListener('beforeunload', () => {
-      stopResultsRefresh();
-    });
-  </script>
-</body>
-</html>
+        // Supprimer dans l'ordre (à cause des foreign keys)
+        await sb.from(CONFIG_TRACTEB
