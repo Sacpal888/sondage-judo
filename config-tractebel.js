@@ -1,4 +1,4 @@
-const CONFIG_ENGIE = {
+const CONFIG_TRACTEBEL = {
   // Connexion Supabase
   supabase: {
     url: 'https://TON-PROJET.supabase.co',
@@ -7,12 +7,12 @@ const CONFIG_ENGIE = {
   
   // Tables dédiées
   tables: {
-    questions: 'engie_sondage_questions',
-    reponses: 'engie_sondage_reponses',
-    config: 'engie_sondage_config'
+    questions: 'tractebel_sondage_questions',
+    reponses: 'tractebel_sondage_reponses',
+    config: 'tractebel_sondage_config'
   },
   
-  // Design basé sur le brief
+  // Apparence
   branding: {
     nom: 'No Mind at Risk',
     logoNMAR: 'assets/logo-nmar.png',
