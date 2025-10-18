@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Mind at Risk - Survey</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config-engie.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 960px;
+      width: 100%;
+      background: rgba(0, 102, 179, 0.95);
+      border: 4px solid #FFFFFF;
+      border-radius: 30px;
+      padding: 50px 60px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    /* En-tête avec logos */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-nmar {
+      max-width: 400px;
+      height: auto;
+      margin-bottom: 30px;
+    }
+
+    .logo-tractebel {
+      max-width: 250px;
+      height: auto;
+      margin-bottom: 40px;
+    }
+
+    /* Séparateur */
+    .separator {
+      width: 100%;
+      height: 3px;
+      background: #FFFFFF;
+      margin: 30px 0;
+    }
+
+    /* Question */
+    .question-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 50px;
+      color: #FFFFFF;
+    }
+
+    /* Grille de boutons 2x4 */
+    .answers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 750px;
+      margin: 0 auto;
+    }
+
+    .answer-btn {
+      background: rgba(0, 102, 179, 1);
+      border: 3px solid #FFFFFF;
+      border-radius: 20px;
+      padding: 30px 20px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .answer-btn:hover {
+      background: rgba(0, 170, 255, 0.9);
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+    }
+
+    .answer-btn:active {
+      transform: scale(0.98);
+    }
+
+    .answer-btn.selected {
+      background: #00AAFF;
+      border-color: #FFED00;
+      border-width: 4px;
+      box-shadow: 0 0 20px rgba(255, 237, 0, 0.5);
+    }
+
+    /* Message de succès */
+    .success-message {
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .success-message h2 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #FFED00;
+    }
+
+    .success-message p {
+      font-size: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Animation de soumission */
+    .submitting {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #FFED00;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .answers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .answer-btn {
+        font-size: 1.5rem;
+        padding: 25px 15px;
+      }
+
+      .question-title {
+        font-size: 2rem;
+      }
+
+      .container {
+        padding: 30px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Formulaire -->
+    <div id="surveyForm">
+      <div class="header">
+        <img class="logo-nmar" id="logoNMAR" src="" alt="No Mind at Risk">
+        <div class="separator"></div>
+        <img class="logo-tractebel" id="logoTractebel" src="" alt="Tractebel ENGIE">
+      </div>
+
+      <h1 class="question-title" id="questionTitle">How do you feel today?</h1>
+
+      <div class="answers-grid" id="answersGrid"></div>
+    </div>
+
+    <!-- Message de chargement -->
+    <div id="submitting" class="submitting hidden">
+      <div class="spinner"></div>
+      <p style="font-size: 1.3rem;">Submitting your answer...</p>
+    </div>
+
+    <!-- Message de succès -->
+    <div id="successMessage" class="success-message hidden">
+      <h2>✓ Thank you!</h2>
+      <p id="thankYouMsg">Your feedback has been recorded.</p>
+    </div>
+  </div>
+
+  <script>
+    // Initialisation Supabase
+    const { createClient } = supabase;
+    const sb = createClient(
+      CONFIG_ENGIE.supabase.url,
+      CONFIG_ENGIE.supabase.anon_key
+    );
+
+    // Variables globales
+    let currentQuestion = null;
+    let selectedAnswer = null;
+    const sessionId = generateSessionId();
+
+    // Appliquer les logos
+    document.getElementById('logoNMAR').src = CONFIG_ENGIE.branding.logoNMAR;
+    document.getElementById('logoTractebel').src = CONFIG_ENGIE.branding.logoTractebel;
+
+    // Charger la question
+    async function loadQuestion() {
+      try {
+        const { data: questions } = await sb
+          .from(CONFIG_ENGIE.tables.questions)
+          .select('*')
+          .eq('active', true)
+          .order('ordre')
+          .limit(1);
+
+        if (questions && questions.length > 0) {
+          currentQuestion = questions[0];
+          displayQuestion();
+        }
+      } catch (error) {
+        console.error('Erreur chargement:', error);
+        alert('Error loading survey. Please refresh the page.');
+      }
+    }
+
+    // Afficher la question
+    function displayQuestion() {
+      document.getElementById('questionTitle').textContent = currentQuestion.question;
+      
+      const grid = document.getElementById('answersGrid');
+      grid.innerHTML = '';
+
+      if (currentQuestion.type === 'multiple_choice') {
+        const options = JSON.parse(currentQuestion.options);
+        
+        options.forEach((option, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'answer-btn';
+          btn.textContent = option;
+          btn.onclick = () => selectAnswer(option, btn);
+          grid.appendChild(btn);
+        });
+      }
+    }
+
+    // Sélectionner et soumettre immédiatement
+    async function selectAnswer(answer, buttonElement) {
+      // Désactiver tous les boutons
+      document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.style.cursor = 'not-allowed';
+      });
+
+      // Marquer comme sélectionné
+      buttonElement.classList.add('selected');
+      selectedAnswer = answer;
+
+      // Attendre 300ms pour l'effet visuel
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Soumettre
+      await submitAnswer();
+    }
+
+    // Soumettre la réponse
+    async function submitAnswer() {
+      // Afficher le spinner
+      document.getElementById('surveyForm').classList.add('hidden');
+      document.getElementById('submitting').classList.remove('hidden');
+
+      try {
+        await sb.from(CONFIG_ENGIE.tables.reponses).insert({
+          question_id: currentQuestion.id,
+          reponse: selectedAnswer,
+          session_id: sessionId
+        });
+
+        // Enregistrer un cookie
+        document.cookie = `voted_engie=true; max-age=${CONFIG_ENGIE.settings.cookieDuree * 86400}; path=/`;
+
+        // Afficher le message de succès
+        setTimeout(() => {
+          document.getElementById('submitting').classList.add('hidden');
+          document.getElementById('successMessage').classList.remove('hidden');
+        }, 800);
+
+      } catch (error) {
+        console.error('Erreur soumission:', error);
+        alert('Error submitting your answer. Please try again.');
+        
+        // Réafficher le formulaire
+        document.getElementById('submitting').classList.add('hidden');
+        document.getElementById('surveyForm').classList.remove('hidden');
+        
+        // Réactiver les boutons
+        document.querySelectorAll('.answer-btn').forEach(btn => {
+          btn.disabled = false;
+          btn.style.cursor = 'pointer';
+        });
+      }
+    }
+
+    // Générer un ID de session
+    function generateSessionId() {
+      return 'engie_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Vérifier si déjà voté
+    if (document.cookie.includes('voted_engie=true')) {
+      document.getElementById('surveyForm').innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+          <h2 style="color: #FFED00; font-size: 2.5rem; margin-bottom: 20px;">
+            Already submitted! 
+          </h2>
+          <p style="font-size: 1.3rem;">
+            Thank you for your previous participation.
+          </p>
+        </div>
+      `;
+    } else {
+      loadQuestion();
+    }
+  </script>
+</body>
+</html>
