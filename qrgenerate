@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator - ENGIE Survey</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #00AAFF 0%, #0066B3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 40px;
+    }
+
+    .container {
+      background: white;
+      padding: 60px;
+      border-radius: 30px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    h1 {
+      color: #0066B3;
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+
+    #qrcode {
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .info {
+      margin-top: 30px;
+      color: #0066B3;
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    .url {
+      background: #f0f0f0;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-family: monospace;
+      font-size: 0.95rem;
+      margin: 20px 0;
+      word-break: break-all;
+    }
+
+    button {
+      background: #00AAFF;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #0066B3;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 ENGIE Survey - QR Code</h1>
+    
+    <div id="qrcode"></div>
+    
+    <div class="info">
+      <p><strong>Survey URL:</strong></p>
+      <div class="url" id="surveyUrl"></div>
+      
+      <button onclick="downloadQR()">📥 Download QR Code</button>
+      <button onclick="printQR()">🖨️ Print QR Code</button>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ REMPLACE CETTE URL PAR TON URL RÉELLE
+    const SURVEY_URL = 'https://tonsite.com/sondage-engie.html';
+    
+    document.getElementById('surveyUrl').textContent = SURVEY_URL;
+
+    // Générer le QR code
+    const qrcode = new QRCode(document.getElementById("qrcode"), {
+      text: SURVEY_URL,
+      width: 400,
+      height: 400,
+      colorDark: "#0066B3",
+      colorLight: "#FFFFFF",
+      correctLevel: QRCode.CorrectLevel.H // Haute correction d'erreur
+    });
+
+    // Télécharger le QR code
+    function downloadQR() {
+      const canvas = document.querySelector('#qrcode canvas');
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'engie-survey-qr-code.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Imprimer le QR code
+    function printQR() {
+      window.print();
+    }
+  </script>
+
+  <style media="print">
+    body {
+      background: white;
+    }
+    button {
+      display: none;
+    }
+  </style>
+</body>
+</html>
