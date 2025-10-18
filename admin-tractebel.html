@@ -104,14 +104,56 @@
       transform: translateY(-2px);
     }
 
-    .login-error {
-      background: rgba(255, 68, 68, 0.2);
-      border: 2px solid #ff4444;
+    .forgot-password {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .forgot-password a {
+      color: #00AAFF;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+      color: #FFED00;
+      text-decoration: underline;
+    }
+
+    .login-error, .login-success {
       border-radius: 10px;
       padding: 15px;
       margin-top: 20px;
-      color: #ffcccc;
       text-align: center;
+    }
+
+    .login-error {
+      background: rgba(255, 68, 68, 0.2);
+      border: 2px solid #ff4444;
+      color: #ffcccc;
+    }
+
+    .login-success {
+      background: rgba(40, 167, 69, 0.2);
+      border: 2px solid #28a745;
+      color: #ccffcc;
+    }
+
+    .back-to-login {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-to-login a {
+      color: #00AAFF;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .back-to-login a:hover {
+      color: #FFED00;
+      text-decoration: underline;
     }
 
     .hidden {
@@ -622,7 +664,32 @@
           <input type="password" id="loginPassword" placeholder="Your password" required>
         </div>
         <button type="submit" class="btn-login">🔓 Login</button>
+        <div class="forgot-password">
+          <a href="#" id="forgotPasswordLink">🔑 Forgot password?</a>
+        </div>
         <div id="loginError" class="login-error hidden"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD SCREEN -->
+  <div id="forgotPasswordScreen" class="login-container hidden">
+    <div class="login-box">
+      <div class="login-header">
+        <h1>🔑 Reset Password</h1>
+        <p>Enter your email to receive a reset link</p>
+      </div>
+      <form id="forgotPasswordForm" class="login-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="resetEmail" placeholder="admin@tractebel.com" required>
+        </div>
+        <button type="submit" class="btn-login">📧 Send Reset Link</button>
+        <div class="back-to-login">
+          <a href="#" id="backToLoginLink">← Back to login</a>
+        </div>
+        <div id="resetError" class="login-error hidden"></div>
+        <div id="resetSuccess" class="login-success hidden"></div>
       </form>
     </div>
   </div>
@@ -739,15 +806,24 @@
 
     function showLogin() {
       document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('forgotPasswordScreen').classList.add('hidden');
+      document.getElementById('dashboard').classList.add('hidden');
+    }
+
+    function showForgotPassword() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('forgotPasswordScreen').classList.remove('hidden');
       document.getElementById('dashboard').classList.add('hidden');
     }
 
     function showDashboard() {
       document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('forgotPasswordScreen').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
       loadPages();
     }
 
+    // Login form
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
@@ -769,6 +845,47 @@
       }
     });
 
+    // Forgot password link
+    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showForgotPassword();
+    });
+
+    // Back to login link
+    document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      showLogin();
+    });
+
+    // Forgot password form
+    document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('resetEmail').value;
+      const errorDiv = document.getElementById('resetError');
+      const successDiv = document.getElementById('resetSuccess');
+
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/admin-tractebel.html'
+        });
+        
+        if (error) throw error;
+        
+        successDiv.textContent = '✅ Password reset email sent! Check your inbox.';
+        successDiv.classList.remove('hidden');
+        document.getElementById('resetEmail').value = '';
+        
+      } catch (error) {
+        errorDiv.textContent = '❌ Error sending reset email. Please try again.';
+        errorDiv.classList.remove('hidden');
+        console.error('Reset password error:', error);
+      }
+    });
+
+    // Logout
     document.getElementById('btnLogout').addEventListener('click', async () => {
       await sb.auth.signOut();
       currentUser = null;
