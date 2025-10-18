@@ -384,15 +384,15 @@
 
         activePage = pages[0];
 
-        // Vérifier le cookie AVANT d'afficher le sondage
+        // IMPORTANT : Appliquer les logos AVANT de vérifier le cookie
+        document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
+        document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
+
+        // Vérifier le cookie APRÈS avoir appliqué les logos
         if (hasVoted(activePage.id)) {
           showAlreadyVoted();
           return;
         }
-
-        // Appliquer les logos
-        document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
-        document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
 
         // Récupérer les choix
         const { data: choicesData } = await sb
