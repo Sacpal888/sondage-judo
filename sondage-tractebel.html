@@ -1,380 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tractebel Survey - No Mind at Risk</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config-tractebel.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<div class="container">
+    <!-- Écran Cookies Consent -->
+    <div id="cookieConsent" class="cookie-consent hidden">
+      <div class="header">
+        <div class="logos-grid">
+          <div class="logo-column">
+            <img class="logo-top" id="logoTopConsent" src="" alt="Logo Top">
+          </div>
+          <div class="separator"></div>
+          <div class="logo-column">
+            <img class="logo-bottom" id="logoBottomConsent" src="" alt="Logo Bottom">
+          </div>
+        </div>
+      </div>
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #0066B3;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: #FFFFFF;
-    }
+      <div class="consent-content">
+        <h2 class="consent-title">🍪 Cookie Notice</h2>
+        <p class="consent-text">
+          Pour assurer l'intégrité du processus de vote, nous enregistrons des données techniques sur votre appareil. En continuant, vous acceptez notre <a href="#" id="linkPrivacyPolicy" class="privacy-link">politique de confidentialité</a>.
+        </p>
+        <div class="consent-buttons">
+          <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accepter</button>
+          <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Refuser</button>
+        </div>
+      </div>
+    </div>
 
-    .container {
-      max-width: 1600px;
-      width: 95%;
-      background: linear-gradient(180deg, #0066B3 0%, #00AAFF 100%);
-      border: 4px solid #FFFFFF;
-      border-radius: 30px;
-      padding: 30px 40px;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
-    }
+    <!-- Politique de Confidentialité -->
+    <div id="privacyPolicy" class="privacy-policy hidden">
+      <div class="header">
+        <div class="logos-grid">
+          <div class="logo-column">
+            <img class="logo-top" id="logoTopPrivacy" src="" alt="Logo Top">
+          </div>
+          <div class="separator"></div>
+          <div class="logo-column">
+            <img class="logo-bottom" id="logoBottomPrivacy" src="" alt="Logo Bottom">
+          </div>
+        </div>
+      </div>
 
-    /* Layout Desktop */
-    @media (min-width: 769px) {
-      .header {
-        margin-bottom: 15px;
-      }
+      <div class="privacy-content">
+        <h2 class="privacy-title">🔒 Politique de Confidentialité</h2>
+        
+        <div class="privacy-section">
+          <h3>Données collectées</h3>
+          <p>Dans le cadre de ce sondage, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote et éviter les votes multiples.</p>
+        </div>
 
-      .logos-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-bottom: 15px;
-        align-items: center;
-      }
+        <div class="privacy-section">
+          <h3>Durée de conservation</h3>
+          <p>Le cookie est conservé pendant <strong>24 heures maximum</strong> après votre vote, puis est automatiquement supprimé.</p>
+        </div>
 
-      .logo-column {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 200px;
-      }
+        <div class="privacy-section">
+          <h3>Utilisation des données</h3>
+          <p>Ce cookie sert <strong>uniquement</strong> à :</p>
+          <ul>
+            <li>Empêcher un même appareil de voter plusieurs fois</li>
+            <li>Assurer la fiabilité des résultats du sondage</li>
+          </ul>
+        </div>
 
-      .logo-top, .logo-bottom {
-        max-width: 400px;
-        max-height: 200px;
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-      }
+        <div class="privacy-section">
+          <h3>Protection de vos données</h3>
+          <p><strong>Aucune donnée personnelle</strong> n'est collectée, stockée, transférée, vendue ou partagée avec des tiers. Le cookie contient uniquement un identifiant technique anonyme.</p>
+        </div>
 
-      .logo-bottom {
-        max-width: 300px;
-      }
+        <div class="privacy-section">
+          <h3>Vos droits</h3>
+          <p>Vous pouvez à tout moment refuser l'utilisation du cookie (et donc décliner votre participation).</p>
+        </div>
 
-      .separator {
-        display: none;
-      }
+        <div class="privacy-section">
+          <h3>Contact</h3>
+          <p>Pour toute question concernant cette politique de confidentialité, veuillez contacter l'administrateur du sondage.</p>
+        </div>
 
-      .question-section {
-        margin-bottom: 15px;
-        text-align: center;
-      }
+        <div class="privacy-buttons">
+          <button class="btn-consent btn-back" id="btnBackToConsent">← Retour</button>
+        </div>
+      </div>
+    </div>
 
-      .question-title {
-        font-size: 2.3rem;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 10px;
-        color: #FFED00;
-        font-family: Arial, sans-serif;
-      }
+    <!-- Refus de participation -->
+    <div id="consentDeclined" class="consent-declined hidden">
+      <div class="header">
+        <div class="logos-grid">
+          <div class="logo-column">
+            <img class="logo-top" id="logoTopDeclined" src="" alt="Logo Top">
+          </div>
+          <div class="separator"></div>
+          <div class="logo-column">
+            <img class="logo-bottom" id="logoBottomDeclined" src="" alt="Logo Bottom">
+          </div>
+        </div>
+      </div>
 
-      .question-description {
-        font-size: 1.4rem;
-        text-align: center;
-        margin-bottom: 0;
-        color: #FFFFFF;
-        font-family: Arial, sans-serif;
-      }
+      <div class="declined-content">
+        <h2 class="declined-title">Participation non autorisée</h2>
+        <p class="declined-text">
+          Nous respectons votre choix de ne pas accepter les cookies techniques. Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
+        </p>
+        <p class="declined-text">
+          Merci de votre compréhension.
+        </p>
+      </div>
+    </div>
 
-      .choices-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px 30px;
-      }
-
-      .choice-btn {
-        background: #00AAFF;
-        border: 3px solid #FFFFFF;
-        border-radius: 15px;
-        padding: 10px 16px;
-        font-size: 1.4rem;
-        font-weight: bold;
-        color: #FFFFFF;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-        min-height: 70px;
-      }
-
-      .choice-btn:hover {
-        background: #0066B3;
-        transform: translateX(5px);
-        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
-      }
-    }
-
-    /* Layout Mobile - OPTIMISÉ */
-    @media (max-width: 768px) {
-      .container {
-        max-width: 100%;
-        width: 95%;
-        padding: 20px 15px;
-      }
-
-      .header {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-
-      .logos-grid {
-        display: block;
-      }
-
-      .logo-column {
-        text-align: center;
-      }
-
-      .logo-top {
-        max-width: 200px;
-        width: 80%;
-        height: auto;
-        margin-bottom: 15px;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .separator {
-        width: 80%;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.5);
-        margin: 0 auto 15px;
-        display: block;
-      }
-
-      .logo-bottom {
-        max-width: 150px;
-        width: 70%;
-        height: auto;
-        margin-bottom: 20px;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .question-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 15px;
-        color: #FFED00;
-        font-family: Arial, sans-serif;
-      }
-
-      .question-description {
-        font-size: 1.1rem;
-        text-align: center;
-        margin-bottom: 20px;
-        color: #FFFFFF;
-        font-family: Arial, sans-serif;
-      }
-
-      .choices-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-width: 100%;
-        margin: 0 auto;
-      }
-
-      .choice-btn {
-        background: #00AAFF;
-        border: 3px solid #FFFFFF;
-        border-radius: 12px;
-        padding: 12px 15px;
-        font-size: 1rem;
-        font-weight: bold;
-        color: #FFFFFF;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 55px;
-        line-height: 1.4;
-      }
-
-      .choice-btn:hover {
-        background: rgba(0, 170, 255, 0.85);
-        transform: scale(1.02);
-        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
-      }
-    }
-
-    /* Extra petit écran (<400px) */
-    @media (max-width: 400px) {
-      .container {
-        padding: 15px 10px;
-      }
-
-      .logo-top {
-        max-width: 180px;
-      }
-
-      .logo-bottom {
-        max-width: 130px;
-      }
-
-      .question-title {
-        font-size: 1.3rem;
-      }
-
-      .question-description {
-        font-size: 1rem;
-      }
-
-      .choice-btn {
-        font-size: 0.95rem;
-        padding: 10px 12px;
-        min-height: 50px;
-      }
-    }
-
-    /* Styles communs pour les boutons */
-    .choice-btn.selected {
-      background: #0066B3;
-      border-color: #FFED00;
-      border-width: 4px;
-      box-shadow: 0 0 20px rgba(255, 237, 0, 0.5);
-    }
-
-    .choice-btn.disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    /* Messages de statut */
-    .success-message, .error-message, .already-voted {
-      text-align: center;
-      padding: 60px 40px;
-    }
-
-    .success-message h2 {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #FFED00;
-      font-family: Arial, sans-serif;
-    }
-
-    .success-message p {
-      font-size: 1.3rem;
-      color: #FFFFFF;
-      font-family: Arial, sans-serif;
-    }
-
-    .already-voted h2 {
-      font-size: 2.5rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #FFED00;
-      font-family: Arial, sans-serif;
-    }
-
-    .already-voted p {
-      font-size: 1.3rem;
-      color: #FFFFFF;
-      font-family: Arial, sans-serif;
-    }
-
-    .error-message h2 {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #FFED00;
-      font-family: Arial, sans-serif;
-    }
-
-    .error-message p {
-      font-size: 1.2rem;
-      color: #FFFFFF;
-      font-family: Arial, sans-serif;
-    }
-
-    @media (max-width: 768px) {
-      .success-message h2 {
-        font-size: 2rem;
-      }
-
-      .success-message p {
-        font-size: 1.1rem;
-      }
-
-      .already-voted h2 {
-        font-size: 1.8rem;
-      }
-
-      .already-voted p {
-        font-size: 1.1rem;
-      }
-
-      .error-message h2 {
-        font-size: 1.6rem;
-      }
-
-      .error-message p {
-        font-size: 1rem;
-      }
-    }
-
-    .submitting {
-      text-align: center;
-      padding: 40px;
-    }
-
-    .submitting p {
-      font-size: 1.3rem;
-      color: #FFFFFF;
-      font-family: Arial, sans-serif;
-      font-weight: bold;
-    }
-
-    .spinner {
-      border: 5px solid rgba(255, 255, 255, 0.3);
-      border-top: 5px solid #FFED00;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .hidden {
-      display: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
     <!-- Formulaire -->
-    <div id="surveyForm">
+    <div id="surveyForm" class="hidden">
       <div class="header">
         <div class="logos-grid">
           <div class="logo-column">
@@ -419,166 +153,3 @@
       <p style="color: #FFFFFF;">Please check back later.</p>
     </div>
   </div>
-
-  <script>
-    const { createClient } = supabase;
-    const sb = createClient(
-      CONFIG_TRACTEBEL.supabase.url,
-      CONFIG_TRACTEBEL.supabase.anon_key
-    );
-
-    let activePage = null;
-    let choices = [];
-    const sessionId = generateSessionId();
-
-    // Charger la page active
-    async function loadActivePage() {
-      try {
-        const { data: pages } = await sb
-          .from(CONFIG_TRACTEBEL.tables.pages)
-          .select('*')
-          .eq('active', true)
-          .limit(1);
-
-        if (!pages || pages.length === 0) {
-          showError();
-          return;
-        }
-
-        activePage = pages[0];
-
-        // IMPORTANT : Appliquer les logos AVANT de vérifier le cookie
-        document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
-        document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
-
-        // Vérifier le cookie APRÈS avoir appliqué les logos
-        if (hasVoted(activePage.id)) {
-          showAlreadyVoted();
-          return;
-        }
-
-        // Récupérer les choix
-        const { data: choicesData } = await sb
-          .from(CONFIG_TRACTEBEL.tables.choix)
-          .select('*')
-          .eq('page_id', activePage.id)
-          .order('ordre');
-
-        choices = choicesData || [];
-        displaySurvey();
-
-      } catch (error) {
-        console.error('Erreur chargement:', error);
-        showError();
-      }
-    }
-
-    function displaySurvey() {
-      document.getElementById('questionTitle').textContent = activePage.titre;
-      document.getElementById('questionDescription').textContent = activePage.description || '';
-
-      const container = document.getElementById('choicesContainer');
-      container.innerHTML = '';
-
-      choices.forEach(choice => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.innerHTML = formatMarkdown(choice.texte);
-        btn.onclick = () => selectChoice(choice, btn);
-        container.appendChild(btn);
-      });
-    }
-
-    async function selectChoice(choice, buttonElement) {
-      // Désactiver tous les boutons
-      document.querySelectorAll('.choice-btn').forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('disabled');
-      });
-
-      buttonElement.classList.add('selected');
-
-      await new Promise(resolve => setTimeout(resolve, 300));
-      await submitVote(choice);
-    }
-
-    async function submitVote(choice) {
-      document.getElementById('surveyForm').classList.add('hidden');
-      document.getElementById('submitting').classList.remove('hidden');
-
-      try {
-        await sb.from(CONFIG_TRACTEBEL.tables.votes).insert({
-          page_id: activePage.id,
-          choix_id: choice.id,
-          session_id: sessionId
-        });
-
-        // Recalculer les stats
-        await sb.rpc('calculer_stats_page', { page_uuid: activePage.id });
-
-        // Définir le cookie (1 vote par page)
-        setCookie(`voted_tractebel_${activePage.id}`, 'true', CONFIG_TRACTEBEL.settings.cookieDuree);
-
-        setTimeout(() => {
-          document.getElementById('submitting').classList.add('hidden');
-          document.getElementById('successMessage').classList.remove('hidden');
-        }, 800);
-
-      } catch (error) {
-        console.error('Erreur soumission:', error);
-        alert('Error submitting your vote. Please try again.');
-        
-        document.getElementById('submitting').classList.add('hidden');
-        document.getElementById('surveyForm').classList.remove('hidden');
-        
-        document.querySelectorAll('.choice-btn').forEach(btn => {
-          btn.disabled = false;
-          btn.classList.remove('disabled');
-        });
-      }
-    }
-
-    function showError() {
-      document.getElementById('surveyForm').classList.add('hidden');
-      document.getElementById('errorMessage').classList.remove('hidden');
-    }
-
-    function showAlreadyVoted() {
-      document.getElementById('surveyForm').classList.add('hidden');
-      document.getElementById('alreadyVoted').classList.remove('hidden');
-    }
-
-    function generateSessionId() {
-      return 'tractebel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    // Gestion des cookies
-    function setCookie(name, value, days) {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-    }
-
-    function getCookie(name) {
-      return document.cookie.split('; ').reduce((r, v) => {
-        const parts = v.split('=');
-        return parts[0] === name ? decodeURIComponent(parts[1]) : r;
-      }, '');
-    }
-
-    function hasVoted(pageId) {
-      return getCookie(`voted_tractebel_${pageId}`) === 'true';
-    }
-
-    // Formatage markdown
-    function formatMarkdown(text) {
-      if (!text) return text;
-      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      return text;
-    }
-
-    // Charger au démarrage
-    loadActivePage();
-  </script>
-</body>
-</html>
