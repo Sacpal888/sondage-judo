@@ -1,25 +1,17 @@
 <div class="container">
     <!-- Écran Cookies Consent -->
     <div id="cookieConsent" class="cookie-consent hidden">
-      <div class="header">
-        <div class="logos-grid">
-          <div class="logo-column">
-            <img class="logo-top" id="logoTopConsent" src="" alt="Logo Top">
-          </div>
-          <div class="separator"></div>
-          <div class="logo-column">
-            <img class="logo-bottom" id="logoBottomConsent" src="" alt="Logo Bottom">
-          </div>
-        </div>
-      </div>
-
       <div class="consent-content">
-        <h2 class="consent-title">🍪 Cookie Notice</h2>
+        <div class="cookie-icon">🍪</div>
+        <h2 class="consent-title">Consentement aux Cookies</h2>
         <p class="consent-text">
-          Pour assurer l'intégrité du processus de vote, nous enregistrons des données techniques sur votre appareil. En continuant, vous acceptez notre <a href="#" id="linkPrivacyPolicy" class="privacy-link">politique de confidentialité</a>.
+          Pour assurer l'intégrité du processus de vote, nous enregistrons des données techniques sur votre appareil. 
+        </p>
+        <p class="consent-text">
+          En continuant, vous acceptez notre <a href="#" id="linkPrivacyPolicy" class="privacy-link">politique de confidentialité</a>.
         </p>
         <div class="consent-buttons">
-          <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accepter</button>
+          <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accepter et Continuer</button>
           <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Refuser</button>
         </div>
       </div>
@@ -27,33 +19,22 @@
 
     <!-- Politique de Confidentialité -->
     <div id="privacyPolicy" class="privacy-policy hidden">
-      <div class="header">
-        <div class="logos-grid">
-          <div class="logo-column">
-            <img class="logo-top" id="logoTopPrivacy" src="" alt="Logo Top">
-          </div>
-          <div class="separator"></div>
-          <div class="logo-column">
-            <img class="logo-bottom" id="logoBottomPrivacy" src="" alt="Logo Bottom">
-          </div>
-        </div>
-      </div>
-
       <div class="privacy-content">
-        <h2 class="privacy-title">🔒 Politique de Confidentialité</h2>
+        <div class="policy-icon">🔒</div>
+        <h2 class="privacy-title">Politique de Confidentialité</h2>
         
         <div class="privacy-section">
-          <h3>Données collectées</h3>
+          <h3>📋 Données collectées</h3>
           <p>Dans le cadre de ce sondage, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote et éviter les votes multiples.</p>
         </div>
 
         <div class="privacy-section">
-          <h3>Durée de conservation</h3>
+          <h3>⏱️ Durée de conservation</h3>
           <p>Le cookie est conservé pendant <strong>24 heures maximum</strong> après votre vote, puis est automatiquement supprimé.</p>
         </div>
 
         <div class="privacy-section">
-          <h3>Utilisation des données</h3>
+          <h3>🎯 Utilisation des données</h3>
           <p>Ce cookie sert <strong>uniquement</strong> à :</p>
           <ul>
             <li>Empêcher un même appareil de voter plusieurs fois</li>
@@ -62,18 +43,13 @@
         </div>
 
         <div class="privacy-section">
-          <h3>Protection de vos données</h3>
+          <h3>🛡️ Protection de vos données</h3>
           <p><strong>Aucune donnée personnelle</strong> n'est collectée, stockée, transférée, vendue ou partagée avec des tiers. Le cookie contient uniquement un identifiant technique anonyme.</p>
         </div>
 
         <div class="privacy-section">
-          <h3>Vos droits</h3>
+          <h3>✋ Vos droits</h3>
           <p>Vous pouvez à tout moment refuser l'utilisation du cookie (et donc décliner votre participation).</p>
-        </div>
-
-        <div class="privacy-section">
-          <h3>Contact</h3>
-          <p>Pour toute question concernant cette politique de confidentialité, veuillez contacter l'administrateur du sondage.</p>
         </div>
 
         <div class="privacy-buttons">
@@ -84,24 +60,16 @@
 
     <!-- Refus de participation -->
     <div id="consentDeclined" class="consent-declined hidden">
-      <div class="header">
-        <div class="logos-grid">
-          <div class="logo-column">
-            <img class="logo-top" id="logoTopDeclined" src="" alt="Logo Top">
-          </div>
-          <div class="separator"></div>
-          <div class="logo-column">
-            <img class="logo-bottom" id="logoBottomDeclined" src="" alt="Logo Bottom">
-          </div>
-        </div>
-      </div>
-
       <div class="declined-content">
+        <div class="declined-icon">🚫</div>
         <h2 class="declined-title">Participation non autorisée</h2>
         <p class="declined-text">
-          Nous respectons votre choix de ne pas accepter les cookies techniques. Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
+          Nous respectons votre choix de ne pas accepter les cookies techniques.
         </p>
         <p class="declined-text">
+          Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
+        </p>
+        <p class="declined-text-small">
           Merci de votre compréhension.
         </p>
       </div>
