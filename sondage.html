@@ -270,7 +270,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Vote Form - Existing styles */
+        /* Vote Form */
         .logo {
             max-width: 200px;
             width: 100%;
@@ -335,6 +335,7 @@
         .message p {
             font-size: 1.2rem;
             line-height: 1.6;
+            white-space: pre-line;
         }
 
         .spinner {
@@ -477,7 +478,7 @@
 
         <!-- Vote Form -->
         <div id="voteSection" class="hidden">
-            <img id="logoImg" class="logo" src="" alt="Logo">
+            <img id="logoImg" class="logo" src="" alt="Logo" style="display: none;">
             <h1 id="titleText" class="title">Vote for Your Champion</h1>
             <div id="playersContainer"></div>
         </div>
@@ -491,7 +492,7 @@
         <!-- Thank You -->
         <div id="thankYou" class="message hidden">
             <h2>✓ Thank You!</h2>
-            <p>Your vote has been recorded.</p>
+            <p id="thankYouText">Your vote has been recorded.</p>
         </div>
 
         <!-- Already Voted -->
@@ -627,18 +628,42 @@
             try {
                 document.getElementById('loadingMessage').classList.remove('hidden');
                 
-                // Load settings
-                const { data: settings } = await supabaseClient
+                // Load logo from settings
+                const { data: logoData } = await supabaseClient
                     .from('settings')
-                    .select('*')
+                    .select('value')
+                    .eq('key', 'logo')
                     .single();
 
-                if (settings) {
-                    document.getElementById('titleText').textContent = settings.titre || 'Vote for Your Champion';
-                    document.getElementById('logoImg').src = settings.logo_url || '';
+                if (logoData && logoData.value) {
+                    const logoImg = document.getElementById('logoImg');
+                    logoImg.src = logoData.value;
+                    logoImg.style.display = 'block';
                 }
 
-                // Load players
+                // Load title from settings
+                const { data: titleData } = await supabaseClient
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'titre')
+                    .single();
+
+                if (titleData && titleData.value) {
+                    document.getElementById('titleText').textContent = titleData.value;
+                }
+
+                // Load thank you message
+                const { data: thankYouData } = await supabaseClient
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'thank_you_message')
+                    .single();
+
+                if (thankYouData && thankYouData.value) {
+                    document.getElementById('thankYouText').textContent = thankYouData.value;
+                }
+
+                // Load players (using 'name' column)
                 const { data: players } = await supabaseClient
                     .from('players')
                     .select('*')
@@ -652,6 +677,7 @@
                     showError('No players available.');
                 }
             } catch (error) {
+                console.error('Error loading data:', error);
                 showError('Error loading data: ' + error.message);
             }
         }
@@ -663,7 +689,7 @@
             players.forEach(player => {
                 const btn = document.createElement('button');
                 btn.className = 'button';
-                btn.textContent = player.nom;
+                btn.textContent = player.nom; // Utilise 'nom' 
                 btn.onclick = () => selectPlayer(player.id, btn);
                 container.appendChild(btn);
             });
@@ -703,10 +729,13 @@
                 console.error('Error submitting vote:', error);
                 showError('Error submitting your vote. Please try again.');
                 
+                document.getElementById('loadingMessage').classList.add('hidden');
+                document.getElementById('voteSection').classList.remove('hidden');
+                
                 const buttons = document.querySelectorAll('#playersContainer .button');
                 buttons.forEach(btn => {
                     btn.disabled = false;
-                    btn.classList.remove('disabled');
+                    btn.classList.remove('disabled', 'selected');
                 });
             }
         }
@@ -716,6 +745,7 @@
         }
 
         function showError(message) {
+            document.getElementById('loadingMessage').classList.add('hidden');
             document.getElementById('errorText').textContent = message;
             document.getElementById('errorMessage').classList.remove('hidden');
         }
