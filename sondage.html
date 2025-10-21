@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Virtual Cup</title>
+    <title>Coupe virtuelle du public</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -39,25 +39,24 @@
             display: none !important;
         }
 
-        /* Cookie Consent Screen */
+        /* ========================================
+           COOKIE CONSENT SCREEN
+        ======================================== */
         .cookie-consent {
             text-align: center;
             width: 100%;
         }
 
         .consent-content {
-            max-width: 550px;
-            margin: 0 auto;
-            padding: 45px 35px;
-            background: rgba(26, 47, 74, 0.6);
-            border: 3px solid rgba(212, 175, 55, 0.4);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px 30px;
+            background: rgba(26, 47, 74, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 15px;
         }
 
         .cookie-icon {
-            font-size: 4.5rem;
-            margin-bottom: 25px;
+            font-size: 4rem;
+            margin-bottom: 20px;
             animation: bounce 2s infinite;
         }
 
@@ -67,23 +66,21 @@
         }
 
         .consent-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #d4af37;
             margin-bottom: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .consent-text {
             font-size: 1.1rem;
             color: #ffffff;
-            line-height: 1.7;
-            margin-bottom: 18px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin-bottom: 15px;
         }
 
         .privacy-link {
-            color: #d4af37;
+            color: #f0d46f;
             text-decoration: underline;
             font-weight: bold;
             cursor: pointer;
@@ -91,25 +88,24 @@
         }
 
         .privacy-link:hover {
-            color: #f0d46f;
+            color: #d4af37;
         }
 
         .consent-buttons {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 25px;
         }
 
         .btn-consent {
-            padding: 16px 35px;
-            font-size: 1.15rem;
+            padding: 15px 35px;
+            font-size: 1.1rem;
             font-weight: bold;
-            border: 3px solid #d4af37;
-            border-radius: 12px;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             width: 100%;
         }
 
@@ -120,245 +116,418 @@
 
         .btn-accept:hover {
             background: #218838;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         }
 
         .btn-decline {
-            background: rgba(212, 175, 55, 0.2);
+            background: rgba(220, 53, 69, 0.2);
             color: #ffffff;
-            border-color: rgba(212, 175, 55, 0.5);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         .btn-decline:hover {
-            background: rgba(212, 175, 55, 0.3);
-            border-color: #d4af37;
-            transform: translateY(-3px);
+            background: rgba(220, 53, 69, 0.4);
+            border-color: #ffffff;
+            transform: translateY(-2px);
         }
 
         .btn-back {
-            background: #1a2f4a;
+            background: #0066B3;
             color: #ffffff;
-            border-color: #d4af37;
         }
 
         .btn-back:hover {
-            background: #0d2744;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+            background: #0088cc;
+            transform: translateY(-2px);
         }
 
-        /* Privacy Policy Screen */
+        /* ========================================
+           PRIVACY POLICY SCREEN
+        ======================================== */
         .privacy-policy {
             text-align: left;
             width: 100%;
-            max-height: 75vh;
+            max-height: 70vh;
             overflow-y: auto;
         }
 
         .privacy-content {
-            max-width: 750px;
-            margin: 0 auto;
-            padding: 35px 25px;
+            padding: 30px 20px;
         }
 
         .policy-icon {
-            font-size: 3.5rem;
+            font-size: 3rem;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .privacy-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #d4af37;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .privacy-section {
-            background: rgba(26, 47, 74, 0.4);
+            background: rgba(26, 47, 74, 0.6);
             border: 2px solid rgba(212, 175, 55, 0.3);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 18px;
-            transition: all 0.3s ease;
-        }
-
-        .privacy-section:hover {
-            background: rgba(26, 47, 74, 0.6);
-            border-color: rgba(212, 175, 55, 0.5);
+            margin-bottom: 15px;
         }
 
         .privacy-section h3 {
-            font-size: 1.3rem;
-            color: #d4af37;
-            margin-bottom: 12px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.2rem;
+            color: #f0d46f;
+            margin-bottom: 10px;
         }
 
         .privacy-section p {
             font-size: 1rem;
             color: #ffffff;
-            line-height: 1.7;
-            margin-bottom: 10px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin-bottom: 8px;
         }
 
         .privacy-section ul {
-            margin-left: 25px;
-            margin-top: 10px;
+            margin-left: 20px;
+            margin-top: 8px;
         }
 
         .privacy-section li {
             font-size: 1rem;
             color: #ffffff;
-            line-height: 1.7;
-            margin-bottom: 8px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin-bottom: 6px;
         }
 
         .privacy-buttons {
             text-align: center;
-            margin-top: 35px;
+            margin-top: 25px;
         }
 
-        /* Consent Declined Screen */
+        /* ========================================
+           CONSENT DECLINED SCREEN
+        ======================================== */
         .consent-declined {
             text-align: center;
             width: 100%;
         }
 
         .declined-content {
-            max-width: 550px;
-            margin: 0 auto;
-            padding: 45px 35px;
-            background: rgba(26, 47, 74, 0.6);
-            border: 3px solid rgba(212, 175, 55, 0.4);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px 30px;
+            background: rgba(26, 47, 74, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 15px;
         }
 
         .declined-icon {
-            font-size: 4.5rem;
-            margin-bottom: 25px;
+            font-size: 4rem;
+            margin-bottom: 20px;
             opacity: 0.8;
         }
 
         .declined-title {
-            font-size: 1.85rem;
+            font-size: 1.7rem;
             font-weight: bold;
             color: #d4af37;
             margin-bottom: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .declined-text {
             font-size: 1.1rem;
             color: #ffffff;
-            line-height: 1.7;
-            margin-bottom: 15px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin-bottom: 12px;
         }
 
         .declined-text-small {
             font-size: 1rem;
             color: rgba(255, 255, 255, 0.8);
             font-style: italic;
-            margin-top: 25px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-top: 20px;
         }
 
-        /* Vote Form - Existing styles */
-        .logo {
-            max-width: 200px;
-            width: 100%;
-            display: block;
-            margin: 0 auto 30px;
-        }
-
-        .title {
-            font-size: 2rem;
-            color: #d4af37;
+        /* ========================================
+           MAIN SURVEY
+        ======================================== */
+        .header {
             text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            position: relative;
         }
-
-        .button {
-            width: 100%;
-            padding: 18px;
-            margin: 10px 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-            background: linear-gradient(135deg, #1a2f4a, #0d2744);
+        
+        .title-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
             color: #d4af37;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+        
+        .kimono-icon {
+            font-size: 2em;
+        }
+        
+        .logo-container {
+            margin: 20px auto;
+            text-align: center;
+            width: 100%;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+        
+        .logo-container img {
+            max-width: 90%;
+            max-height: 150px;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            display: block;
+            background: transparent;
+            object-fit: contain;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .logo-placeholder {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .vote-text {
+            color: #ffffff;
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        /* Cartes des joueurs */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .player-card {
+            background: rgba(26, 47, 74, 0.8);
             border: 2px solid #d4af37;
             border-radius: 12px;
+            padding: 20px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow: hidden;
         }
-
-        .button:hover:not(.disabled) {
-            background: linear-gradient(135deg, #d4af37, #f0d46f);
-            color: #0a1828;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-        }
-
-        .button.selected {
-            background: linear-gradient(135deg, #d4af37, #f0d46f);
-            color: #0a1828;
-            border-width: 3px;
+        
+        .player-card:hover {
+            transform: translateY(-5px);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            border-color: #f0d46f;
+            background: rgba(26, 47, 74, 1);
         }
-
-        .button.disabled {
-            opacity: 0.6;
+        
+        .player-card.selected {
+            border: 3px solid #f0d46f;
+            background: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            animation: pulse-gold 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-gold {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);
+            }
+        }
+        
+        .player-card.disabled {
+            opacity: 0.4;
             cursor: not-allowed;
+            filter: grayscale(1);
         }
-
-        .message {
-            text-align: center;
-            padding: 40px 30px;
+        
+        .player-card.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .player-name {
             color: #ffffff;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
-
-        .message h2 {
-            font-size: 2.2rem;
+        
+        .player-card.selected .player-name {
+            color: #f0d46f;
+        }
+        
+        .vote-button {
+            background: #d4af37;
+            color: #0a1828;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .player-card.selected .vote-button {
+            display: inline-block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .vote-button:hover {
+            background: #f0d46f;
+            transform: scale(1.05);
+        }
+        
+        .thank-you {
+            display: none;
+            text-align: center;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #d4af37;
+            animation: fadeInScale 0.5s ease-in;
+        }
+        
+        .thank-you.show {
+            display: block;
+        }
+        
+        .thank-you h2 {
             color: #d4af37;
             margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .thank-you p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        .message p {
-            font-size: 1.2rem;
+        .votes-frozen {
+            display: none;
+            text-align: center;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(100, 149, 237, 0.3), rgba(70, 130, 180, 0.3));
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #87CEEB;
+            margin-top: 20px;
+            animation: fadeInScale 0.5s ease-in;
+        }
+        
+        .votes-frozen.show {
+            display: block;
+        }
+        
+        .votes-frozen h3 {
+            color: #87CEEB;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+        
+        .votes-frozen p {
+            color: #ffffff;
+            font-size: 1.1em;
             line-height: 1.6;
         }
 
-        .spinner {
-            border: 4px solid rgba(212, 175, 55, 0.3);
-            border-top: 4px solid #d4af37;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        .loading {
+            text-align: center;
+            color: #f0d46f;
+            padding: 20px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .error-message {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
         }
-
-        @media (max-width: 768px) {
+        
+        /* Responsive */
+        @media (max-width: 480px) {
             .container {
-                padding: 25px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .kimono-icon {
+                font-size: 1.8em;
+            }
+            
+            .vote-text {
+                font-size: 1.1em;
+            }
+            
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .consent-content,
+            .declined-content {
+                padding: 30px 20px;
+            }
+
+            .cookie-icon,
+            .declined-icon {
+                font-size: 3.5rem;
             }
 
             .consent-title {
-                font-size: 1.6rem;
+                font-size: 1.5rem;
             }
 
             .consent-text {
@@ -366,180 +535,194 @@
             }
 
             .btn-consent {
-                padding: 14px 28px;
-                font-size: 1.05rem;
-            }
-
-            .privacy-title {
-                font-size: 1.6rem;
-            }
-
-            .privacy-section h3 {
-                font-size: 1.15rem;
-            }
-
-            .privacy-section p,
-            .privacy-section li {
-                font-size: 0.95rem;
-            }
-
-            .title {
-                font-size: 1.6rem;
-            }
-
-            .button {
-                font-size: 1.1rem;
-                padding: 16px;
+                padding: 12px 25px;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Cookie Consent Screen -->
+        <!-- ========================================
+             COOKIE CONSENT SCREEN
+        ======================================== -->
         <div id="cookieConsent" class="cookie-consent hidden">
             <div class="consent-content">
                 <div class="cookie-icon">🍪</div>
-                <h2 class="consent-title">Cookie Consent</h2>
+                <h2 class="consent-title">Consentement aux cookies</h2>
                 <p class="consent-text">
-                    To ensure the integrity of the voting process, we use a technical cookie to prevent multiple votes from the same device.
+                    Pour garantir l'intégrité du processus de vote, nous enregistrons des données techniques de votre appareil.
                 </p>
                 <p class="consent-text">
-                    By continuing, you accept our <a href="#" id="linkPrivacyPolicy" class="privacy-link">privacy policy</a>.
+                    En continuant, vous acceptez notre <a href="#" id="linkPrivacyPolicy" class="privacy-link">politique de confidentialité</a>.
                 </p>
                 <div class="consent-buttons">
-                    <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accept and Continue</button>
-                    <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Decline</button>
+                    <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accepter et continuer</button>
+                    <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Refuser</button>
                 </div>
             </div>
         </div>
 
-        <!-- Privacy Policy -->
+        <!-- ========================================
+             PRIVACY POLICY
+        ======================================== -->
         <div id="privacyPolicy" class="privacy-policy hidden">
             <div class="privacy-content">
                 <div class="policy-icon">🔒</div>
-                <h2 class="privacy-title">Privacy Policy</h2>
+                <h2 class="privacy-title">Politique de confidentialité</h2>
                 
                 <div class="privacy-section">
-                    <h3>📋 Data Collected</h3>
-                    <p>For this survey, we use a temporary technical cookie to ensure vote integrity and prevent multiple votes.</p>
+                    <h3>📋 Données collectées</h3>
+                    <p>Dans le cadre de ce vote, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote et empêcher les votes multiples.</p>
                 </div>
 
                 <div class="privacy-section">
-                    <h3>⏱️ Storage Duration</h3>
-                    <p>The cookie is stored for <strong>24 hours maximum</strong> after your vote, then automatically deleted.</p>
+                    <h3>⏱️ Durée de conservation</h3>
+                    <p>Le cookie est conservé pour une durée <strong>maximale de 24 heures</strong> après votre vote, puis est automatiquement supprimé.</p>
                 </div>
 
                 <div class="privacy-section">
-                    <h3>🎯 Data Usage</h3>
-                    <p>This cookie serves <strong>only</strong> to:</p>
+                    <h3>🎯 Utilisation des données</h3>
+                    <p>Ce cookie est utilisé <strong>uniquement</strong> pour :</p>
                     <ul>
-                        <li>Prevent the same device from voting multiple times</li>
-                        <li>Ensure the reliability of survey results</li>
+                        <li>Empêcher le même appareil de voter plusieurs fois</li>
+                        <li>Garantir la fiabilité des résultats du vote</li>
                     </ul>
                 </div>
 
                 <div class="privacy-section">
-                    <h3>🛡️ Data Protection</h3>
-                    <p><strong>No personal data</strong> is collected, stored, transferred, sold, or shared with third parties. The cookie contains only an anonymous technical identifier.</p>
+                    <h3>🛡️ Protection des données</h3>
+                    <p><strong>Aucune donnée personnelle</strong> n'est collectée, stockée, transférée, vendue ou partagée avec des tiers. Le cookie ne contient qu'un identifiant technique anonyme.</p>
                 </div>
 
                 <div class="privacy-section">
-                    <h3>✋ Your Rights</h3>
-                    <p>You can decline cookie usage at any time (and thus decline participation).</p>
+                    <h3>✋ Vos droits</h3>
+                    <p>Vous pouvez refuser l'utilisation du cookie à tout moment (et donc refuser votre participation).</p>
                 </div>
 
                 <div class="privacy-buttons">
-                    <button class="btn-consent btn-back" id="btnBackToConsent">← Back</button>
+                    <button class="btn-consent btn-back" id="btnBackToConsent">← Retour</button>
                 </div>
             </div>
         </div>
 
-        <!-- Consent Declined -->
+        <!-- ========================================
+             CONSENT DECLINED
+        ======================================== -->
         <div id="consentDeclined" class="consent-declined hidden">
             <div class="declined-content">
                 <div class="declined-icon">🚫</div>
-                <h2 class="declined-title">Participation Not Authorized</h2>
+                <h2 class="declined-title">Participation non autorisée</h2>
                 <p class="declined-text">
-                    We respect your choice not to accept technical cookies.
+                    Nous respectons votre choix de ne pas accepter les cookies techniques.
                 </p>
                 <p class="declined-text">
-                    Unfortunately, without these cookies, we cannot guarantee the integrity of the voting process.
+                    Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
                 </p>
                 <p class="declined-text-small">
-                    Thank you for your understanding.
+                    Merci de votre compréhension.
                 </p>
-                <div class="consent-buttons" style="margin-top: 30px;">
-                    <button class="btn-consent btn-back" id="btnRetryConsent">← Change My Mind</button>
+                <div class="consent-buttons" style="margin-top: 25px;">
+                    <button class="btn-consent btn-back" id="btnRetryConsent">← Changer d'avis</button>
                 </div>
             </div>
         </div>
 
-        <!-- Vote Form -->
-        <div id="voteSection" class="hidden">
-            <img id="logoImg" class="logo" src="" alt="Logo">
-            <h1 id="titleText" class="title">Vote for Your Champion</h1>
-            <div id="playersContainer"></div>
+        <!-- ========================================
+             MAIN SURVEY CONTENT
+        ======================================== -->
+        <div id="mainContent" class="hidden">
+            <div class="header">
+                <div class="title-container">
+                    <h1 id="pageTitle">Coupe virtuelle du public</h1>
+                    <span class="kimono-icon">🥋</span>
+                </div>
+            </div>
+            
+            <div class="logo-container" id="logoContainer">
+                <!-- Le logo sera inséré ici -->
+            </div>
+            
+            <div id="loadingMessage" class="loading">
+                ⏳ Chargement...
+            </div>
+            
+            <div id="voteSection" style="display: none;">
+                <div class="vote-text" id="invitationText">
+                    Votez pour votre joueur(euse) favori(te) !
+                </div>
+                
+                <div class="players-grid" id="playersGrid">
+                    <!-- Les cartes des joueurs seront insérées ici -->
+                </div>
+            </div>
+
+            <div class="votes-frozen" id="votesFrozen">
+                <h3>❄️ Votes figés</h3>
+                <p>
+                    Les votes sont malheureusement figés à présent.<br>
+                    Merci de votre compréhension.
+                </p>
+            </div>
+            
+            <div class="thank-you" id="thankYou">
+                <h2>✨ Merci ! ✨</h2>
+                <p id="thankYouText">
+                    Merci d'avoir voté !<br><br>
+                    N'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives
+                </p>
+            </div>
         </div>
 
-        <!-- Loading -->
-        <div id="loadingMessage" class="message hidden">
-            <div class="spinner"></div>
-            <p>Loading...</p>
-        </div>
-
-        <!-- Thank You -->
-        <div id="thankYou" class="message hidden">
-            <h2>✓ Thank You!</h2>
-            <p>Your vote has been recorded.</p>
-        </div>
-
-        <!-- Already Voted -->
-        <div id="alreadyVoted" class="message hidden">
-            <h2>Already Voted!</h2>
-            <p>Thank you for your participation.</p>
-        </div>
-
-        <!-- Error -->
-        <div id="errorMessage" class="message hidden">
-            <h2>⚠️ Error</h2>
-            <p id="errorText">An error occurred. Please try again later.</p>
-        </div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
     </div>
 
     <script>
-        const COOKIE_CONSENT_NAME = 'vote_cookie_consent';
-        const VOTED_COOKIE_NAME = 'has_voted';
-        let supabaseClient = null;
+        let supabaseClient;
+        let hasVoted = false;
         let sessionId = null;
+        let selectedPlayerId = null;
+        const COOKIE_CONSENT_NAME = 'judo_cookie_consent';
+        const COOKIE_VOTED_NAME = 'judo_has_voted';
 
-        // Cookie Management
+        // ============================================
+        // COOKIE UTILITIES
+        // ============================================
+
         function setCookie(name, value, days) {
             const expires = new Date(Date.now() + days * 864e5).toUTCString();
             document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+            console.log('🍪 Cookie créé:', name, '=', value);
         }
 
         function getCookie(name) {
-            return document.cookie.split('; ').reduce((r, v) => {
+            const value = document.cookie.split('; ').reduce((r, v) => {
                 const parts = v.split('=');
                 return parts[0] === name ? decodeURIComponent(parts[1]) : r;
             }, '');
+            console.log('🔍 Lecture cookie:', name, '=', value || '(vide)');
+            return value;
         }
 
         function deleteCookie(name) {
             document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+            console.log('🗑️ Cookie supprimé:', name);
         }
 
         function generateSessionId() {
-            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            return 'judo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Check consent on load
+        // ============================================
+        // CONSENT MANAGEMENT
+        // ============================================
+
         function checkCookieConsent() {
             const consent = getCookie(COOKIE_CONSENT_NAME);
             
             if (consent === 'accepted') {
-                initializeVoting();
+                sessionId = generateSessionId();
+                initSupabase();
             } else if (consent === 'declined') {
                 showConsentDeclined();
             } else {
@@ -555,13 +738,26 @@
             document.getElementById('consentDeclined').classList.remove('hidden');
         }
 
+        function showPrivacyPolicy() {
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('privacyPolicy').classList.remove('hidden');
+        }
+
+        function backToConsent() {
+            document.getElementById('privacyPolicy').classList.add('hidden');
+            document.getElementById('cookieConsent').classList.remove('hidden');
+        }
+
         function acceptCookies() {
+            console.log('🍪 Acceptation des cookies...');
             setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
             document.getElementById('cookieConsent').classList.add('hidden');
-            initializeVoting();
+            sessionId = generateSessionId();
+            initSupabase();
         }
 
         function declineCookies() {
+            console.log('❌ Refus des cookies...');
             setCookie(COOKIE_CONSENT_NAME, 'declined', 365);
             document.getElementById('cookieConsent').classList.add('hidden');
             showConsentDeclined();
@@ -573,17 +769,7 @@
             showCookieConsent();
         }
 
-        function showPrivacyPolicy() {
-            document.getElementById('cookieConsent').classList.add('hidden');
-            document.getElementById('privacyPolicy').classList.remove('hidden');
-        }
-
-        function backToConsent() {
-            document.getElementById('privacyPolicy').classList.add('hidden');
-            document.getElementById('cookieConsent').classList.remove('hidden');
-        }
-
-        // Event listeners
+        // Event listeners for consent
         document.getElementById('btnAcceptCookies').addEventListener('click', acceptCookies);
         document.getElementById('btnDeclineCookies').addEventListener('click', declineCookies);
         document.getElementById('linkPrivacyPolicy').addEventListener('click', function(e) {
@@ -593,135 +779,255 @@
         document.getElementById('btnBackToConsent').addEventListener('click', backToConsent);
         document.getElementById('btnRetryConsent').addEventListener('click', retryConsent);
 
-        // Initialize voting system
-        async function initializeVoting() {
-            if (!await initSupabase()) return;
-            
-            sessionId = generateSessionId();
-            
-            // Check if already voted
-            if (getCookie(VOTED_COOKIE_NAME) === 'true') {
-                showAlreadyVoted();
-                return;
-            }
-            
-            await loadData();
-        }
+        // ============================================
+        // SUPABASE INITIALIZATION
+        // ============================================
 
         async function initSupabase() {
             try {
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showError('Configuration error. Please contact administrator.');
+                    showError('Configuration manquante. Contactez l\'administrateur.');
                     return false;
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                document.getElementById('mainContent').classList.remove('hidden');
+                
+                await loadMessages();
+                await checkIfVotesFrozen();
+                
                 return true;
             } catch (error) {
-                showError('Connection error: ' + error.message);
+                showError('Erreur de connexion: ' + error.message);
                 return false;
             }
         }
 
-        async function loadData() {
+        // ============================================
+        // CHECK IF VOTES ARE FROZEN
+        // ============================================
+
+        async function checkIfVotesFrozen() {
             try {
-                document.getElementById('loadingMessage').classList.remove('hidden');
-                
-                // Load settings
-                const { data: settings } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('settings')
-                    .select('*')
-                    .single();
-
-                if (settings) {
-                    document.getElementById('titleText').textContent = settings.titre || 'Vote for Your Champion';
-                    document.getElementById('logoImg').src = settings.logo_url || '';
+                    .select('value')
+                    .eq('key', 'votes_frozen')
+                    .maybeSingle();
+                
+                if (data && data.value === 'true') {
+                    console.log('❄️ Les votes sont figés');
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('votesFrozen').classList.add('show');
+                    await loadLogo();
+                    return;
                 }
+                
+                // Votes not frozen, check if already voted
+                const alreadyVoted = getCookie(COOKIE_VOTED_NAME) === 'true';
+                
+                if (alreadyVoted) {
+                    console.log('✓ Utilisateur a déjà voté');
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('thankYou').classList.add('show');
+                    await loadLogo();
+                    return;
+                }
+                
+                // Load the voting interface
+                await loadData();
+                
+            } catch (error) {
+                console.error('Erreur vérification gel:', error);
+                await loadData();
+            }
+        }
 
-                // Load players
-                const { data: players } = await supabaseClient
+        // ============================================
+        // LOAD SURVEY DATA
+        // ============================================
+
+        async function loadData() {
+            if (!supabaseClient) return;
+            
+            try {
+                document.getElementById('loadingMessage').style.display = 'block';
+                
+                await loadLogo();
+                
+                const { data: playersData, error: playersError } = await supabaseClient
                     .from('players')
                     .select('*')
-                    .order('ordre');
-
-                if (players && players.length > 0) {
-                    displayPlayers(players);
-                    document.getElementById('loadingMessage').classList.add('hidden');
-                    document.getElementById('voteSection').classList.remove('hidden');
-                } else {
-                    showError('No players available.');
-                }
-            } catch (error) {
-                showError('Error loading data: ' + error.message);
-            }
-        }
-
-        function displayPlayers(players) {
-            const container = document.getElementById('playersContainer');
-            container.innerHTML = '';
-
-            players.forEach(player => {
-                const btn = document.createElement('button');
-                btn.className = 'button';
-                btn.textContent = player.nom;
-                btn.onclick = () => selectPlayer(player.id, btn);
-                container.appendChild(btn);
-            });
-        }
-
-        async function selectPlayer(playerId, buttonElement) {
-            const buttons = document.querySelectorAll('#playersContainer .button');
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.classList.add('disabled');
-            });
-
-            buttonElement.classList.add('selected');
-
-            await new Promise(resolve => setTimeout(resolve, 300));
-            await submitVote(playerId);
-        }
-
-        async function submitVote(playerId) {
-            document.getElementById('voteSection').classList.add('hidden');
-            document.getElementById('loadingMessage').classList.remove('hidden');
-
-            try {
-                await supabaseClient.from('votes').insert({
-                    player_id: playerId,
-                    session_id: sessionId
-                });
-
-                setCookie(VOTED_COOKIE_NAME, 'true', 1);
-
-                setTimeout(() => {
-                    document.getElementById('loadingMessage').classList.add('hidden');
-                    document.getElementById('thankYou').classList.remove('hidden');
-                }, 800);
-
-            } catch (error) {
-                console.error('Error submitting vote:', error);
-                showError('Error submitting your vote. Please try again.');
+                    .order('nom', { ascending: true });
                 
-                const buttons = document.querySelectorAll('#playersContainer .button');
-                buttons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.classList.remove('disabled');
+                if (playersError) throw playersError;
+                
+                const grid = document.getElementById('playersGrid');
+                grid.innerHTML = '';
+                
+                if (playersData && playersData.length > 0) {
+                    playersData.forEach(player => {
+                        const card = document.createElement('div');
+                        card.className = 'player-card';
+                        card.dataset.playerId = player.id;
+                        card.innerHTML = `
+                            <div class="player-name">${escapeHtml(player.nom)}</div>
+                            <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
+                        `;
+                        
+                        card.addEventListener('click', (e) => {
+                            if (!e.target.classList.contains('vote-button')) {
+                                selectPlayer(player.id);
+                            }
+                        });
+                        
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="color: #ffffff; text-align: center;">Aucun candidat disponible</p>';
+                }
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('voteSection').style.display = 'block';
+                
+            } catch (error) {
+                showError('Erreur de chargement: ' + error.message);
+            }
+        }
+
+        function selectPlayer(playerId) {
+            if (hasVoted) return;
+            
+            document.querySelectorAll('.player-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                selectedPlayerId = playerId;
+            }
+        }
+        
+        async function confirmVote(playerId) {
+            if (hasVoted) return;
+            
+            document.querySelectorAll('.player-card').forEach(card => {
+                if (card.dataset.playerId != playerId) {
+                    card.classList.add('disabled');
+                }
+            });
+            
+            await saveVote(playerId);
+        }
+
+        async function saveVote(playerId) {
+            if (!supabaseClient || !sessionId) return;
+            
+            try {
+                // Insert vote in database
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .insert({
+                        player_id: playerId,
+                        ip_address: sessionId
+                    });
+                
+                if (error) throw error;
+                
+                // Set cookie to prevent multiple votes
+                setCookie(COOKIE_VOTED_NAME, 'true', 1); // 1 day
+                
+                hasVoted = true;
+                
+                setTimeout(() => {
+                    document.getElementById('voteSection').style.display = 'none';
+                    document.getElementById('thankYou').classList.add('show');
+                }, 800);
+                
+            } catch (error) {
+                console.error('Erreur lors du vote:', error);
+                alert('Erreur lors de l\'enregistrement de votre vote. Veuillez réessayer.');
+                
+                document.querySelectorAll('.player-card').forEach(card => {
+                    card.classList.remove('disabled');
                 });
             }
         }
 
-        function showAlreadyVoted() {
-            document.getElementById('alreadyVoted').classList.remove('hidden');
+        async function loadLogo() {
+            try {
+                const { data: logoData, error: logoError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                const logoContainer = document.getElementById('logoContainer');
+                
+                if (logoError || !logoData || !logoData.value) {
+                    logoContainer.innerHTML = '';
+                    return;
+                }
+                
+                logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
+            } catch (error) {
+                console.error('Erreur chargement logo:', error);
+                document.getElementById('logoContainer').innerHTML = '';
+            }
+        }
+
+        async function loadMessages() {
+            try {
+                if (!supabaseClient) return;
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('key, value')
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou']);
+                
+                if (error) throw error;
+                
+                const map = {};
+                (data || []).forEach(row => {
+                    map[row.key] = row.value;
+                });
+                
+                if (map['msg_title']) {
+                    document.getElementById('pageTitle').textContent = map['msg_title'];
+                    document.title = map['msg_title'];
+                }
+                if (map['msg_invitation']) {
+                    document.getElementById('invitationText').innerHTML = map['msg_invitation'].replace(/\n/g, '<br>');
+                }
+                if (map['msg_thankyou']) {
+                    document.getElementById('thankYouText').innerHTML = map['msg_thankyou'].replace(/\n/g, '<br>');
+                }
+            } catch (e) {
+                console.warn('Erreur chargement messages:', e);
+            }
         }
 
         function showError(message) {
-            document.getElementById('errorText').textContent = message;
-            document.getElementById('errorMessage').classList.remove('hidden');
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
         }
 
-        // Start application
-        checkCookieConsent();
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkCookieConsent();
+        });
     </script>
 </body>
 </html>
