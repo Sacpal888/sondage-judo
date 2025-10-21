@@ -756,13 +756,13 @@
 
         async function updateVoteCount() {
             try {
-                const { data: playersData, error } = await supabaseClient
-                    .from('players')
-                    .select('votes');
+                const { count, error } = await supabaseClient
+                    .from('votes')
+                    .select('*', { count: 'exact', head: true });
                 
                 if (error) throw error;
                 
-                const totalVotes = playersData.reduce((sum, player) => sum + (player.votes || 0), 0);
+                const totalVotes = count || 0;
                 document.getElementById('totalVotesCount').textContent = totalVotes;
                 
                 const { data: allPlayers } = await supabaseClient
@@ -904,7 +904,7 @@
         }
 
         // ============================================
-        // CONTRÔLE DES VOTES - NOUVEAU SYSTÈME
+        // CONTRÔLE DES VOTES
         // ============================================
 
         async function loadVoteStatus() {
@@ -977,8 +977,8 @@
             
             try {
                 const { error } = await supabaseClient
-                    .from('players')
-                    .update({ votes: 0 })
+                    .from('votes')
+                    .delete()
                     .neq('id', 0);
                 
                 if (error) throw error;
