@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 Admin - Système de Vote</title>
-    
-    <!-- Supabase SDK -->
+    <title>Administration - Système de Vote</title>
+    <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="./config.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -30,18 +27,20 @@
         
         .header {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         
         .header h1 {
             color: #667eea;
-            font-size: 24px;
+            font-size: 32px;
         }
         
         .user-info {
@@ -59,139 +58,153 @@
             background: #dc3545;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
         }
         
         .logout-btn:hover {
             background: #c82333;
+            transform: translateY(-2px);
         }
         
         .section {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
         .section h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 20px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr;
+            max-width: 300px;
+            margin: 20px auto;
         }
         
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 30px;
+            border-radius: 12px;
             text-align: center;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
         
         .stat-value {
-            font-size: 32px;
+            font-size: 56px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         
         .stat-label {
-            font-size: 14px;
+            font-size: 18px;
             opacity: 0.9;
         }
         
         input[type="text"],
-        input[type="file"],
-        textarea {
+        input[type="file"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
+            margin: 10px 0;
             border: 2px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
         
-        textarea {
-            resize: vertical;
-            font-family: inherit;
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
         }
         
         button {
             background: #667eea;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
+            transition: all 0.3s;
+            margin: 5px;
         }
         
         button:hover {
             background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .player-list {
             list-style: none;
+            margin-top: 20px;
         }
         
         .player-item {
             background: #f8f9fa;
             padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+            margin: 10px 0;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: transform 0.3s;
+        }
+        
+        .player-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
         
         .player-info {
-            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
         .player-name {
-            font-weight: bold;
-            font-size: 16px;
+            font-weight: 600;
             color: #333;
+            font-size: 18px;
         }
         
-        .player-votes {
-            color: #667eea;
-            font-size: 14px;
-            margin-top: 5px;
+        .vote-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
         }
         
-        .player-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn-edit {
-            background: #28a745;
-        }
-        
-        .btn-delete {
+        .delete-btn {
             background: #dc3545;
+            padding: 8px 20px;
+            font-size: 14px;
         }
         
-        .btn-reset {
-            background: #ffc107;
-            color: #000;
+        .delete-btn:hover {
+            background: #c82333;
         }
         
         .status-message {
-            padding: 10px;
+            padding: 15px;
             border-radius: 5px;
             margin-top: 10px;
             display: none;
@@ -212,46 +225,6 @@
             color: #0c5460;
         }
         
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 90%;
-        }
-        
-        .modal-content h3 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-        
-        .logo-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin: 10px 0;
-        }
-        
-        #authLoading, #mainContainer {
-            transition: opacity 0.3s;
-        }
-        
         .hidden {
             display: none !important;
         }
@@ -262,13 +235,51 @@
             color: #555;
             font-weight: 500;
         }
+        
+        .logo-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .vote-control-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .reset-votes-btn {
+            background: #ff6b6b;
+        }
+        
+        .reset-votes-btn:hover {
+            background: #ee5a52;
+        }
+        
+        .freeze-votes-btn {
+            background: #4ecdc4;
+        }
+        
+        .freeze-votes-btn:hover {
+            background: #45b8b0;
+        }
+        
+        .unfreeze-votes-btn {
+            background: #95e1d3;
+        }
+        
+        .unfreeze-votes-btn:hover {
+            background: #7dd3c0;
+        }
     </style>
 </head>
 <body>
     <!-- Écran de chargement authentification -->
     <div id="authLoading" class="container">
         <div class="section" style="text-align: center; padding: 60px 20px;">
-            <div style="font-size: 48px; margin-bottom: 20px;">🔐</div>
+            <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
             <h2 style="color: white; margin-bottom: 15px;">Vérification de l'authentification...</h2>
             <p style="color: white; opacity: 0.9;">Veuillez patienter</p>
         </div>
@@ -294,14 +305,6 @@
                         <div class="stat-value" id="totalVotesCount">0</div>
                         <div class="stat-label">Votes totaux</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="playerCount">0</div>
-                        <div class="stat-label">Candidats</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="uniqueIPsCount">0</div>
-                        <div class="stat-label">IPs uniques</div>
-                    </div>
                 </div>
             </div>
 
@@ -309,7 +312,7 @@
             <div class="section">
                 <h2>🎨 Logo de l'Overlay</h2>
                 <input type="file" id="logoInput" accept="image/*" onchange="uploadLogo()">
-                <div id="logoPreview"></div>
+                <div id="logoPreview" class="logo-preview"></div>
                 <button onclick="deleteLogo()" style="background: #dc3545;">🗑️ Supprimer le logo</button>
                 <div id="logoStatus" class="status-message"></div>
             </div>
@@ -332,148 +335,64 @@
                 </div>
             </div>
 
-            <!-- Gestion des Votes -->
+            <!-- Contrôle des Votes -->
             <div class="section">
-                <h2>⚙️ Gestion des Votes</h2>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <label style="display: flex; align-items: center; cursor: pointer;">
-                        <input type="checkbox" id="singleVoteToggle" onchange="toggleSingleVote()" 
-                               style="width: auto; margin-right: 10px; transform: scale(1.5);">
-                        <span style="font-weight: normal;">
-                            <strong>Limiter à 1 vote par personne (IP)</strong><br>
-                            <small style="color: #666;">Décochez pour autoriser les votes multiples</small>
-                        </span>
-                    </label>
-                    <div id="voteStatusMessage" class="status-message"></div>
-                </div>
-                
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border: 2px solid #ffc107;">
-                    <p style="margin-bottom: 15px;"><strong>⚠️ Réinitialisation des votes</strong></p>
-                    <button onclick="resetVotes()" class="btn-reset">
+                <h2>🎯 Contrôle des Votes</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    Gérez l'état des votes : réinitialisez tous les votes ou figez/dégeler le système de vote.
+                </p>
+                <div class="vote-control-buttons">
+                    <button class="reset-votes-btn" onclick="resetAllVotes()">
                         🔄 Réinitialiser tous les votes
                     </button>
-                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                        Cette action supprime tous les votes de la table mais conserve les candidats
-                    </p>
+                    <button class="freeze-votes-btn" onclick="freezeVotes()">
+                        ❄️ Figer les votes
+                    </button>
+                    <button class="unfreeze-votes-btn" onclick="unfreezeVotes()">
+                        🔥 Dégeler les votes
+                    </button>
                 </div>
-                <div id="resetVotesStatus" class="status-message"></div>
-            </div>
-
-            <!-- Messages du Sondage -->
-            <div class="section">
-                <h2>✏️ Messages du Sondage</h2>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                    Personnalisez les messages affichés sur la page de vote
-                </p>
-                
-                <label for="msgTitle">Titre principal de la page de vote :</label>
-                <input type="text" id="msgTitle" placeholder="Coupe virtuelle du public" maxlength="100">
-                
-                <label for="msgInvitation">Message d'invitation au vote :</label>
-                <textarea id="msgInvitation" placeholder="Votez pour votre joueur(euse) favori(te) !" rows="2"></textarea>
-                
-                <label for="msgThankYou">Message de remerciement (après le vote) :</label>
-                <textarea id="msgThankYou" placeholder="Merci d'avoir voté !" rows="3"></textarea>
-                
-                <label for="msgAlreadyVoted">Message si déjà voté :</label>
-                <textarea id="msgAlreadyVoted" placeholder="Merci, votre vote a déjà été enregistré !" rows="3"></textarea>
-                
-                <button onclick="saveMessages()">💾 Enregistrer les messages</button>
-                <button onclick="resetMessagesToDefault()" style="background: #6c757d;">🔄 Réinitialiser</button>
-                <div id="messagesStatus" class="status-message"></div>
-            </div>
-
-            <!-- Messages des Résultats -->
-            <div class="section">
-                <h2>📊 Messages des Résultats</h2>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                    Personnalisez les messages affichés sur la page de résultats
-                </p>
-                
-                <label for="msgResultsTitle">Titre de la page des résultats :</label>
-                <input type="text" id="msgResultsTitle" placeholder="Résultats en Direct" maxlength="100">
-                
-                <label for="msgResultsSubtitle">Sous-titre :</label>
-                <input type="text" id="msgResultsSubtitle" placeholder="Coupe virtuelle du public 🥋" maxlength="100">
-                
-                <label for="msgResultsNoVotes">Message si aucun vote :</label>
-                <input type="text" id="msgResultsNoVotes" placeholder="Aucun vote pour le moment..." maxlength="100">
-                
-                <label for="msgResultsRefresh">Message de mise à jour :</label>
-                <input type="text" id="msgResultsRefresh" placeholder="Mise à jour en temps réel" maxlength="100">
-                
-                <button onclick="saveResultsMessages()">💾 Enregistrer les messages</button>
-                <button onclick="resetResultsMessagesToDefault()" style="background: #6c757d;">🔄 Réinitialiser</button>
-                <div id="resultsMessagesStatus" class="status-message"></div>
-            </div>
-
-            <!-- RGPD -->
-            <div class="section">
-                <h2>🔒 Gestion RGPD</h2>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                    Gérez les données personnelles conformément au RGPD
-                </p>
-                
-                <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <p style="margin-bottom: 10px;">
-                        <strong>Statistiques :</strong>
-                    </p>
-                    <p>📊 Nombre d'adresses IP stockées : <span id="ipCount" style="font-weight: bold;">0</span></p>
-                    <p>📅 Vote le plus ancien : il y a <span id="oldestVote" style="font-weight: bold;">0</span> jours</p>
-                </div>
-                
-                <button onclick="anonymizeOldIPs()" style="background: #17a2b8;">
-                    🔒 Anonymiser les IPs > 30 jours
-                </button>
-                <button onclick="deleteAllIPs()" style="background: #dc3545;">
-                    🗑️ Supprimer toutes les IPs
-                </button>
-                
-                <div id="rgpdStatus" class="status-message"></div>
-                
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 12px;">
-                    <p style="margin-bottom: 10px;"><strong>ℹ️ Informations légales :</strong></p>
-                    <p>• Les adresses IP sont stockées uniquement pour éviter les votes multiples</p>
-                    <p>• Recommandation RGPD : anonymiser les IPs après 30 jours</p>
-                    <p>• Ajoutez une mention sur votre page de vote</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal d'édition -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>✏️ Modifier le Candidat</h3>
-            <input type="text" id="editPlayerName" placeholder="Nouveau nom">
-            <div style="margin-top: 20px;">
-                <button onclick="saveEdit()" style="background: #28a745;">💾 Enregistrer</button>
-                <button onclick="closeEditModal()" style="background: #6c757d;">❌ Annuler</button>
+                <div id="voteControlStatus" class="status-message"></div>
             </div>
         </div>
     </div>
 
     <script>
         let supabaseClient;
-        let players = [];
-        let editingPlayerId = null;
         let currentUser = null;
+        let players = [];
+        let voteRefreshInterval = null;
+
+        // ============================================
+        // INITIALISATION
+        // ============================================
+
+        async function init() {
+            try {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                const isAuth = await checkAuth();
+                if (!isAuth) return;
+                
+                await loadData();
+                startVoteRefresh();
+                
+            } catch (error) {
+                console.error('Erreur initialisation:', error);
+                alert('Erreur : ' + error.message);
+            }
+        }
 
         // ============================================
         // AUTHENTIFICATION
         // ============================================
 
-        async function initSupabase() {
+        async function checkAuth() {
             try {
-                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    throw new Error('Configuration Supabase manquante');
-                }
-                
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
                 const { data: { session }, error } = await supabaseClient.auth.getSession();
                 
                 if (error || !session) {
+                    alert('⚠️ Vous devez être connecté');
                     redirectToLogin();
                     return false;
                 }
@@ -525,21 +444,12 @@
             if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
             
             try {
+                stopVoteRefresh();
                 await supabaseClient.auth.signOut();
                 redirectToLogin();
             } catch (error) {
                 console.error('Erreur déconnexion:', error);
             }
-        }
-
-        async function validateAdminBeforeAction() {
-            const isAdmin = await checkIfAdmin();
-            if (!isAdmin) {
-                alert('❌ Session expirée ou droits insuffisants');
-                redirectToLogin();
-                return false;
-            }
-            return true;
         }
 
         // ============================================
@@ -560,332 +470,78 @@
                 
                 players = playersData || [];
                 
-                // Charger les résultats avec les votes depuis v_results
-                await updatePlayerList();
+                displayPlayers();
+                await updateVoteCount();
                 
-                // Charger les autres données
-                await loadLogo();
-                await loadVotesStats();
-                await loadSingleVoteSetting();
-                await loadCustomMessages();
-                await loadResultsMessages();
-                await loadRGPDStats();
+                console.log('✅ Données chargées');
                 
             } catch (error) {
-                console.error('Erreur chargement:', error);
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
+                console.error('Erreur chargement données:', error);
+                showStatus('addPlayerStatus', '❌ Erreur de chargement', 'error');
             }
         }
 
-        async function updatePlayerList() {
+        function displayPlayers() {
             const playerList = document.getElementById('playerList');
-            playerList.innerHTML = '';
-            
-            document.getElementById('playerCount').textContent = players.length;
             
             if (players.length === 0) {
-                playerList.innerHTML = '<li style="text-align: center; color: #999; padding: 20px;">Aucun candidat</li>';
+                playerList.innerHTML = '<li style="text-align: center; padding: 20px; color: #999;">Aucun candidat pour le moment</li>';
                 return;
             }
             
-            // Charger les votes depuis v_results
+            playerList.innerHTML = players.map(player => `
+                <li class="player-item">
+                    <div class="player-info">
+                        <span class="player-name">${escapeHtml(player.name)}</span>
+                        <span class="vote-count">${player.votes || 0} votes</span>
+                    </div>
+                    <button class="delete-btn" onclick="deletePlayer(${player.id})">🗑️ Supprimer</button>
+                </li>
+            `).join('');
+        }
+
+        // ============================================
+        // RAFRAÎCHISSEMENT AUTOMATIQUE DES VOTES
+        // ============================================
+
+        function startVoteRefresh() {
+            // Mise à jour toutes les 2 secondes
+            voteRefreshInterval = setInterval(async () => {
+                await updateVoteCount();
+            }, 2000);
+        }
+
+        function stopVoteRefresh() {
+            if (voteRefreshInterval) {
+                clearInterval(voteRefreshInterval);
+                voteRefreshInterval = null;
+            }
+        }
+
+        async function updateVoteCount() {
             try {
-                const { data: results, error } = await supabaseClient
-                    .from('v_results')
-                    .select('*')
-                    .order('votes', { ascending: false });
+                const { data: playersData, error } = await supabaseClient
+                    .from('players')
+                    .select('votes');
                 
                 if (error) throw error;
                 
-                // Créer un map des votes par player_id
-                const votesMap = {};
-                if (results) {
-                    results.forEach(r => {
-                        votesMap[r.player_id] = {
-                            votes: r.votes || 0,
-                            percentage: r.percentage || 0
-                        };
-                    });
+                const totalVotes = playersData.reduce((sum, player) => sum + (player.votes || 0), 0);
+                document.getElementById('totalVotesCount').textContent = totalVotes;
+                
+                // Mettre à jour aussi la liste des joueurs
+                const { data: allPlayers } = await supabaseClient
+                    .from('players')
+                    .select('*')
+                    .order('id', { ascending: true });
+                
+                if (allPlayers) {
+                    players = allPlayers;
+                    displayPlayers();
                 }
                 
-                // Afficher les joueurs avec leurs votes
-                players.forEach(player => {
-                    const voteInfo = votesMap[player.id] || { votes: 0, percentage: 0 };
-                    
-                    const li = document.createElement('li');
-                    li.className = 'player-item';
-                    li.innerHTML = `
-                        <div class="player-info">
-                            <div class="player-name">${player.name}</div>
-                            <div class="player-votes">${voteInfo.votes} vote${voteInfo.votes > 1 ? 's' : ''} (${voteInfo.percentage.toFixed(1)}%)</div>
-                        </div>
-                        <div class="player-actions">
-                            <button class="btn-edit" onclick="editPlayer(${player.id})">✏️ Modifier</button>
-                            <button class="btn-delete" onclick="deletePlayer(${player.id})">🗑️ Supprimer</button>
-                        </div>
-                    `;
-                    playerList.appendChild(li);
-                });
             } catch (error) {
-                console.error('Erreur chargement résultats:', error);
-                // Afficher les joueurs sans les votes en cas d'erreur
-                players.forEach(player => {
-                    const li = document.createElement('li');
-                    li.className = 'player-item';
-                    li.innerHTML = `
-                        <div class="player-info">
-                            <div class="player-name">${player.name}</div>
-                            <div class="player-votes">0 vote</div>
-                        </div>
-                        <div class="player-actions">
-                            <button class="btn-edit" onclick="editPlayer(${player.id})">✏️ Modifier</button>
-                            <button class="btn-delete" onclick="deletePlayer(${player.id})">🗑️ Supprimer</button>
-                        </div>
-                    `;
-                    playerList.appendChild(li);
-                });
-            }
-        }
-
-        async function loadVotesStats() {
-            try {
-                // Total des votes
-                const { count: totalVotes, error: votesError } = await supabaseClient
-                    .from('votes')
-                    .select('*', { count: 'exact', head: true });
-                
-                if (votesError) throw votesError;
-                
-                document.getElementById('totalVotesCount').textContent = totalVotes || 0;
-                
-                // IPs uniques
-                const { data: uniqueIPs, error: ipsError } = await supabaseClient
-                    .from('votes')
-                    .select('ip_address');
-                
-                if (ipsError) throw ipsError;
-                
-                const uniqueCount = uniqueIPs ? new Set(uniqueIPs.map(v => v.ip_address)).size : 0;
-                document.getElementById('uniqueIPsCount').textContent = uniqueCount;
-                
-            } catch (error) {
-                console.error('Erreur chargement stats votes:', error);
-                document.getElementById('totalVotesCount').textContent = '?';
-                document.getElementById('uniqueIPsCount').textContent = '?';
-            }
-        }
-
-        async function refreshData() {
-            await loadData();
-            showStatus('addPlayerStatus', '✅ Données actualisées', 'success', 2000);
-        }
-
-        // ============================================
-        // GESTION DES CANDIDATS
-        // ============================================
-
-        async function addPlayer() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            const input = document.getElementById('playerName');
-            const name = input.value.trim();
-            
-            if (!name) {
-                showStatus('addPlayerStatus', '❌ Veuillez entrer un nom', 'error');
-                return;
-            }
-            
-            if (players.some(p => p.name === name)) {
-                showStatus('addPlayerStatus', '❌ Ce joueur existe déjà', 'error');
-                return;
-            }
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('players')
-                    .insert({ name: name });
-                
-                if (error) throw error;
-                
-                input.value = '';
-                await loadData();
-                showStatus('addPlayerStatus', '✅ Candidat ajouté', 'success', 2000);
-            } catch (error) {
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        function editPlayer(id) {
-            const player = players.find(p => p.id === id);
-            if (!player) return;
-            
-            editingPlayerId = id;
-            document.getElementById('editPlayerName').value = player.name;
-            document.getElementById('editModal').classList.add('show');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('show');
-            editingPlayerId = null;
-        }
-
-        async function saveEdit() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            const newName = document.getElementById('editPlayerName').value.trim();
-            
-            if (!newName) {
-                alert('❌ Le nom ne peut pas être vide');
-                return;
-            }
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('players')
-                    .update({ name: newName })
-                    .eq('id', editingPlayerId);
-                
-                if (error) throw error;
-                
-                closeEditModal();
-                await loadData();
-                showStatus('addPlayerStatus', '✅ Candidat modifié', 'success', 2000);
-            } catch (error) {
-                alert('❌ Erreur : ' + error.message);
-            }
-        }
-
-        async function deletePlayer(id) {
-            if (!await validateAdminBeforeAction()) return;
-            
-            const player = players.find(p => p.id === id);
-            if (!confirm(`Supprimer "${player.name}" ?\n\nLes votes associés seront également supprimés.`)) return;
-            
-            try {
-                // Supprimer d'abord les votes associés
-                await supabaseClient
-                    .from('votes')
-                    .delete()
-                    .eq('player_id', id);
-                
-                // Puis supprimer le joueur
-                const { error } = await supabaseClient
-                    .from('players')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) throw error;
-                
-                await loadData();
-                showStatus('addPlayerStatus', '✅ Candidat supprimé', 'success', 2000);
-            } catch (error) {
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        async function clearAll() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            if (!confirm('⚠️ ATTENTION : Supprimer TOUS les candidats et TOUS les votes ?\n\nCette action est IRRÉVERSIBLE.')) return;
-            if (!confirm('Êtes-vous ABSOLUMENT SÛR ?')) return;
-            
-            try {
-                // Supprimer tous les votes d'abord
-                await supabaseClient
-                    .from('votes')
-                    .delete()
-                    .neq('id', 0);
-                
-                // Puis supprimer tous les joueurs
-                const { error } = await supabaseClient
-                    .from('players')
-                    .delete()
-                    .neq('id', 0);
-                
-                if (error) throw error;
-                
-                await loadData();
-                showStatus('addPlayerStatus', '✅ Tout a été effacé', 'success', 2000);
-            } catch (error) {
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        // ============================================
-        // GESTION DES VOTES
-        // ============================================
-
-        async function resetVotes() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            if (!confirm('Réinitialiser tous les votes ?\n\nLes candidats seront conservés mais tous les votes seront supprimés.')) return;
-            
-            try {
-                showStatus('resetVotesStatus', '⏳ Réinitialisation en cours...', 'info');
-                
-                // Supprimer tous les votes de la table votes
-                const { error } = await supabaseClient
-                    .from('votes')
-                    .delete()
-                    .neq('id', 0);
-                
-                if (error) throw error;
-                
-                await loadVotesStats();
-                await updatePlayerList();
-                await loadRGPDStats();
-                
-                showStatus('resetVotesStatus', '✅ Tous les votes ont été réinitialisés', 'success', 3000);
-            } catch (error) {
-                showStatus('resetVotesStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        async function loadSingleVoteSetting() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .eq('key', 'single_vote_enabled')
-                    .single();
-                
-                const checkbox = document.getElementById('singleVoteToggle');
-                checkbox.checked = data ? data.value === 'true' : true;
-            } catch (error) {
-                document.getElementById('singleVoteToggle').checked = true;
-            }
-        }
-
-        async function toggleSingleVote() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            const enabled = document.getElementById('singleVoteToggle').checked;
-            
-            try {
-                showStatus('voteStatusMessage', '⏳ Enregistrement...', 'info');
-                
-                const { data: existing } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .eq('key', 'single_vote_enabled')
-                    .single();
-                
-                if (existing) {
-                    await supabaseClient
-                        .from('settings')
-                        .update({ value: String(enabled) })
-                        .eq('key', 'single_vote_enabled');
-                } else {
-                    await supabaseClient
-                        .from('settings')
-                        .insert({ key: 'single_vote_enabled', value: String(enabled) });
-                }
-                
-                showStatus('voteStatusMessage', 
-                    enabled ? '✅ Vote unique activé' : '✅ Votes multiples activés', 
-                    'success', 3000);
-            } catch (error) {
-                showStatus('voteStatusMessage', '❌ Erreur : ' + error.message, 'error');
+                console.error('Erreur mise à jour votes:', error);
             }
         }
 
@@ -893,315 +549,209 @@
         // GESTION DU LOGO
         // ============================================
 
-        async function loadLogo() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .eq('key', 'logo')
-                    .single();
-                
-                const preview = document.getElementById('logoPreview');
-                if (data && data.value) {
-                    preview.innerHTML = `<img src="${data.value}" class="logo-preview" alt="Logo">`;
-                } else {
-                    preview.innerHTML = '<p style="color: #999;">Aucun logo</p>';
-                }
-            } catch (error) {
-                document.getElementById('logoPreview').innerHTML = '<p style="color: #999;">Aucun logo</p>';
-            }
-        }
-
         async function uploadLogo() {
-            if (!await validateAdminBeforeAction()) return;
+            const fileInput = document.getElementById('logoInput');
+            const file = fileInput.files[0];
             
-            const file = document.getElementById('logoInput').files[0];
             if (!file) return;
             
+            if (!file.type.startsWith('image/')) {
+                showStatus('logoStatus', '❌ Veuillez sélectionner une image', 'error');
+                return;
+            }
+            
             try {
-                showStatus('logoStatus', '⏳ Upload en cours...', 'info');
-                
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     const base64 = e.target.result;
                     
-                    const { data: existing } = await supabaseClient
+                    const { error } = await supabaseClient
                         .from('settings')
-                        .select('*')
-                        .eq('key', 'logo')
-                        .single();
+                        .upsert({ 
+                            key: 'logo', 
+                            value: base64 
+                        }, { 
+                            onConflict: 'key' 
+                        });
                     
-                    if (existing) {
-                        await supabaseClient
-                            .from('settings')
-                            .update({ value: base64 })
-                            .eq('key', 'logo');
-                    } else {
-                        await supabaseClient
-                            .from('settings')
-                            .insert({ key: 'logo', value: base64 });
-                    }
+                    if (error) throw error;
                     
-                    await loadLogo();
-                    showStatus('logoStatus', '✅ Logo uploadé', 'success', 3000);
+                    document.getElementById('logoPreview').innerHTML = `<img src="${base64}" alt="Logo">`;
+                    showStatus('logoStatus', '✅ Logo uploadé avec succès', 'success');
                 };
+                
                 reader.readAsDataURL(file);
+                
             } catch (error) {
-                showStatus('logoStatus', '❌ Erreur : ' + error.message, 'error');
+                console.error('Erreur upload logo:', error);
+                showStatus('logoStatus', '❌ Erreur upload', 'error');
             }
         }
 
         async function deleteLogo() {
-            if (!await validateAdminBeforeAction()) return;
             if (!confirm('Supprimer le logo ?')) return;
             
             try {
-                await supabaseClient
+                const { error } = await supabaseClient
                     .from('settings')
                     .delete()
                     .eq('key', 'logo');
                 
-                await loadLogo();
-                showStatus('logoStatus', '✅ Logo supprimé', 'success', 3000);
-            } catch (error) {
-                showStatus('logoStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        // ============================================
-        // MESSAGES PERSONNALISÉS
-        // ============================================
-
-        const DEFAULT_MESSAGES = {
-            title: 'Coupe virtuelle du public',
-            invitation: 'Votez pour votre joueur(euse) favori(te) !',
-            thankYou: 'Merci d\'avoir voté !',
-            alreadyVoted: 'Merci, votre vote a déjà été enregistré !'
-        };
-
-        async function loadCustomMessages() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
-                
                 if (error) throw error;
                 
-                const messages = {};
-                if (data) {
-                    data.forEach(item => messages[item.key] = item.value);
-                }
+                document.getElementById('logoPreview').innerHTML = '';
+                document.getElementById('logoInput').value = '';
+                showStatus('logoStatus', '✅ Logo supprimé', 'success');
                 
-                document.getElementById('msgTitle').value = messages.msg_title || DEFAULT_MESSAGES.title;
-                document.getElementById('msgInvitation').value = messages.msg_invitation || DEFAULT_MESSAGES.invitation;
-                document.getElementById('msgThankYou').value = messages.msg_thankyou || DEFAULT_MESSAGES.thankYou;
-                document.getElementById('msgAlreadyVoted').value = messages.msg_alreadyvoted || DEFAULT_MESSAGES.alreadyVoted;
             } catch (error) {
-                console.error('Erreur chargement messages:', error);
+                console.error('Erreur suppression logo:', error);
+                showStatus('logoStatus', '❌ Erreur suppression', 'error');
             }
-        }
-
-        async function saveMessages() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            try {
-                showStatus('messagesStatus', '⏳ Enregistrement...', 'info');
-                
-                const messages = [
-                    { key: 'msg_title', value: document.getElementById('msgTitle').value || DEFAULT_MESSAGES.title },
-                    { key: 'msg_invitation', value: document.getElementById('msgInvitation').value || DEFAULT_MESSAGES.invitation },
-                    { key: 'msg_thankyou', value: document.getElementById('msgThankYou').value || DEFAULT_MESSAGES.thankYou },
-                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
-                ];
-                
-                for (const msg of messages) {
-                    const { data: existing } = await supabaseClient
-                        .from('settings')
-                        .select('*')
-                        .eq('key', msg.key)
-                        .single();
-                    
-                    if (existing) {
-                        await supabaseClient
-                            .from('settings')
-                            .update({ value: msg.value })
-                            .eq('key', msg.key);
-                    } else {
-                        await supabaseClient
-                            .from('settings')
-                            .insert(msg);
-                    }
-                }
-                
-                showStatus('messagesStatus', '✅ Messages enregistrés', 'success', 3000);
-            } catch (error) {
-                showStatus('messagesStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        async function resetMessagesToDefault() {
-            document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
-            document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
-            document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
-            document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
-            await saveMessages();
-        }
-
-        const DEFAULT_RESULTS_MESSAGES = {
-            title: 'Résultats en Direct',
-            subtitle: 'Coupe virtuelle du public 🥋',
-            noVotes: 'Aucun vote pour le moment...',
-            refresh: 'Mise à jour en temps réel'
-        };
-
-        async function loadResultsMessages() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .in('key', ['msg_results_title', 'msg_results_subtitle', 'msg_results_no_votes', 'msg_results_refresh']);
-                
-                if (error) throw error;
-                
-                const messages = {};
-                if (data) {
-                    data.forEach(item => messages[item.key] = item.value);
-                }
-                
-                document.getElementById('msgResultsTitle').value = messages.msg_results_title || DEFAULT_RESULTS_MESSAGES.title;
-                document.getElementById('msgResultsSubtitle').value = messages.msg_results_subtitle || DEFAULT_RESULTS_MESSAGES.subtitle;
-                document.getElementById('msgResultsNoVotes').value = messages.msg_results_no_votes || DEFAULT_RESULTS_MESSAGES.noVotes;
-                document.getElementById('msgResultsRefresh').value = messages.msg_results_refresh || DEFAULT_RESULTS_MESSAGES.refresh;
-            } catch (error) {
-                console.error('Erreur chargement messages résultats:', error);
-            }
-        }
-
-        async function saveResultsMessages() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            try {
-                showStatus('resultsMessagesStatus', '⏳ Enregistrement...', 'info');
-                
-                const messages = [
-                    { key: 'msg_results_title', value: document.getElementById('msgResultsTitle').value || DEFAULT_RESULTS_MESSAGES.title },
-                    { key: 'msg_results_subtitle', value: document.getElementById('msgResultsSubtitle').value || DEFAULT_RESULTS_MESSAGES.subtitle },
-                    { key: 'msg_results_no_votes', value: document.getElementById('msgResultsNoVotes').value || DEFAULT_RESULTS_MESSAGES.noVotes },
-                    { key: 'msg_results_refresh', value: document.getElementById('msgResultsRefresh').value || DEFAULT_RESULTS_MESSAGES.refresh }
-                ];
-                
-                for (const msg of messages) {
-                    const { data: existing } = await supabaseClient
-                        .from('settings')
-                        .select('*')
-                        .eq('key', msg.key)
-                        .single();
-                    
-                    if (existing) {
-                        await supabaseClient
-                            .from('settings')
-                            .update({ value: msg.value })
-                            .eq('key', msg.key);
-                    } else {
-                        await supabaseClient
-                            .from('settings')
-                            .insert(msg);
-                    }
-                }
-                
-                showStatus('resultsMessagesStatus', '✅ Messages enregistrés', 'success', 3000);
-            } catch (error) {
-                showStatus('resultsMessagesStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        async function resetResultsMessagesToDefault() {
-            document.getElementById('msgResultsTitle').value = DEFAULT_RESULTS_MESSAGES.title;
-            document.getElementById('msgResultsSubtitle').value = DEFAULT_RESULTS_MESSAGES.subtitle;
-            document.getElementById('msgResultsNoVotes').value = DEFAULT_RESULTS_MESSAGES.noVotes;
-            document.getElementById('msgResultsRefresh').value = DEFAULT_RESULTS_MESSAGES.refresh;
-            await saveResultsMessages();
         }
 
         // ============================================
-        // GESTION RGPD
+        // GESTION DES JOUEURS
         // ============================================
 
-        async function loadRGPDStats() {
-            try {
-                const { data: votes, error, count } = await supabaseClient
-                    .from('votes')
-                    .select('voted_at', { count: 'exact' })
-                    .order('voted_at', { ascending: true });
-                
-                if (error) throw error;
-                
-                document.getElementById('ipCount').textContent = count || 0;
-                
-                if (votes && votes.length > 0) {
-                    const oldestVote = new Date(votes[0].voted_at);
-                    const today = new Date();
-                    const daysDiff = Math.floor((today - oldestVote) / (1000 * 60 * 60 * 24));
-                    document.getElementById('oldestVote').textContent = daysDiff;
-                } else {
-                    document.getElementById('oldestVote').textContent = '0';
-                }
-            } catch (error) {
-                console.error('Erreur stats RGPD:', error);
+        async function addPlayer() {
+            const nameInput = document.getElementById('playerName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showStatus('addPlayerStatus', '⚠️ Veuillez entrer un nom', 'error');
+                return;
             }
-        }
-
-        async function anonymizeOldIPs() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            if (!confirm('Anonymiser toutes les adresses IP de plus de 30 jours ?\n\nLes votes seront conservés mais les IPs seront remplacées par "anonymized".')) return;
             
             try {
-                showStatus('rgpdStatus', '⏳ Anonymisation en cours...', 'info');
-                
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                
                 const { error } = await supabaseClient
-                    .from('votes')
-                    .update({ ip_address: 'anonymized' })
-                    .lt('voted_at', thirtyDaysAgo.toISOString());
+                    .from('players')
+                    .insert({ name: name, votes: 0 });
                 
                 if (error) throw error;
                 
-                await loadRGPDStats();
-                await loadVotesStats();
+                nameInput.value = '';
+                showStatus('addPlayerStatus', '✅ Candidat ajouté', 'success');
+                await loadData();
                 
-                showStatus('rgpdStatus', '✅ IPs anciennes anonymisées', 'success', 3000);
             } catch (error) {
-                showStatus('rgpdStatus', '❌ Erreur : ' + error.message, 'error');
+                console.error('Erreur ajout joueur:', error);
+                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
             }
         }
 
-        async function deleteAllIPs() {
-            if (!await validateAdminBeforeAction()) return;
-            
-            if (!confirm('⚠️ ATTENTION : Supprimer TOUTES les adresses IP ?\n\nTOUS LES VOTES seront supprimés. Action IRRÉVERSIBLE.')) return;
-            if (!confirm('Êtes-vous ABSOLUMENT SÛR ?')) return;
+        async function deletePlayer(playerId) {
+            if (!confirm('Supprimer ce candidat ?')) return;
             
             try {
-                showStatus('rgpdStatus', '⏳ Suppression en cours...', 'info');
-                
                 const { error } = await supabaseClient
-                    .from('votes')
+                    .from('players')
+                    .delete()
+                    .eq('id', playerId);
+                
+                if (error) throw error;
+                
+                await loadData();
+                
+            } catch (error) {
+                console.error('Erreur suppression joueur:', error);
+                alert('❌ Erreur suppression');
+            }
+        }
+
+        async function clearAll() {
+            if (!confirm('⚠️ ATTENTION : Supprimer TOUS les candidats ?\nCette action est irréversible !')) return;
+            if (!confirm('Êtes-vous VRAIMENT sûr ?')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('players')
                     .delete()
                     .neq('id', 0);
                 
                 if (error) throw error;
                 
-                await loadRGPDStats();
-                await loadVotesStats();
-                await updatePlayerList();
+                await loadData();
+                alert('✅ Tous les candidats ont été supprimés');
                 
-                showStatus('rgpdStatus', '✅ Toutes les IPs et votes ont été supprimés', 'success', 3000);
             } catch (error) {
-                showStatus('rgpdStatus', '❌ Erreur : ' + error.message, 'error');
+                console.error('Erreur suppression totale:', error);
+                alert('❌ Erreur : ' + error.message);
+            }
+        }
+
+        async function refreshData() {
+            await loadData();
+        }
+
+        // ============================================
+        // CONTRÔLE DES VOTES
+        // ============================================
+
+        async function resetAllVotes() {
+            if (!confirm('⚠️ ATTENTION : Réinitialiser TOUS les votes à zéro ?\nCette action est irréversible !')) return;
+            if (!confirm('Confirmez-vous la réinitialisation de tous les votes ?')) return;
+            
+            try {
+                // Réinitialiser tous les votes à 0
+                const { error } = await supabaseClient
+                    .from('players')
+                    .update({ votes: 0 })
+                    .neq('id', 0);
+                
+                if (error) throw error;
+                
+                showStatus('voteControlStatus', '✅ Tous les votes ont été réinitialisés', 'success');
+                await loadData();
+                
+            } catch (error) {
+                console.error('Erreur réinitialisation votes:', error);
+                showStatus('voteControlStatus', '❌ Erreur : ' + error.message, 'error');
+            }
+        }
+
+        async function freezeVotes() {
+            if (!confirm('Figer les votes ? Les utilisateurs ne pourront plus voter.')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .upsert({ 
+                        key: 'votes_frozen', 
+                        value: 'true' 
+                    }, { 
+                        onConflict: 'key' 
+                    });
+                
+                if (error) throw error;
+                
+                showStatus('voteControlStatus', '❄️ Les votes sont maintenant figés', 'success');
+                
+            } catch (error) {
+                console.error('Erreur gel votes:', error);
+                showStatus('voteControlStatus', '❌ Erreur : ' + error.message, 'error');
+            }
+        }
+
+        async function unfreezeVotes() {
+            if (!confirm('Dégeler les votes ? Les utilisateurs pourront à nouveau voter.')) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .upsert({ 
+                        key: 'votes_frozen', 
+                        value: 'false' 
+                    }, { 
+                        onConflict: 'key' 
+                    });
+                
+                if (error) throw error;
+                
+                showStatus('voteControlStatus', '🔥 Les votes sont maintenant dégelés', 'success');
+                
+            } catch (error) {
+                console.error('Erreur dégel votes:', error);
+                showStatus('voteControlStatus', '❌ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -1209,28 +759,32 @@
         // UTILITAIRES
         // ============================================
 
-        function showStatus(elementId, message, type, duration = 0) {
+        function showStatus(elementId, message, type) {
             const element = document.getElementById(elementId);
             element.textContent = message;
             element.className = `status-message status-${type}`;
             element.style.display = 'block';
             
-            if (duration > 0) {
-                setTimeout(() => {
-                    element.style.display = 'none';
-                }, duration);
-            }
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // ============================================
-        // INITIALISATION
+        // DÉMARRAGE
         // ============================================
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const initialized = await initSupabase();
-            if (initialized) {
-                await loadData();
-            }
+        window.addEventListener('DOMContentLoaded', init);
+        
+        // Nettoyer l'intervalle avant de quitter la page
+        window.addEventListener('beforeunload', () => {
+            stopVoteRefresh();
         });
     </script>
 </body>
