@@ -304,35 +304,105 @@
             font-weight: 500;
         }
 
+        /* ========================================
+           NOUVEAU STYLE POUR LES BOUTONS DE VOTE
+        ======================================== */
         .vote-control-buttons {
             display: flex;
             gap: 15px;
             margin-top: 20px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .vote-toggle-container {
+            display: flex;
+            gap: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .vote-toggle-btn {
+            background: #d3d3d3;
+            color: #666;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+            border-radius: 0;
+            position: relative;
+        }
+        
+        .vote-toggle-btn:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .vote-toggle-btn:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .vote-toggle-btn:hover:not(.active) {
+            background: #c0c0c0;
+            transform: none;
+        }
+        
+        .vote-toggle-btn.active {
+            background: #dc3545;
+            color: white;
+            box-shadow: 0 0 20px rgba(220, 53, 69, 0.5);
+            transform: none;
+        }
+        
+        .vote-toggle-btn.active::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
+        
+        .vote-toggle-btn.votes-active.active {
+            padding-left: 40px;
+        }
+        
+        .vote-toggle-btn.votes-frozen.active {
+            padding-left: 40px;
         }
         
         .reset-votes-btn {
             background: #ff6b6b;
+            margin-left: auto;
         }
         
         .reset-votes-btn:hover {
             background: #ee5a52;
         }
         
-        .freeze-votes-btn {
-            background: #4ecdc4;
-        }
-        
-        .freeze-votes-btn:hover {
-            background: #45b8b0;
-        }
-        
-        .unfreeze-votes-btn {
-            background: #95e1d3;
-        }
-        
-        .unfreeze-votes-btn:hover {
-            background: #7dd3c0;
+        .vote-status-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 15px;
         }
     </style>
 </head>
@@ -400,17 +470,20 @@
             <div class="section">
                 <h2>🎯 Contrôle des Votes</h2>
                 <p style="margin-bottom: 15px; color: #666;">
-                    Gérez l'état des votes : réinitialisez tous les votes ou figez/dégeler le système de vote.
+                    Gérez l'état des votes : activez ou gelez le système de vote, ou réinitialisez tous les votes.
                 </p>
                 <div class="vote-control-buttons">
+                    <span class="vote-status-label">État actuel :</span>
+                    <div class="vote-toggle-container">
+                        <button class="vote-toggle-btn votes-active active" id="btnVotesActive" onclick="setVoteStatus('active')">
+                            ✅ Votes activés
+                        </button>
+                        <button class="vote-toggle-btn votes-frozen" id="btnVotesFrozen" onclick="setVoteStatus('frozen')">
+                            ❄️ Votes gelés
+                        </button>
+                    </div>
                     <button class="reset-votes-btn" onclick="resetAllVotes()">
                         🔄 Réinitialiser tous les votes
-                    </button>
-                    <button class="freeze-votes-btn" onclick="freezeVotes()">
-                        ❄️ Figer les votes
-                    </button>
-                    <button class="unfreeze-votes-btn" onclick="unfreezeVotes()">
-                        🔥 Dégeler les votes
                     </button>
                 </div>
                 <div id="voteControlStatus" class="status-message"></div>
@@ -473,7 +546,7 @@
             <input type="text" id="editPlayerName" placeholder="Nouveau nom">
             <div style="margin-top: 20px;">
                 <button onclick="saveEdit()" style="background: #28a745;">💾 Enregistrer</button>
-                <button onclick="closeEditModal()" style="background: #6c757d;">❌ Annuler</button>
+                <button onclick="closeEditModal()" style="background: #6c757d;">✖ Annuler</button>
             </div>
         </div>
     </div>
@@ -509,7 +582,7 @@
                 
                 const isAdmin = await checkIfAdmin();
                 if (!isAdmin) {
-                    alert('❌ Accès refusé : vous n\'êtes pas administrateur');
+                    alert('✖ Accès refusé : vous n\'êtes pas administrateur');
                     redirectToLogin();
                     return false;
                 }
@@ -563,7 +636,7 @@
         async function validateAdminBeforeAction() {
             const isAdmin = await checkIfAdmin();
             if (!isAdmin) {
-                alert('❌ Session expirée ou droits insuffisants');
+                alert('✖ Session expirée ou droits insuffisants');
                 redirectToLogin();
                 return false;
             }
@@ -592,10 +665,11 @@
                 await updateVoteCount();
                 await loadCustomMessages();
                 await loadResultsMessages();
+                await loadVoteStatus();
                 
             } catch (error) {
                 console.error('Erreur chargement:', error);
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('addPlayerStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -633,7 +707,7 @@
                     li.className = 'player-item';
                     li.innerHTML = `
                         <div class="player-info">
-                            <div class="player-name">${escapeHtml(player.name)}</div>
+                            <div class="player-name">${escapeHtml(player.nom)}</div>
                             <div class="player-votes">${voteInfo.votes} vote${voteInfo.votes > 1 ? 's' : ''} (${voteInfo.percentage.toFixed(1)}%)</div>
                         </div>
                         <div class="player-actions">
@@ -650,7 +724,7 @@
                     li.className = 'player-item';
                     li.innerHTML = `
                         <div class="player-info">
-                            <div class="player-name">${escapeHtml(player.name)}</div>
+                            <div class="player-name">${escapeHtml(player.nom)}</div>
                             <div class="player-votes">0 vote</div>
                         </div>
                         <div class="player-actions">
@@ -722,19 +796,19 @@
             const name = input.value.trim();
             
             if (!name) {
-                showStatus('addPlayerStatus', '❌ Veuillez entrer un nom', 'error');
+                showStatus('addPlayerStatus', '✖ Veuillez entrer un nom', 'error');
                 return;
             }
             
-            if (players.some(p => p.name === name)) {
-                showStatus('addPlayerStatus', '❌ Ce joueur existe déjà', 'error');
+            if (players.some(p => p.nom === name)) {
+                showStatus('addPlayerStatus', '✖ Ce joueur existe déjà', 'error');
                 return;
             }
             
             try {
                 const { error } = await supabaseClient
                     .from('players')
-                    .insert({ name: name });
+                    .insert({ nom: name });
                 
                 if (error) throw error;
                 
@@ -742,7 +816,7 @@
                 await loadData();
                 showStatus('addPlayerStatus', '✅ Candidat ajouté', 'success', 2000);
             } catch (error) {
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('addPlayerStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -751,7 +825,7 @@
             if (!player) return;
             
             editingPlayerId = id;
-            document.getElementById('editPlayerName').value = player.name;
+            document.getElementById('editPlayerName').value = player.nom;
             document.getElementById('editModal').classList.add('show');
         }
 
@@ -766,14 +840,14 @@
             const newName = document.getElementById('editPlayerName').value.trim();
             
             if (!newName) {
-                alert('❌ Le nom ne peut pas être vide');
+                alert('✖ Le nom ne peut pas être vide');
                 return;
             }
             
             try {
                 const { error } = await supabaseClient
                     .from('players')
-                    .update({ name: newName })
+                    .update({ nom: newName })
                     .eq('id', editingPlayerId);
                 
                 if (error) throw error;
@@ -782,7 +856,7 @@
                 await loadData();
                 showStatus('addPlayerStatus', '✅ Candidat modifié', 'success', 2000);
             } catch (error) {
-                alert('❌ Erreur : ' + error.message);
+                alert('✖ Erreur : ' + error.message);
             }
         }
 
@@ -790,7 +864,7 @@
             if (!await validateAdminBeforeAction()) return;
             
             const player = players.find(p => p.id === id);
-            if (!confirm(`Supprimer "${player.name}" ?\n\nLes votes associés seront également supprimés.`)) return;
+            if (!confirm(`Supprimer "${player.nom}" ?\n\nLes votes associés seront également supprimés.`)) return;
             
             try {
                 await supabaseClient
@@ -808,7 +882,7 @@
                 await loadData();
                 showStatus('addPlayerStatus', '✅ Candidat supprimé', 'success', 2000);
             } catch (error) {
-                showStatus('addPlayerStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('addPlayerStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -825,13 +899,77 @@
                 await loadData();
                 alert('✅ Tous les candidats et votes ont été supprimés');
             } catch (error) {
-                alert('❌ Erreur : ' + error.message);
+                alert('✖ Erreur : ' + error.message);
             }
         }
 
         // ============================================
-        // CONTRÔLE DES VOTES
+        // CONTRÔLE DES VOTES - NOUVEAU SYSTÈME
         // ============================================
+
+        async function loadVoteStatus() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'votes_frozen')
+                    .maybeSingle();
+                
+                const btnActive = document.getElementById('btnVotesActive');
+                const btnFrozen = document.getElementById('btnVotesFrozen');
+                
+                if (data && data.value === 'true') {
+                    btnActive.classList.remove('active');
+                    btnFrozen.classList.add('active');
+                } else {
+                    btnActive.classList.add('active');
+                    btnFrozen.classList.remove('active');
+                }
+            } catch (error) {
+                console.error('Erreur chargement statut votes:', error);
+            }
+        }
+
+        async function setVoteStatus(status) {
+            if (!await validateAdminBeforeAction()) return;
+            
+            const isFrozen = status === 'frozen';
+            const message = isFrozen 
+                ? 'Geler les votes ? Les utilisateurs ne pourront plus voter.' 
+                : 'Activer les votes ? Les utilisateurs pourront voter.';
+            
+            if (!confirm(message)) return;
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .upsert({ 
+                        key: 'votes_frozen', 
+                        value: isFrozen ? 'true' : 'false'
+                    }, { 
+                        onConflict: 'key' 
+                    });
+                
+                if (error) throw error;
+                
+                const btnActive = document.getElementById('btnVotesActive');
+                const btnFrozen = document.getElementById('btnVotesFrozen');
+                
+                if (isFrozen) {
+                    btnActive.classList.remove('active');
+                    btnFrozen.classList.add('active');
+                    showStatus('voteControlStatus', '❄️ Les votes sont maintenant gelés', 'success');
+                } else {
+                    btnActive.classList.add('active');
+                    btnFrozen.classList.remove('active');
+                    showStatus('voteControlStatus', '✅ Les votes sont maintenant activés', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Erreur changement statut votes:', error);
+                showStatus('voteControlStatus', '✖ Erreur : ' + error.message, 'error');
+            }
+        }
 
         async function resetAllVotes() {
             if (!confirm('⚠️ ATTENTION : Réinitialiser TOUS les votes à zéro ?\nCette action est irréversible !')) return;
@@ -850,53 +988,7 @@
                 
             } catch (error) {
                 console.error('Erreur réinitialisation votes:', error);
-                showStatus('voteControlStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        async function freezeVotes() {
-            if (!confirm('Figer les votes ? Les utilisateurs ne pourront plus voter.')) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('settings')
-                    .upsert({ 
-                        key: 'votes_frozen', 
-                        value: 'true' 
-                    }, { 
-                        onConflict: 'key' 
-                    });
-                
-                if (error) throw error;
-                
-                showStatus('voteControlStatus', '❄️ Les votes sont maintenant figés', 'success');
-                
-            } catch (error) {
-                console.error('Erreur gel votes:', error);
-                showStatus('voteControlStatus', '❌ Erreur : ' + error.message, 'error');
-            }
-        }
-
-        async function unfreezeVotes() {
-            if (!confirm('Dégeler les votes ? Les utilisateurs pourront à nouveau voter.')) return;
-            
-            try {
-                const { error } = await supabaseClient
-                    .from('settings')
-                    .upsert({ 
-                        key: 'votes_frozen', 
-                        value: 'false' 
-                    }, { 
-                        onConflict: 'key' 
-                    });
-                
-                if (error) throw error;
-                
-                showStatus('voteControlStatus', '🔥 Les votes sont maintenant dégelés', 'success');
-                
-            } catch (error) {
-                console.error('Erreur dégel votes:', error);
-                showStatus('voteControlStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('voteControlStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -958,7 +1050,7 @@
                 };
                 reader.readAsDataURL(file);
             } catch (error) {
-                showStatus('logoStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('logoStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -975,7 +1067,7 @@
                 await loadLogo();
                 showStatus('logoStatus', '✅ Logo supprimé', 'success', 3000);
             } catch (error) {
-                showStatus('logoStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('logoStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -1047,7 +1139,7 @@
                 
                 showStatus('messagesStatus', '✅ Messages enregistrés', 'success', 3000);
             } catch (error) {
-                showStatus('messagesStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('messagesStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
@@ -1127,7 +1219,7 @@
                 
                 showStatus('resultsMessagesStatus', '✅ Messages enregistrés', 'success', 3000);
             } catch (error) {
-                showStatus('resultsMessagesStatus', '❌ Erreur : ' + error.message, 'error');
+                showStatus('resultsMessagesStatus', '✖ Erreur : ' + error.message, 'error');
             }
         }
 
