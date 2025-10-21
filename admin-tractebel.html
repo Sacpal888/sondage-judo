@@ -165,6 +165,15 @@
       background: #cc0000;
     }
 
+    .btn-warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e68900;
+    }
+
     .main-content {
       max-width: 1400px;
       margin: 0 auto;
@@ -830,6 +839,7 @@
               `<button class="btn btn-small btn-success" data-activate="${page.id}">🟢 Activate</button>` :
               `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`
             }
+            <button class="btn btn-small btn-warning" data-reset="${page.id}">🔄 Reset Votes</button>
             <button class="btn btn-small" data-edit="${page.id}">✏️ Edit</button>
             <button class="btn btn-small btn-danger" data-delete="${page.id}">🗑️ Delete</button>
           </div>
@@ -840,6 +850,10 @@
 
       document.querySelectorAll('[data-activate]').forEach(btn => {
         btn.addEventListener('click', () => activatePage(btn.dataset.activate));
+      });
+
+      document.querySelectorAll('[data-reset]').forEach(btn => {
+        btn.addEventListener('click', () => resetPageVotes(btn.dataset.reset));
       });
 
       document.querySelectorAll('[data-edit]').forEach(btn => {
@@ -861,6 +875,50 @@
         await loadPages();
       } catch (error) {
         console.error('Error:', error);
+        alert('❌ Error: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // 🔄 NOUVELLE FONCTION : RÉINITIALISER LES VOTES
+    // ============================================
+    
+    async function resetPageVotes(pageId) {
+      const page = allPages.find(p => p.id === pageId);
+      
+      if (!confirm(`⚠️ RESET VOTES FOR "${page.titre}"?\n\n⚠️ This will DELETE ALL VOTES for this page!\n\n⚠️ This action CANNOT be undone!\n\nType "RESET" to confirm.`)) {
+        return;
+      }
+
+      // Double confirmation avec prompt
+      const confirmation = prompt('Type "RESET" to confirm deletion of all votes:');
+      if (confirmation !== 'RESET') {
+        alert('❌ Reset cancelled');
+        return;
+      }
+
+      try {
+        // Supprimer les statistiques
+        const { error: statsError } = await sb
+          .from(CONFIG_TRACTEBEL.tables.stats)
+          .delete()
+          .eq('page_id', pageId);
+
+        if (statsError) throw statsError;
+
+        // Supprimer les votes
+        const { error: votesError } = await sb
+          .from(CONFIG_TRACTEBEL.tables.votes)
+          .delete()
+          .eq('page_id', pageId);
+
+        if (votesError) throw votesError;
+
+        alert('✅ All votes have been reset for this page!');
+        await loadPages();
+
+      } catch (error) {
+        console.error('Error resetting votes:', error);
         alert('❌ Error: ' + error.message);
       }
     }
