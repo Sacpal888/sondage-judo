@@ -414,28 +414,28 @@
 <body>
     <div class="container">
         <!-- Bouton RGPD vertical -->
-        <a href="rgpd.html" class="rgpd-button" target="_blank">Politique de confidentialitÃ©</a>
+        <a href="rgpd.html" class="rgpd-button" target="_blank">Politique de confidentialité</a>
         
         <div class="header">
             <div class="title-container">
                 <h1 id="pageTitle">Coupe virtuelle du public</h1>
-                <span class="kimono-icon">ðŸ¥‹</span>
+                <span class="kimono-icon">🥋</span>
             </div>
         </div>
         
         <div class="logo-container" id="logoContainer">
-            <!-- Le logo sera insÃ©rÃ© ici -->
+            <!-- Le logo sera inséré ici -->
         </div>
         
         <div id="loadingMessage" class="loading">
-            â³ Chargement...
+            ⏳ Chargement...
         </div>
         
         <div class="queue-message" id="queueMessage">
             <div class="queue-spinner"></div>
-            <h3>â³ Beaucoup de monde vote en ce moment !</h3>
+            <h3>⏳ Beaucoup de monde vote en ce moment !</h3>
             <p>Merci de patienter quelques secondes...<br>
-            Votre vote sera enregistrÃ© automatiquement.</p>
+            Votre vote sera enregistré automatiquement.</p>
             <p id="queueAttempt" style="font-size: 0.9em; color: #f0d46f; margin-top: 15px;">
                 Tentative <span id="attemptNumber">1</span>/5
             </p>
@@ -448,23 +448,23 @@
             
             <div id="voteSection">
                 <div class="players-grid" id="playersGrid">
-                    <!-- Les cartes des joueurs seront insÃ©rÃ©es ici -->
+                    <!-- Les cartes des joueurs seront insérées ici -->
                 </div>
             </div>
             
             <div class="already-voted" id="alreadyVoted">
-                <h3>âœ… Merci !</h3>
+                <h3>✅ Merci !</h3>
                 <p id="alreadyVotedText">
-                    Merci, votre vote a dÃ©jÃ  Ã©tÃ© enregistrÃ© !<br>
+                    Merci, votre vote a déjà été enregistré !<br>
                     Nous avons bien pris en compte votre participation.
                 </p>
             </div>
             
             <div class="thank-you" id="thankYou">
-                <h2>âœ¨ Merci ! âœ¨</h2>
+                <h2>✨ Merci ! ✨</h2>
                 <p id="thankYouText">
-                    Merci d'avoir votÃ© !<br><br>
-                    N'hÃ©sitez pas Ã  vous abonner pour plus de fun encore dans les prochains lives
+                    Merci d'avoir voté !<br><br>
+                    N'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives
                 </p>
             </div>
         </div>
@@ -577,7 +577,7 @@ async function loadSingleVoteSetting() {
                 const data = await response.json();
                 return data.ip;
             } catch (error) {
-                console.error('Erreur rÃ©cupÃ©ration IP:', error);
+                console.error('Erreur récupération IP:', error);
                 let fallbackId = localStorage.getItem('voter_id');
                 if (!fallbackId) {
                     fallbackId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -599,7 +599,7 @@ async function loadSingleVoteSetting() {
                 
                 return data && data.length > 0;
             } catch (error) {
-                console.error('Erreur vÃ©rification vote:', error);
+                console.error('Erreur vérification vote:', error);
                 return false;
             }
         }
@@ -645,7 +645,7 @@ async function loadSingleVoteSetting() {
                         card.dataset.playerId = player.id;
                         card.innerHTML = `
                             <div class="player-name">${player.name}</div>
-                            <button class="vote-button" onclick="confirmVote(${player.id})">âœ“ Voter</button>
+                            <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
                         `;
                         
                         card.addEventListener('click', (e) => {
@@ -671,12 +671,12 @@ async function loadSingleVoteSetting() {
         function selectPlayer(playerId) {
             if (hasVoted) return;
             
-            // Retirer la sÃ©lection de toutes les cartes
+            // Retirer la sélection de toutes les cartes
             document.querySelectorAll('.player-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
-            // SÃ©lectionner la carte cliquÃ©e
+            // Sélectionner la carte cliquée
             const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
             if (selectedCard) {
                 selectedCard.classList.add('selected');
@@ -687,7 +687,7 @@ async function loadSingleVoteSetting() {
         async function confirmVote(playerId) {
             if (hasVoted) return;
             
-            // DÃ©sactiver toutes les cartes sauf celle sÃ©lectionnÃ©e
+            // Désactiver toutes les cartes sauf celle sélectionnée
             document.querySelectorAll('.player-card').forEach(card => {
                 if (card.dataset.playerId != playerId) {
                     card.classList.add('disabled');
@@ -713,13 +713,13 @@ async function loadSingleVoteSetting() {
                 const logoContainer = document.getElementById('logoContainer');
                 
                 if (logoError) {
-                    console.log('Pas de logo trouvÃ©:', logoError.message);
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configurÃ©)</div>';
+                    console.log('Pas de logo trouvé:', logoError.message);
+                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configuré)</div>';
                     return;
                 }
                 
                 if (logoData && logoData.value) {
-                    console.log('Logo chargÃ©, taille:', logoData.value.length, 'caractÃ¨res');
+                    console.log('Logo chargé, taille:', logoData.value.length, 'caractères');
                     logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
                 } else {
                     console.log('Logo vide dans la base');
@@ -747,7 +747,7 @@ async function loadSingleVoteSetting() {
                         });
                     
                     if (error && error.code === '23505') {
-                        console.log('Vote dÃ©jÃ  enregistrÃ© (duplicate), considÃ©rÃ© comme succÃ¨s');
+                        console.log('Vote déjà enregistré (duplicate), considéré comme succès');
                         return;
                     }
                     
@@ -755,7 +755,7 @@ async function loadSingleVoteSetting() {
                 }, 'enregistrement vote');
                 
                 hideQueueMessage();
-                console.log('Vote enregistrÃ© avec succÃ¨s');
+                console.log('Vote enregistré avec succès');
                 if (singleVoteEnabled) {
                     hasVoted = true;
                     const vs = document.getElementById('voteSection'); if (vs) vs.style.display = 'none';
@@ -767,10 +767,10 @@ async function loadSingleVoteSetting() {
                     const av = document.getElementById('alreadyVoted'); if (av) av.classList.remove('show');
                 }
                 } catch (error) {
-                console.error('Erreur lors du vote aprÃ¨s tous les retries:', error);
+                console.error('Erreur lors du vote après tous les retries:', error);
                 hideQueueMessage();
                 
-                console.log('VÃ©rification finale si le vote est passÃ©...');
+                console.log('Vérification finale si le vote est passé...');
                 try {
                     const finalCheck = await supabaseClient
                         .from('votes')
@@ -779,7 +779,7 @@ async function loadSingleVoteSetting() {
                         .limit(1);
                     
                     if (finalCheck.data && finalCheck.data.length > 0) {
-                        console.log('âœ… Vote trouvÃ© dans la DB malgrÃ© l\'erreur rÃ©seau');
+                        console.log('✅ Vote trouvé dans la DB malgré l\'erreur réseau');
                         
                         if (singleVoteEnabled) {
                             hasVoted = true;
@@ -793,21 +793,21 @@ async function loadSingleVoteSetting() {
                         return;
                     }
                 } catch (checkError) {
-                    console.error('Erreur lors de la vÃ©rification finale:', checkError);
+                    console.error('Erreur lors de la vérification finale:', checkError);
                 }
                 
                 const voteSection = document.getElementById('voteSection');
                 voteSection.innerHTML = `
                     <div style="text-align: center; color: #ff6b6b; padding: 20px; background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 2px solid #dc3545;">
-                        <h3 style="margin-bottom: 10px;">ðŸ˜” Trop de monde vote en ce moment</h3>
-                        <p>Nous n'avons pas pu enregistrer votre vote immÃ©diatement.</p>
+                        <h3 style="margin-bottom: 10px;">😔 Trop de monde vote en ce moment</h3>
+                        <p>Nous n'avons pas pu enregistrer votre vote immédiatement.</p>
                         <p style="margin-top: 15px;">
                             <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">
-                                ðŸ”„ RÃ©essayer de voter
+                                🔄 Réessayer de voter
                             </button>
                         </p>
                         <p style="font-size: 0.9em; color: #aaa; margin-top: 10px;">
-                            Si votre vote Ã©tait dÃ©jÃ  passÃ©, nous vous le confirmerons
+                            Si votre vote était déjà passé, nous vous le confirmerons
                         </p>
                     </div>
                 `;
@@ -833,7 +833,7 @@ async function loadSingleVoteSetting() {
             document.getElementById('errorMessage').style.display = 'block';
         }
         
-        // --- FIX: charger les textes aprÃ¨s initSupabase, et simplifier la requÃªte comme pour "players"
+        // --- FIX: charger les textes après initSupabase, et simplifier la requête comme pour "players"
         async function loadMessages() {
             try {
                 if (!supabaseClient) return;
@@ -864,11 +864,11 @@ async function loadSingleVoteSetting() {
                     $('alreadyVotedText').innerHTML = (map['msg_alreadyvoted'] || $('alreadyVotedText').innerHTML).replace(/\n/g, '<br>');
                 }
             } catch (e) {
-                console.warn('loadMessages(): utilisation des valeurs par dÃ©faut (Ã©chec de chargement)', e);
+                console.warn('loadMessages(): utilisation des valeurs par défaut (échec de chargement)', e);
             }
         }
         
-        // Ordre corrigÃ©: init -> loadMessages -> loadData
+        // Ordre corrigé: init -> loadMessages -> loadData
         window.addEventListener('DOMContentLoaded', async () => {
             const initialized = await initSupabase();
             if (initialized) {
@@ -878,3 +878,4 @@ async function loadSingleVoteSetting() {
     </script>
 </body>
 </html>
+
