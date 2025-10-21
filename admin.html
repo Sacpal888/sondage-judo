@@ -146,6 +146,14 @@
             font-size: 1.3em;
         }
         
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
         input[type="text"], input[type="file"], textarea {
             width: 100%;
             padding: 12px;
@@ -356,6 +364,25 @@
         .modal-buttons button {
             flex: 1;
         }
+
+        .vote-count {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .vote-count h3 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .vote-count p {
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -414,9 +441,23 @@
             <button onclick="deleteLogo()" id="deleteLogoBtn" style="background: #dc3545; display: none; margin-top: 10px;">🗑️ Supprimer le logo</button>
         </div>
         
+        <!-- Section Titre et Messages -->
+        <div class="section">
+            <h2>✏️ Titre et Messages du Sondage</h2>
+            
+            <label for="surveyTitle">Titre du sondage :</label>
+            <input type="text" id="surveyTitle" placeholder="Vote for Your Champion" maxlength="100">
+            
+            <label for="surveyThankYou">Message de remerciement après vote :</label>
+            <textarea id="surveyThankYou" placeholder="Merci d'avoir voté !" rows="3" maxlength="500"></textarea>
+            
+            <button onclick="saveSurveySettings()" style="background: #28a745; margin-top: 15px;">💾 Enregistrer</button>
+            <button onclick="resetSurveySettings()" style="background: #6c757d;">🔄 Restaurer par défaut</button>
+        </div>
+        
         <!-- Section Manual Add -->
         <div class="section">
-            <h2>✏️ Ajout Manuel de Candidats</h2>
+            <h2>➕ Ajout Manuel de Candidats</h2>
             <input type="text" id="playerName" placeholder="Nom du joueur">
             <button onclick="addPlayer()">Ajouter</button>
         </div>
@@ -427,37 +468,27 @@
             <ul class="player-list" id="playerList"></ul>
             
             <div class="export-section">
-                <button onclick="clearAll()" style="background: #dc3545;">🗑️ Tout Effacer</button>
+                <button onclick="resetVotes()" style="background: #ffc107; color: #000;">🔄 Réinitialiser les votes uniquement</button>
+                <button onclick="clearAll()" style="background: #dc3545;">🗑️ Tout Effacer (candidats + votes)</button>
                 <button onclick="refreshData()">🔄 Actualiser</button>
+            </div>
+
+            <div class="vote-count">
+                <h3 id="totalVotes">0</h3>
+                <p>Votes enregistrés</p>
             </div>
         </div>
         
-        <!-- Section Vote Settings (WITHOUT IP tracking) -->
+        <!-- Section Vote Settings -->
         <div class="section">
             <h2>⚙️ Paramètres de Vote</h2>
             
             <div class="info-box">
                 <strong>ℹ️ Information :</strong><br>
-                Le système utilise maintenant des cookies pour gérer les votes.<br>
+                Le système utilise des cookies pour gérer les votes.<br>
                 Les utilisateurs doivent accepter les cookies avant de voter.<br>
                 Un cookie temporaire (24h) empêche les votes multiples depuis le même appareil.
             </div>
-        </div>
-
-        <!-- Section Messages Configuration -->
-        <div class="section">
-            <h2>💬 Configuration des Messages</h2>
-            
-            <label for="msgTitle">Titre du sondage :</label>
-            <input type="text" id="msgTitle" placeholder="Vote for Your Champion" maxlength="100">
-            
-            <label for="msgThankYou">Message de remerciement :</label>
-            <textarea id="msgThankYou" placeholder="Merci d'avoir voté !" rows="3" maxlength="500"></textarea>
-            
-            <button onclick="saveMessages()" style="background: #28a745; margin-top: 15px;">💾 Enregistrer les messages</button>
-            <button onclick="resetMessagesToDefault()" style="background: #6c757d;">🔄 Restaurer par défaut</button>
-            
-            <div id="messagesStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
         </div>
 
         <!-- Section Results Messages -->
@@ -606,8 +637,9 @@
         async function initAdmin() {
             await loadLogo();
             await loadPlayers();
-            await loadMessages();
+            await loadSurveySettings();
             await loadResultsMessages();
+            await loadVoteCount();
         }
         
         // ============================================
@@ -695,36 +727,65 @@
         }
         
         // ============================================
+        // SURVEY SETTINGS
+        // ============================================
+        
+        async function loadSurveySettings() {
+            try {
+                const title = await loadSetting('titre', DEFAULT_MESSAGES.title);
+                const thankYou = await loadSetting('thank_you_message', DEFAULT_MESSAGES.thankYou);
+                
+                document.getElementById('surveyTitle').value = title;
+                document.getElementById('surveyThankYou').value = thankYou;
+            } catch (error) {
+                console.error('Erreur chargement paramètres:', error);
+            }
+        }
+        
+        async function saveSurveySettings() {
+            const title = document.getElementById('surveyTitle').value.trim();
+            const thankYou = document.getElementById('surveyThankYou').value.trim();
+            
+            showStatus('💾 Enregistrement...', 'loading');
+            
+            try {
+                await saveSetting('titre', title || DEFAULT_MESSAGES.title);
+                await saveSetting('thank_you_message', thankYou || DEFAULT_MESSAGES.thankYou);
+                
+                showStatus('✅ Paramètres enregistrés avec succès', 'success');
+                
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function resetSurveySettings() {
+            if (!confirm('Restaurer les paramètres par défaut ?')) return;
+            
+            document.getElementById('surveyTitle').value = DEFAULT_MESSAGES.title;
+            document.getElementById('surveyThankYou').value = DEFAULT_MESSAGES.thankYou;
+            
+            await saveSurveySettings();
+        }
+        
+        // ============================================
         // PLAYERS MANAGEMENT
         // ============================================
         
         async function loadPlayers() {
             try {
-                console.log('🔍 Chargement des joueurs...');
-                
-                if (!supabaseClient) {
-                    console.error('❌ Supabase client non initialisé');
-                    showStatus('❌ Client Supabase non initialisé', 'error');
-                    return;
-                }
-                
                 const { data, error } = await supabaseClient
                     .from('players')
                     .select('*')
                     .order('ordre');
                 
-                if (error) {
-                    console.error('❌ Erreur Supabase:', error);
-                    throw error;
-                }
+                if (error) throw error;
                 
-                console.log('✅ Joueurs chargés:', data);
                 players = data || [];
                 displayPlayers();
                 
             } catch (error) {
-                console.error('❌ Erreur chargement joueurs:', error);
-                console.error('Détails:', error.message, error.code, error.details);
+                console.error('Erreur chargement joueurs:', error);
                 showStatus('❌ Erreur: ' + (error.message || 'Erreur inconnue'), 'error');
             }
         }
@@ -738,10 +799,13 @@
             players.forEach((player, index) => {
                 const li = document.createElement('li');
                 li.className = 'player-item';
+                
+                const safeName = (player.nom || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+                
                 li.innerHTML = `
-                    <span>${index + 1}. ${player.nom}</span>
+                    <span>${index + 1}. ${player.nom || 'Sans nom'}</span>
                     <div class="player-actions">
-                        <button class="edit-btn" onclick="openEditModal(${player.id}, '${player.nom.replace(/'/g, "\\'")}')">
+                        <button class="edit-btn" onclick="openEditModal(${player.id}, '${safeName}')">
                             ✏️ Modifier
                         </button>
                         <button class="delete-btn" onclick="deletePlayer(${player.id})">
@@ -765,7 +829,7 @@
             
             try {
                 const ordre = players.length > 0 
-                    ? Math.max(...players.map(p => p.ordre)) + 1 
+                    ? Math.max(...players.map(p => p.ordre || 0)) + 1 
                     : 1;
                 
                 const { error } = await supabaseClient
@@ -834,6 +898,25 @@
                 
                 showStatus('✅ Candidat supprimé', 'success');
                 await loadPlayers();
+                await loadVoteCount();
+                
+            } catch (error) {
+                showStatus('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function resetVotes() {
+            if (!confirm('⚠️ ATTENTION !\n\nRéinitialiser uniquement les votes ?\n\nLes candidats seront conservés.')) {
+                return;
+            }
+            
+            showStatus('Réinitialisation des votes...', 'loading');
+            
+            try {
+                await supabaseClient.from('votes').delete().neq('id', 0);
+                
+                showStatus('✅ Votes réinitialisés', 'success');
+                await loadVoteCount();
                 
             } catch (error) {
                 showStatus('❌ Erreur: ' + error.message, 'error');
@@ -853,6 +936,7 @@
                 
                 showStatus('✅ Tout a été effacé', 'success');
                 await loadPlayers();
+                await loadVoteCount();
                 
             } catch (error) {
                 showStatus('❌ Erreur: ' + error.message, 'error');
@@ -862,63 +946,22 @@
         async function refreshData() {
             showStatus('Actualisation...', 'loading');
             await loadPlayers();
+            await loadVoteCount();
             showStatus('✅ Données actualisées', 'success');
         }
         
-        // ============================================
-        // MESSAGES MANAGEMENT
-        // ============================================
-        
-        async function loadMessages() {
+        async function loadVoteCount() {
             try {
-                const title = await loadSetting('titre', DEFAULT_MESSAGES.title);
-                const thankYou = await loadSetting('thank_you_message', DEFAULT_MESSAGES.thankYou);
+                const { count, error } = await supabaseClient
+                    .from('votes')
+                    .select('*', { count: 'exact', head: true });
                 
-                document.getElementById('msgTitle').value = title;
-                document.getElementById('msgThankYou').value = thankYou;
+                if (!error) {
+                    document.getElementById('totalVotes').textContent = count || 0;
+                }
             } catch (error) {
-                console.error('Erreur chargement messages:', error);
+                console.error('Erreur chargement votes:', error);
             }
-        }
-        
-        async function saveMessages() {
-            const title = document.getElementById('msgTitle').value.trim();
-            const thankYou = document.getElementById('msgThankYou').value.trim();
-            
-            const statusDiv = document.getElementById('messagesStatus');
-            statusDiv.style.display = 'block';
-            statusDiv.style.background = '#fff3cd';
-            statusDiv.style.color = '#856404';
-            statusDiv.textContent = '💾 Enregistrement...';
-            
-            try {
-                await saveSetting('titre', title || DEFAULT_MESSAGES.title);
-                await saveSetting('thank_you_message', thankYou || DEFAULT_MESSAGES.thankYou);
-                
-                statusDiv.style.background = '#d4edda';
-                statusDiv.style.color = '#155724';
-                statusDiv.textContent = '✅ Messages enregistrés avec succès';
-                
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 3000);
-                
-            } catch (error) {
-                statusDiv.style.background = '#f8d7da';
-                statusDiv.style.color = '#721c24';
-                statusDiv.textContent = '❌ Erreur: ' + error.message;
-            }
-        }
-        
-        async function resetMessagesToDefault() {
-            if (!confirm('Restaurer tous les messages à leurs valeurs par défaut ?')) {
-                return;
-            }
-            
-            document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
-            document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
-            
-            await saveMessages();
         }
         
         // ============================================
