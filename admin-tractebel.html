@@ -518,7 +518,6 @@
   <div class="controls">
     <button class="btn btn-success" id="btnCreate">➕ Create New Page</button>
     <button class="btn" id="btnRefresh">🔄 Refresh</button>
-    <button class="btn btn-warning" id="btnResetVotes">🗑️ Reset All Votes</button>
   </div>
 
   <div class="main-content">
@@ -712,6 +711,7 @@
               `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`
             }
             <button class="btn btn-small" data-edit="${page.id}">✏️ Edit</button>
+            <button class="btn btn-small btn-warning" data-reset="${page.id}">🔄 Reset Votes</button>
             <button class="btn btn-small btn-danger" data-delete="${page.id}">🗑️ Delete</button>
           </div>
         `;
@@ -725,6 +725,10 @@
 
       document.querySelectorAll('[data-edit]').forEach(btn => {
         btn.addEventListener('click', () => editPage(btn.dataset.edit));
+      });
+
+      document.querySelectorAll('[data-reset]').forEach(btn => {
+        btn.addEventListener('click', () => resetPageVotes(btn.dataset.reset));
       });
 
       document.querySelectorAll('[data-delete]').forEach(btn => {
@@ -758,6 +762,21 @@
         await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ active: false }).neq('id', '00000000-0000-0000-0000-000000000000');
         await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ active: true }).eq('id', pageId);
         alert('✅ Page activated!');
+        await loadPages();
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error: ' + error.message);
+      }
+    }
+
+    async function resetPageVotes(pageId) {
+      const page = allPages.find(p => p.id === pageId);
+      if (!confirm(`Reset votes for "${page.titre}"?\n\nThis will delete all votes for this page only.\n\nThis action CANNOT be undone!`)) return;
+
+      try {
+        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
+        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
+        alert('✅ Votes reset for this page!');
         await loadPages();
       } catch (error) {
         console.error('Error:', error);
@@ -923,20 +942,6 @@
     document.getElementById('btnRefresh').addEventListener('click', loadPages);
     document.getElementById('btnCancel').addEventListener('click', closeModal);
     document.getElementById('btnAddChoice').addEventListener('click', () => addChoiceField());
-
-    document.getElementById('btnResetVotes').addEventListener('click', async () => {
-      if (!confirm('⚠️ Reset ALL votes for ALL pages?\n\nThis will:\n- Delete all votes\n- Delete all stats\n- Keep all pages and choices\n\nThis action CANNOT be undone!')) return;
-
-      try {
-        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        alert('✅ All votes have been reset!');
-        await loadPages();
-      } catch (error) {
-        console.error('Error resetting votes:', error);
-        alert('❌ Error: ' + error.message);
-      }
-    });
 
     document.getElementById('pageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
