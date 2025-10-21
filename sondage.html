@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coupe virtuelle du public</title>
+    <title>Public Virtual Cup</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -34,848 +34,694 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             position: relative;
         }
-        
-        /* Bouton RGPD vertical */
-        .rgpd-button {
-            position: absolute;
-            left: -123px;
-            top: 50%;
-            transform: translateY(-50%) rotate(-90deg);
-            transform-origin: center;
-            background: rgba(212, 175, 55, 0.9);
-            color: #0a1828;
-            padding: 8px 20px;
-            border-radius: 8px 8px 0 0;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
-            transition: all 0.3s;
-            white-space: nowrap;
-            cursor: pointer;
-            border: 2px solid #d4af37;
+
+        .hidden {
+            display: none !important;
         }
-        
-        .rgpd-button:hover {
-            background: rgba(240, 212, 111, 0.95);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
-            transform: translateY(-50%) rotate(-90deg) translateY(-3px);
-        }
-        
-        /* Responsive : sur mobile, mettre le bouton en bas */
-        @media (max-width: 600px) {
-            .rgpd-button {
-                position: fixed;
-                left: 50%;
-                top: auto;
-                bottom: 10px;
-                transform: translateX(-50%) rotate(0deg);
-                padding: 10px 20px;
-                border-radius: 8px;
-            }
-            
-            .rgpd-button:hover {
-                transform: translateX(-50%) translateY(-2px);
-            }
-        }
-        
-        .header {
+
+        /* Cookie Consent Screen */
+        .cookie-consent {
             text-align: center;
+            width: 100%;
+        }
+
+        .consent-content {
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 45px 35px;
+            background: rgba(26, 47, 74, 0.6);
+            border: 3px solid rgba(212, 175, 55, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .cookie-icon {
+            font-size: 4.5rem;
             margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-            position: relative;
+            animation: bounce 2s infinite;
         }
-        
-        .title-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        
-        h1 {
+
+        .consent-title {
+            font-size: 2rem;
+            font-weight: bold;
             color: #d4af37;
-            font-size: 1.8em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin: 0;
-        }
-        
-        .kimono-icon {
-            font-size: 2em;
-        }
-        
-        .logo-container {
-            margin: 20px auto;
-            text-align: center;
-            width: 100%;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-        }
-        
-        .logo-container img {
-            max-width: 90%;
-            max-height: 150px;
-            width: auto;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid #d4af37;
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-            display: block;
-            background: transparent;
-            object-fit: contain;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .logo-placeholder {
-            color: #666;
-            font-size: 0.9em;
-            font-style: italic;
-        }
-        
-        .vote-text {
-            color: #ffffff;
-            text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 25px;
-            font-weight: 500;
-        }
-        
-        /* Cartes des joueurs */
-        .players-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
             margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        .player-card {
-            background: rgba(26, 47, 74, 0.8);
-            border: 2px solid #d4af37;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .player-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .player-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-            border-color: #f0d46f;
-            background: rgba(26, 47, 74, 1);
-        }
-        
-        .player-card:hover::before {
-            left: 100%;
-        }
-        
-        .player-card.selected {
-            border: 3px solid #f0d46f;
-            background: rgba(212, 175, 55, 0.2);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            animation: pulse-gold 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-gold {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);
-            }
-        }
-        
-        .player-card.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-        
-        .player-card.disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .player-name {
+
+        .consent-text {
+            font-size: 1.1rem;
             color: #ffffff;
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 10px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        .player-card.selected .player-name {
+
+        .privacy-link {
+            color: #d4af37;
+            text-decoration: underline;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .privacy-link:hover {
             color: #f0d46f;
         }
-        
-        .vote-button {
-            background: #d4af37;
-            color: #0a1828;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
+
+        .consent-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-consent {
+            padding: 16px 35px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border: 3px solid #d4af37;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            width: 100%;
+        }
+
+        .btn-accept {
+            background: #28a745;
+            color: #ffffff;
+        }
+
+        .btn-accept:hover {
+            background: #218838;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        }
+
+        .btn-decline {
+            background: rgba(212, 175, 55, 0.2);
+            color: #ffffff;
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-decline:hover {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: #d4af37;
+            transform: translateY(-3px);
+        }
+
+        .btn-back {
+            background: #1a2f4a;
+            color: #ffffff;
+            border-color: #d4af37;
+        }
+
+        .btn-back:hover {
+            background: #0d2744;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Privacy Policy Screen */
+        .privacy-policy {
+            text-align: left;
+            width: 100%;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+
+        .privacy-content {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 35px 25px;
+        }
+
+        .policy-icon {
+            font-size: 3.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .privacy-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 30px;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .privacy-section {
+            background: rgba(26, 47, 74, 0.4);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-section:hover {
+            background: rgba(26, 47, 74, 0.6);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .privacy-section h3 {
+            font-size: 1.3rem;
+            color: #d4af37;
+            margin-bottom: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .privacy-section p {
+            font-size: 1rem;
+            color: #ffffff;
+            line-height: 1.7;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .privacy-section ul {
+            margin-left: 25px;
             margin-top: 10px;
-            display: none;
         }
-        
-        .player-card.selected .vote-button {
-            display: inline-block;
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .vote-button:hover {
-            background: #f0d46f;
-            transform: scale(1.05);
-        }
-        
-        .thank-you {
-            display: none;
-            text-align: center;
+
+        .privacy-section li {
+            font-size: 1rem;
             color: #ffffff;
-            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #d4af37;
-            animation: fadeInScale 0.5s ease-in;
+            line-height: 1.7;
+            margin-bottom: 8px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
-        .thank-you.show {
+
+        .privacy-buttons {
+            text-align: center;
+            margin-top: 35px;
+        }
+
+        /* Consent Declined Screen */
+        .consent-declined {
+            text-align: center;
+            width: 100%;
+        }
+
+        .declined-content {
+            max-width: 550px;
+            margin: 0 auto;
+            padding: 45px 35px;
+            background: rgba(26, 47, 74, 0.6);
+            border: 3px solid rgba(212, 175, 55, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .declined-icon {
+            font-size: 4.5rem;
+            margin-bottom: 25px;
+            opacity: 0.8;
+        }
+
+        .declined-title {
+            font-size: 1.85rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .declined-text {
+            font-size: 1.1rem;
+            color: #ffffff;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .declined-text-small {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            margin-top: 25px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Vote Form - Existing styles */
+        .logo {
+            max-width: 200px;
+            width: 100%;
             display: block;
+            margin: 0 auto 30px;
         }
-        
-        .thank-you h2 {
+
+        .title {
+            font-size: 2rem;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .button {
+            width: 100%;
+            padding: 18px;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1a2f4a, #0d2744);
+            color: #d4af37;
+            border: 2px solid #d4af37;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .button:hover:not(.disabled) {
+            background: linear-gradient(135deg, #d4af37, #f0d46f);
+            color: #0a1828;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .button.selected {
+            background: linear-gradient(135deg, #d4af37, #f0d46f);
+            color: #0a1828;
+            border-width: 3px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        .button.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            text-align: center;
+            padding: 40px 30px;
+            color: #ffffff;
+        }
+
+        .message h2 {
+            font-size: 2.2rem;
             color: #d4af37;
             margin-bottom: 15px;
-            font-size: 1.5em;
         }
-        
-        .thank-you p {
-            font-size: 1.1em;
-            line-height: 1.6;
-        }
-        
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .already-voted {
-            display: none;
-            text-align: center;
-            color: #d4af37;
-            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #d4af37;
-            margin-top: 20px;
-            animation: fadeInScale 0.5s ease-in;
-        }
-        
-        .already-voted.show {
-            display: block;
-        }
-        
-        .already-voted h3 {
-            color: #d4af37;
-            font-size: 1.4em;
-            margin-bottom: 15px;
-        }
-        
-        .already-voted p {
-            color: #ffffff;
-            font-size: 1.1em;
+
+        .message p {
+            font-size: 1.2rem;
             line-height: 1.6;
         }
 
-        .loading {
-            text-align: center;
-            color: #f0d46f;
-            padding: 20px;
-        }
-        
-        .queue-message {
-            display: none;
-            text-align: center;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(240, 212, 111, 0.15));
-            border: 2px solid #d4af37;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        .queue-message.show {
-            display: block;
-        }
-        
-        .queue-message h3 {
-            color: #f0d46f;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .queue-message p {
-            color: #ffffff;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
-        
-        .queue-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
+        .spinner {
             border: 4px solid rgba(212, 175, 55, 0.3);
             border-top: 4px solid #d4af37;
             border-radius: 50%;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 15px auto;
+            margin: 0 auto 20px;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        @keyframes pulse {
-            0%, 100% { 
-                box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-            }
-            50% { 
-                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            }
-        }
 
-        .error-message {
-            background: rgba(220, 53, 69, 0.2);
-            border: 2px solid #dc3545;
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        /* Responsive */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                padding: 25px;
             }
-            
-            h1 {
-                font-size: 1.5em;
+
+            .consent-title {
+                font-size: 1.6rem;
             }
-            
-            .kimono-icon {
-                font-size: 1.8em;
+
+            .consent-text {
+                font-size: 1rem;
             }
-            
-            .vote-text {
-                font-size: 1.1em;
+
+            .btn-consent {
+                padding: 14px 28px;
+                font-size: 1.05rem;
             }
-            
-            .players-grid {
-                grid-template-columns: 1fr;
+
+            .privacy-title {
+                font-size: 1.6rem;
+            }
+
+            .privacy-section h3 {
+                font-size: 1.15rem;
+            }
+
+            .privacy-section p,
+            .privacy-section li {
+                font-size: 0.95rem;
+            }
+
+            .title {
+                font-size: 1.6rem;
+            }
+
+            .button {
+                font-size: 1.1rem;
+                padding: 16px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Bouton RGPD vertical -->
-        <a href="rgpd.html" class="rgpd-button" target="_blank">Politique de confidentialité</a>
-        
-        <div class="header">
-            <div class="title-container">
-                <h1 id="pageTitle">Coupe virtuelle du public</h1>
-                <span class="kimono-icon">🥋</span>
-            </div>
-        </div>
-        
-        <div class="logo-container" id="logoContainer">
-            <!-- Le logo sera inséré ici -->
-        </div>
-        
-        <div id="loadingMessage" class="loading">
-            ⏳ Chargement...
-        </div>
-        
-        <div class="queue-message" id="queueMessage">
-            <div class="queue-spinner"></div>
-            <h3>⏳ Beaucoup de monde vote en ce moment !</h3>
-            <p>Merci de patienter quelques secondes...<br>
-            Votre vote sera enregistré automatiquement.</p>
-            <p id="queueAttempt" style="font-size: 0.9em; color: #f0d46f; margin-top: 15px;">
-                Tentative <span id="attemptNumber">1</span>/5
-            </p>
-        </div>
-        
-        <div id="mainContent" style="display: none;">
-            <div class="vote-text" id="invitationText">
-                Votez pour votre joueur(euse) favori(te) !
-            </div>
-            
-            <div id="voteSection">
-                <div class="players-grid" id="playersGrid">
-                    <!-- Les cartes des joueurs seront insérées ici -->
+        <!-- Cookie Consent Screen -->
+        <div id="cookieConsent" class="cookie-consent hidden">
+            <div class="consent-content">
+                <div class="cookie-icon">🍪</div>
+                <h2 class="consent-title">Cookie Consent</h2>
+                <p class="consent-text">
+                    To ensure the integrity of the voting process, we use a technical cookie to prevent multiple votes from the same device.
+                </p>
+                <p class="consent-text">
+                    By continuing, you accept our <a href="#" id="linkPrivacyPolicy" class="privacy-link">privacy policy</a>.
+                </p>
+                <div class="consent-buttons">
+                    <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accept and Continue</button>
+                    <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Decline</button>
                 </div>
-            </div>
-            
-            <div class="already-voted" id="alreadyVoted">
-                <h3>✅ Merci !</h3>
-                <p id="alreadyVotedText">
-                    Merci, votre vote a déjà été enregistré !<br>
-                    Nous avons bien pris en compte votre participation.
-                </p>
-            </div>
-            
-            <div class="thank-you" id="thankYou">
-                <h2>✨ Merci ! ✨</h2>
-                <p id="thankYouText">
-                    Merci d'avoir voté !<br><br>
-                    N'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives
-                </p>
             </div>
         </div>
 
-        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <!-- Privacy Policy -->
+        <div id="privacyPolicy" class="privacy-policy hidden">
+            <div class="privacy-content">
+                <div class="policy-icon">🔒</div>
+                <h2 class="privacy-title">Privacy Policy</h2>
+                
+                <div class="privacy-section">
+                    <h3>📋 Data Collected</h3>
+                    <p>For this survey, we use a temporary technical cookie to ensure vote integrity and prevent multiple votes.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>⏱️ Storage Duration</h3>
+                    <p>The cookie is stored for <strong>24 hours maximum</strong> after your vote, then automatically deleted.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>🎯 Data Usage</h3>
+                    <p>This cookie serves <strong>only</strong> to:</p>
+                    <ul>
+                        <li>Prevent the same device from voting multiple times</li>
+                        <li>Ensure the reliability of survey results</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>🛡️ Data Protection</h3>
+                    <p><strong>No personal data</strong> is collected, stored, transferred, sold, or shared with third parties. The cookie contains only an anonymous technical identifier.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>✋ Your Rights</h3>
+                    <p>You can decline cookie usage at any time (and thus decline participation).</p>
+                </div>
+
+                <div class="privacy-buttons">
+                    <button class="btn-consent btn-back" id="btnBackToConsent">← Back</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consent Declined -->
+        <div id="consentDeclined" class="consent-declined hidden">
+            <div class="declined-content">
+                <div class="declined-icon">🚫</div>
+                <h2 class="declined-title">Participation Not Authorized</h2>
+                <p class="declined-text">
+                    We respect your choice not to accept technical cookies.
+                </p>
+                <p class="declined-text">
+                    Unfortunately, without these cookies, we cannot guarantee the integrity of the voting process.
+                </p>
+                <p class="declined-text-small">
+                    Thank you for your understanding.
+                </p>
+                <div class="consent-buttons" style="margin-top: 30px;">
+                    <button class="btn-consent btn-back" id="btnRetryConsent">← Change My Mind</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vote Form -->
+        <div id="voteSection" class="hidden">
+            <img id="logoImg" class="logo" src="" alt="Logo">
+            <h1 id="titleText" class="title">Vote for Your Champion</h1>
+            <div id="playersContainer"></div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingMessage" class="message hidden">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <!-- Thank You -->
+        <div id="thankYou" class="message hidden">
+            <h2>✓ Thank You!</h2>
+            <p>Your vote has been recorded.</p>
+        </div>
+
+        <!-- Already Voted -->
+        <div id="alreadyVoted" class="message hidden">
+            <h2>Already Voted!</h2>
+            <p>Thank you for your participation.</p>
+        </div>
+
+        <!-- Error -->
+        <div id="errorMessage" class="message hidden">
+            <h2>⚠️ Error</h2>
+            <p id="errorText">An error occurred. Please try again later.</p>
+        </div>
     </div>
 
     <script>
-// --- Single-vote runtime setting ---
-let singleVoteEnabled = false; // default: multi-vote allowed unless admin enables restriction
-async function loadSingleVoteSetting() {
-  try {
-    if (!supabaseClient) return;
-    const { data, error } = await supabaseClient
-      .from('settings')
-      .select('value')
-      .eq('key', 'single_vote_enabled')
-      .maybeSingle();
-    if (!error && data && typeof data.value === 'string') {
-      singleVoteEnabled = (data.value === 'true');
-      console.debug('[singleVote] setting loaded:', singleVoteEnabled);
-    } else {
-      console.debug('[singleVote] no explicit setting found, default:', singleVoteEnabled, error);
-    }
-  } catch (e) {
-    console.debug('[singleVote] load error, keeping default:', e);
-  }
-}
+        const COOKIE_CONSENT_NAME = 'vote_cookie_consent';
+        const VOTED_COOKIE_NAME = 'has_voted';
+        let supabaseClient = null;
+        let sessionId = null;
 
+        // Cookie Management
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+        }
 
-        let supabaseClient;
-        let hasVoted = false;
-        let userIP = null;
-        let selectedPlayerId = null;
-        
-        const RETRY_CONFIG = {
-            maxAttempts: 5,
-            initialDelay: 2000,
-            maxDelay: 15000,
-            backoffMultiplier: 1.5
-        };
-        
-        async function retryWithBackoff(fn, context = '', attempt = 1) {
-            try {
-                return await fn();
-            } catch (error) {
-                console.error(`Erreur tentative ${attempt} (${context}):`, error);
-                
-                const isRetryable = 
-                    error.message?.includes('Failed to fetch') ||
-                    error.message?.includes('network') ||
-                    error.message?.includes('timeout') ||
-                    error.code === 'PGRST301' ||
-                    error.code === '429' ||
-                    error.status === 429 ||
-                    error.status === 503;
-                
-                if (!isRetryable || attempt >= RETRY_CONFIG.maxAttempts) {
-                    throw error;
-                }
-                
-                showQueueMessage(attempt);
-                
-                const baseDelay = Math.min(
-                    RETRY_CONFIG.initialDelay * Math.pow(RETRY_CONFIG.backoffMultiplier, attempt - 1),
-                    RETRY_CONFIG.maxDelay
-                );
-                
-                const jitter = baseDelay * (0.7 + Math.random() * 0.6);
-                const delay = Math.floor(jitter);
-                
-                console.log(`Nouvelle tentative dans ${delay}ms...`);
-                
-                await new Promise(resolve => setTimeout(resolve, delay));
-                
-                return retryWithBackoff(fn, context, attempt + 1);
+        function getCookie(name) {
+            return document.cookie.split('; ').reduce((r, v) => {
+                const parts = v.split('=');
+                return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+            }, '');
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+        }
+
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Check consent on load
+        function checkCookieConsent() {
+            const consent = getCookie(COOKIE_CONSENT_NAME);
+            
+            if (consent === 'accepted') {
+                initializeVoting();
+            } else if (consent === 'declined') {
+                showConsentDeclined();
+            } else {
+                showCookieConsent();
             }
         }
-        
-        function showQueueMessage(attempt) {
-            const queueMsg = document.getElementById('queueMessage');
-            const attemptNumber = document.getElementById('attemptNumber');
+
+        function showCookieConsent() {
+            document.getElementById('cookieConsent').classList.remove('hidden');
+        }
+
+        function showConsentDeclined() {
+            document.getElementById('consentDeclined').classList.remove('hidden');
+        }
+
+        function acceptCookies() {
+            setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
+            document.getElementById('cookieConsent').classList.add('hidden');
+            initializeVoting();
+        }
+
+        function declineCookies() {
+            setCookie(COOKIE_CONSENT_NAME, 'declined', 365);
+            document.getElementById('cookieConsent').classList.add('hidden');
+            showConsentDeclined();
+        }
+
+        function retryConsent() {
+            deleteCookie(COOKIE_CONSENT_NAME);
+            document.getElementById('consentDeclined').classList.add('hidden');
+            showCookieConsent();
+        }
+
+        function showPrivacyPolicy() {
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('privacyPolicy').classList.remove('hidden');
+        }
+
+        function backToConsent() {
+            document.getElementById('privacyPolicy').classList.add('hidden');
+            document.getElementById('cookieConsent').classList.remove('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('btnAcceptCookies').addEventListener('click', acceptCookies);
+        document.getElementById('btnDeclineCookies').addEventListener('click', declineCookies);
+        document.getElementById('linkPrivacyPolicy').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPrivacyPolicy();
+        });
+        document.getElementById('btnBackToConsent').addEventListener('click', backToConsent);
+        document.getElementById('btnRetryConsent').addEventListener('click', retryConsent);
+
+        // Initialize voting system
+        async function initializeVoting() {
+            if (!await initSupabase()) return;
             
-            attemptNumber.textContent = attempt;
-            queueMsg.classList.add('show');
+            sessionId = generateSessionId();
+            
+            // Check if already voted
+            if (getCookie(VOTED_COOKIE_NAME) === 'true') {
+                showAlreadyVoted();
+                return;
+            }
+            
+            await loadData();
         }
-        
-        function hideQueueMessage() {
-            document.getElementById('queueMessage').classList.remove('show');
-        }
-        
+
         async function initSupabase() {
             try {
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showError('Configuration manquante. Contactez l\'administrateur.');
+                    showError('Configuration error. Please contact administrator.');
                     return false;
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 return true;
             } catch (error) {
-                showError('Erreur de connexion: ' + error.message);
+                showError('Connection error: ' + error.message);
                 return false;
             }
         }
 
-        async function getUserIP() {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                return data.ip;
-            } catch (error) {
-                console.error('Erreur récupération IP:', error);
-                let fallbackId = localStorage.getItem('voter_id');
-                if (!fallbackId) {
-                    fallbackId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    localStorage.setItem('voter_id', fallbackId);
-                }
-                return fallbackId;
-            }
-        }
-        
-        async function checkIfVoted(ip) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('votes')
-                    .select('*')
-                    .eq('ip_address', ip)
-                    .limit(1);
-                
-                if (error) throw error;
-                
-                return data && data.length > 0;
-            } catch (error) {
-                console.error('Erreur vérification vote:', error);
-                return false;
-            }
-        }
-        
         async function loadData() {
-            // MESSAGE FIX: ne plus appeler loadMessages() ici
-            if (!supabaseClient) return;
-            
             try {
-                document.getElementById('loadingMessage').style.display = 'block';
-                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('loadingMessage').classList.remove('hidden');
                 
-                userIP = await getUserIP();
-                
-                let voted = false;
-                if (singleVoteEnabled) {
-                    voted = await checkIfVoted(userIP);
-                }
-                if (voted) {
-                    showAlreadyVoted();
-                    await loadLogo();
-                    document.getElementById('loadingMessage').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
-                    return;
-                }
-                
-                await loadLogo();
-                
-                const { data: playersData, error: playersError } = await supabaseClient
-                    .from('players')
-                    .select('*')
-                    .order('name', { ascending: true });
-                
-                if (playersError) throw playersError;
-                
-                const grid = document.getElementById('playersGrid');
-                grid.innerHTML = '';
-                
-                if (playersData && playersData.length > 0) {
-                    playersData.forEach(player => {
-                        const card = document.createElement('div');
-                        card.className = 'player-card';
-                        card.dataset.playerId = player.id;
-                        card.innerHTML = `
-                            <div class="player-name">${player.name}</div>
-                            <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
-                        `;
-                        
-                        card.addEventListener('click', (e) => {
-                            if (!e.target.classList.contains('vote-button')) {
-                                selectPlayer(player.id);
-                            }
-                        });
-                        
-                        grid.appendChild(card);
-                    });
-                } else {
-                    grid.innerHTML = '<p style="color: #ffffff; text-align: center;">Aucun candidat disponible</p>';
-                }
-                
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                
-            } catch (error) {
-                showError('Erreur de chargement: ' + error.message);
-            }
-        }
-        
-        function selectPlayer(playerId) {
-            if (hasVoted) return;
-            
-            // Retirer la sélection de toutes les cartes
-            document.querySelectorAll('.player-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Sélectionner la carte cliquée
-            const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-                selectedPlayerId = playerId;
-            }
-        }
-        
-        async function confirmVote(playerId) {
-            if (hasVoted) return;
-            
-            // Désactiver toutes les cartes sauf celle sélectionnée
-            document.querySelectorAll('.player-card').forEach(card => {
-                if (card.dataset.playerId != playerId) {
-                    card.classList.add('disabled');
-                }
-            });
-            
-            await saveVote(playerId);
-            
-            setTimeout(() => {
-                document.getElementById('voteSection').style.display = 'none';
-                document.getElementById('thankYou').classList.add('show');
-            }, 1000);
-        }
-        
-        async function loadLogo() {
-            try {
-                const { data: logoData, error: logoError } = await supabaseClient
+                // Load settings
+                const { data: settings } = await supabaseClient
                     .from('settings')
                     .select('*')
-                    .eq('key', 'logo')
                     .single();
-                
-                const logoContainer = document.getElementById('logoContainer');
-                
-                if (logoError) {
-                    console.log('Pas de logo trouvé:', logoError.message);
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Aucun logo configuré)</div>';
-                    return;
+
+                if (settings) {
+                    document.getElementById('titleText').textContent = settings.titre || 'Vote for Your Champion';
+                    document.getElementById('logoImg').src = settings.logo_url || '';
                 }
-                
-                if (logoData && logoData.value) {
-                    console.log('Logo chargé, taille:', logoData.value.length, 'caractères');
-                    logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo du tournoi">`;
+
+                // Load players
+                const { data: players } = await supabaseClient
+                    .from('players')
+                    .select('*')
+                    .order('ordre');
+
+                if (players && players.length > 0) {
+                    displayPlayers(players);
+                    document.getElementById('loadingMessage').classList.add('hidden');
+                    document.getElementById('voteSection').classList.remove('hidden');
                 } else {
-                    console.log('Logo vide dans la base');
-                    logoContainer.innerHTML = '<div class="logo-placeholder">(Logo non disponible)</div>';
+                    showError('No players available.');
                 }
             } catch (error) {
-                console.error('Erreur chargement logo:', error);
-                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">(Erreur chargement logo)</div>';
+                showError('Error loading data: ' + error.message);
             }
         }
-        
-        async function saveVote(playerId) {
-            if (!supabaseClient || !userIP) return;
-            
+
+        function displayPlayers(players) {
+            const container = document.getElementById('playersContainer');
+            container.innerHTML = '';
+
+            players.forEach(player => {
+                const btn = document.createElement('button');
+                btn.className = 'button';
+                btn.textContent = player.nom;
+                btn.onclick = () => selectPlayer(player.id, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        async function selectPlayer(playerId, buttonElement) {
+            const buttons = document.querySelectorAll('#playersContainer .button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('disabled');
+            });
+
+            buttonElement.classList.add('selected');
+
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await submitVote(playerId);
+        }
+
+        async function submitVote(playerId) {
+            document.getElementById('voteSection').classList.add('hidden');
+            document.getElementById('loadingMessage').classList.remove('hidden');
+
             try {
-                document.getElementById('queueMessage').classList.add('show');
-                document.getElementById('attemptNumber').textContent = '1';
+                await supabaseClient.from('votes').insert({
+                    player_id: playerId,
+                    session_id: sessionId
+                });
+
+                setCookie(VOTED_COOKIE_NAME, 'true', 1);
+
+                setTimeout(() => {
+                    document.getElementById('loadingMessage').classList.add('hidden');
+                    document.getElementById('thankYou').classList.remove('hidden');
+                }, 800);
+
+            } catch (error) {
+                console.error('Error submitting vote:', error);
+                showError('Error submitting your vote. Please try again.');
                 
-                await retryWithBackoff(async () => {
-                    const { error } = await supabaseClient
-                        .from('votes')
-                        .insert({
-                            player_id: playerId,
-                            ip_address: userIP
-                        });
-                    
-                    if (error && error.code === '23505') {
-                        console.log('Vote déjà enregistré (duplicate), considéré comme succès');
-                        return;
-                    }
-                    
-                    if (error) throw error;
-                }, 'enregistrement vote');
-                
-                hideQueueMessage();
-                console.log('Vote enregistré avec succès');
-                if (singleVoteEnabled) {
-                    hasVoted = true;
-                    const vs = document.getElementById('voteSection'); if (vs) vs.style.display = 'none';
-                    const ty = document.getElementById('thankYou'); if (ty) ty.classList.add('show');
-                } else {
-                    hasVoted = false; // allow immediate re-vote
-                    const vs = document.getElementById('voteSection'); if (vs) vs.style.display = 'block';
-                    const ty = document.getElementById('thankYou'); if (ty) ty.classList.remove('show');
-                    const av = document.getElementById('alreadyVoted'); if (av) av.classList.remove('show');
-                }
-                } catch (error) {
-                console.error('Erreur lors du vote après tous les retries:', error);
-                hideQueueMessage();
-                
-                console.log('Vérification finale si le vote est passé...');
-                try {
-                    const finalCheck = await supabaseClient
-                        .from('votes')
-                        .select('*')
-                        .eq('ip_address', userIP)
-                        .limit(1);
-                    
-                    if (finalCheck.data && finalCheck.data.length > 0) {
-                        console.log('✅ Vote trouvé dans la DB malgré l\'erreur réseau');
-                        
-                        if (singleVoteEnabled) {
-                            hasVoted = true;
-                            document.getElementById('voteSection').style.display = 'none';
-                            document.getElementById('thankYou').classList.add('show');
-                        } else {
-                            hasVoted = false;
-                            const vs = document.getElementById('voteSection'); if (vs) vs.style.display = 'block';
-                            const ty = document.getElementById('thankYou'); if (ty) ty.classList.remove('show');
-                        }
-                        return;
-                    }
-                } catch (checkError) {
-                    console.error('Erreur lors de la vérification finale:', checkError);
-                }
-                
-                const voteSection = document.getElementById('voteSection');
-                voteSection.innerHTML = `
-                    <div style="text-align: center; color: #ff6b6b; padding: 20px; background: rgba(220, 53, 69, 0.1); border-radius: 12px; border: 2px solid #dc3545;">
-                        <h3 style="margin-bottom: 10px;">😔 Trop de monde vote en ce moment</h3>
-                        <p>Nous n'avons pas pu enregistrer votre vote immédiatement.</p>
-                        <p style="margin-top: 15px;">
-                            <button onclick="location.reload()" style="background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">
-                                🔄 Réessayer de voter
-                            </button>
-                        </p>
-                        <p style="font-size: 0.9em; color: #aaa; margin-top: 10px;">
-                            Si votre vote était déjà passé, nous vous le confirmerons
-                        </p>
-                    </div>
-                `;
+                const buttons = document.querySelectorAll('#playersContainer .button');
+                buttons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('disabled');
+                });
             }
         }
-        
+
         function showAlreadyVoted() {
-            if (singleVoteEnabled) {
-                document.getElementById('voteSection').style.display = 'none';
-                document.getElementById('alreadyVoted').classList.add('show');
-                hasVoted = true;
-            } else {
-                const vs = document.getElementById('voteSection'); if (vs) vs.style.display = 'block';
-                const av = document.getElementById('alreadyVoted'); if (av) av.classList.remove('show');
-                hasVoted = false;
-            }
+            document.getElementById('alreadyVoted').classList.remove('hidden');
         }
 
         function showError(message) {
-            document.getElementById('loadingMessage').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorMessage').classList.remove('hidden');
         }
-        
-        // --- FIX: charger les textes après initSupabase, et simplifier la requête comme pour "players"
-        async function loadMessages() {
-            try {
-                if (!supabaseClient) return;
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('key, value')
-                    .in('key', ['msg_title','msg_invitation','msg_thankyou','msg_alreadyvoted']);
-                if (error) throw error;
-                
-                const map = {};
-                (data || []).forEach(row => {
-                    map[row.key] = row.value;
-                });
-                
-                const $ = (id) => document.getElementById(id);
-    
-                if ($('pageTitle')) {
-                    $('pageTitle').textContent = map['msg_title'] || $('pageTitle').textContent;
-                    document.title = $('pageTitle').textContent;
-                }
-                if ($('invitationText')) {
-                    $('invitationText').innerHTML = (map['msg_invitation'] || $('invitationText').innerHTML).replace(/\n/g, '<br>');
-                }
-                if ($('thankYouText')) {
-                    $('thankYouText').innerHTML = (map['msg_thankyou'] || $('thankYouText').innerHTML).replace(/\n/g, '<br>');
-                }
-                if ($('alreadyVotedText')) {
-                    $('alreadyVotedText').innerHTML = (map['msg_alreadyvoted'] || $('alreadyVotedText').innerHTML).replace(/\n/g, '<br>');
-                }
-            } catch (e) {
-                console.warn('loadMessages(): utilisation des valeurs par défaut (échec de chargement)', e);
-            }
-        }
-        
-        // Ordre corrigé: init -> loadMessages -> loadData
-        window.addEventListener('DOMContentLoaded', async () => {
-            const initialized = await initSupabase();
-            if (initialized) {
-                await loadMessages(); await loadSingleVoteSetting(); await loadData();
-}
-        });
+
+        // Start application
+        checkCookieConsent();
     </script>
 </body>
 </html>
-
