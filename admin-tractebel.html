@@ -21,6 +21,49 @@
       min-height: 100vh;
     }
 
+    /* 🔒 Loading Screen pour vérification authentification */
+    #authLoading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0066B3 0%, #003d6b 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+
+    #authLoading .spinner {
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #FFED00;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    #authLoading p {
+      color: #FFFFFF;
+      font-size: 1.2rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #mainContent {
+      display: none;
+    }
+
+    #mainContent.show {
+      display: block;
+    }
+
     .header {
       max-width: 1400px;
       margin: 0 auto 40px;
@@ -29,6 +72,39 @@
       background: rgba(0, 170, 255, 0.1);
       border: 3px solid #00AAFF;
       border-radius: 20px;
+      position: relative;
+    }
+
+    /* Bouton de déconnexion */
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 68, 68, 0.8);
+      color: white;
+      border: 2px solid #ff4444;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: #ff4444;
+      transform: translateY(-2px);
+    }
+
+    .user-info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 170, 255, 0.2);
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #FFED00;
     }
 
     h1 {
@@ -87,15 +163,6 @@
 
     .btn-danger:hover {
       background: #cc0000;
-    }
-
-    .btn-warning {
-      background: #ff9800;
-      color: white;
-    }
-
-    .btn-warning:hover {
-      background: #e68900;
     }
 
     .main-content {
@@ -257,18 +324,6 @@
 
     .choice-list li:last-child {
       border-bottom: none;
-    }
-
-    .page-vote-count {
-      background: rgba(255, 237, 0, 0.2);
-      border: 2px solid #FFED00;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 15px;
-      text-align: center;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #FFED00;
     }
 
     .page-actions {
@@ -483,6 +538,17 @@
     }
 
     @media (max-width: 768px) {
+      .user-info, .logout-btn {
+        position: static;
+        margin: 10px auto;
+        display: block;
+        width: fit-content;
+      }
+
+      .header {
+        padding: 60px 20px 20px;
+      }
+
       .pages-grid {
         grid-template-columns: 1fr;
       }
@@ -510,23 +576,35 @@
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>📊 TRACTEBEL Survey Dashboard</h1>
-    <p class="subtitle">No Mind at Risk - Multi-Page Management</p>
+  <!-- 🔒 Loading Screen d'authentification -->
+  <div id="authLoading">
+    <div class="spinner"></div>
+    <p>🔐 Vérification de l'authentification...</p>
   </div>
 
-  <div class="controls">
-    <button class="btn btn-success" id="btnCreate">➕ Create New Page</button>
-    <button class="btn" id="btnRefresh">🔄 Refresh</button>
-  </div>
+  <!-- 📊 Contenu principal (caché tant que pas authentifié) -->
+  <div id="mainContent">
+    <div class="header">
+      <div class="user-info" id="userInfo">👤 Loading...</div>
+      <button class="logout-btn" id="logoutBtn">🚪 Déconnexion</button>
+      <h1>📊 TRACTEBEL Survey Dashboard</h1>
+      <p class="subtitle">No Mind at Risk - Multi-Page Management</p>
+    </div>
 
-  <div class="main-content">
-    <div class="section">
-      <h3 class="section-title">Survey Pages (Ordered: Left → Right, Top → Bottom)</h3>
-      <div class="pages-grid" id="pagesGrid"></div>
+    <div class="controls">
+      <button class="btn btn-success" id="btnCreate">➕ Create New Page</button>
+      <button class="btn" id="btnRefresh">🔄 Refresh</button>
+    </div>
+
+    <div class="main-content">
+      <div class="section">
+        <h3 class="section-title">Survey Pages (Ordered: Left → Right, Top → Bottom)</h3>
+        <div class="pages-grid" id="pagesGrid"></div>
+      </div>
     </div>
   </div>
 
+  <!-- Modal création/édition de page -->
   <div class="modal" id="pageModal">
     <div class="modal-content">
       <h2 class="modal-header" id="modalTitle">Create New Page</h2>
@@ -598,10 +676,65 @@
 
     let allPages = [];
     let editingPageId = null;
-    let editingChoices = []; // Stocker les choix existants lors de l'édition
     let logoTopBase64 = '';
     let logoBottomBase64 = '';
-    let voteCountInterval = null;
+    let currentUser = null;
+
+    // ============================================
+    // 🔒 VÉRIFICATION AUTHENTIFICATION AU CHARGEMENT
+    // ============================================
+    
+    async function checkAuthentication() {
+      try {
+        // Vérifier la session Supabase
+        const { data: { session }, error } = await sb.auth.getSession();
+        
+        if (error || !session) {
+          // Pas de session valide → rediriger vers login
+          console.log('❌ Pas de session valide, redirection vers login...');
+          window.location.href = 'login-tractebel.html';
+          return false;
+        }
+
+        // Session valide !
+        currentUser = session.user;
+        console.log('✅ Authentifié:', currentUser.email);
+
+        // Afficher l'email de l'utilisateur
+        document.getElementById('userInfo').textContent = `👤 ${currentUser.email}`;
+
+        // Cacher le loading, afficher le contenu
+        document.getElementById('authLoading').style.display = 'none';
+        document.getElementById('mainContent').classList.add('show');
+
+        return true;
+
+      } catch (error) {
+        console.error('Erreur vérification auth:', error);
+        window.location.href = 'login-tractebel.html';
+        return false;
+      }
+    }
+
+    // ============================================
+    // 🚪 DÉCONNEXION
+    // ============================================
+    
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+
+      try {
+        await sb.auth.signOut();
+        window.location.href = 'login-tractebel.html';
+      } catch (error) {
+        console.error('Erreur déconnexion:', error);
+        alert('Erreur lors de la déconnexion');
+      }
+    });
+
+    // ============================================
+    // RESTE DU CODE ADMIN (identique)
+    // ============================================
 
     function formatMarkdown(text) {
       if (!text) return text;
@@ -625,7 +758,6 @@
 
         allPages = pages || [];
         await displayPages();
-        startVoteCountRefresh();
 
       } catch (error) {
         console.error('Error:', error);
@@ -650,17 +782,8 @@
           .eq('page_id', page.id)
           .order('ordre');
 
-        // Récupérer le nombre de votes
-        const { data: votes } = await sb
-          .from(CONFIG_TRACTEBEL.tables.votes)
-          .select('id', { count: 'exact', head: true })
-          .eq('page_id', page.id);
-
-        const voteCount = votes || 0;
-
         const card = document.createElement('div');
         card.className = 'page-card' + (page.active ? ' active' : '');
-        card.setAttribute('data-page-id', page.id);
 
         let resultTitleHtml = '';
         if (page.result_title) {
@@ -701,9 +824,6 @@
           ${page.description ? `<div class="page-description">${page.description}</div>` : ''}
           ${logosHtml}
           ${resultTitleHtml}
-          <div class="page-vote-count" data-vote-counter="${page.id}">
-            📊 ${voteCount} vote${voteCount !== 1 ? 's' : ''}
-          </div>
           ${choicesHtml}
           <div class="page-actions">
             ${!page.active ?
@@ -711,7 +831,6 @@
               `<button class="btn btn-small" style="background: #666; cursor: not-allowed;" disabled>Already Active</button>`
             }
             <button class="btn btn-small" data-edit="${page.id}">✏️ Edit</button>
-            <button class="btn btn-small btn-warning" data-reset="${page.id}">🔄 Reset Votes</button>
             <button class="btn btn-small btn-danger" data-delete="${page.id}">🗑️ Delete</button>
           </div>
         `;
@@ -727,32 +846,9 @@
         btn.addEventListener('click', () => editPage(btn.dataset.edit));
       });
 
-      document.querySelectorAll('[data-reset]').forEach(btn => {
-        btn.addEventListener('click', () => resetPageVotes(btn.dataset.reset));
-      });
-
       document.querySelectorAll('[data-delete]').forEach(btn => {
         btn.addEventListener('click', () => deletePage(btn.dataset.delete));
       });
-    }
-
-    // Rafraîchir les compteurs de votes toutes les 2 secondes
-    function startVoteCountRefresh() {
-      if (voteCountInterval) clearInterval(voteCountInterval);
-      
-      voteCountInterval = setInterval(async () => {
-        for (const page of allPages) {
-          const { count } = await sb
-            .from(CONFIG_TRACTEBEL.tables.votes)
-            .select('*', { count: 'exact', head: true })
-            .eq('page_id', page.id);
-
-          const counterElement = document.querySelector(`[data-vote-counter="${page.id}"]`);
-          if (counterElement) {
-            counterElement.textContent = `📊 ${count || 0} vote${count !== 1 ? 's' : ''}`;
-          }
-        }
-      }, 2000);
     }
 
     async function activatePage(pageId) {
@@ -769,24 +865,8 @@
       }
     }
 
-    async function resetPageVotes(pageId) {
-      const page = allPages.find(p => p.id === pageId);
-      if (!confirm(`Reset votes for "${page.titre}"?\n\nThis will delete all votes for this page only.\n\nThis action CANNOT be undone!`)) return;
-
-      try {
-        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().eq('page_id', pageId);
-        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().eq('page_id', pageId);
-        alert('✅ Votes reset for this page!');
-        await loadPages();
-      } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error: ' + error.message);
-      }
-    }
-
     function openCreateModal() {
       editingPageId = null;
-      editingChoices = [];
       logoTopBase64 = '';
       logoBottomBase64 = '';
       
@@ -824,10 +904,8 @@
 
       const { data: choix } = await sb.from(CONFIG_TRACTEBEL.tables.choix).select('*').eq('page_id', pageId).order('ordre');
 
-      editingChoices = choix || []; // Sauvegarder les choix existants
-
       document.getElementById('choicesEditor').innerHTML = '';
-      editingChoices.forEach(choice => addChoiceField(choice.texte, choice.id));
+      choix?.forEach(choice => addChoiceField(choice.texte));
 
       document.getElementById('pageModal').classList.add('active');
     }
@@ -895,13 +973,10 @@
       }
     });
 
-    function addChoiceField(value = '', choiceId = null) {
+    function addChoiceField(value = '') {
       const editor = document.getElementById('choicesEditor');
       const item = document.createElement('div');
       item.className = 'choice-item';
-      if (choiceId) {
-        item.setAttribute('data-choice-id', choiceId);
-      }
       item.innerHTML = `
         <input type="text" class="form-input" placeholder="Choice text (use **bold** or *italic*)" value="${value.replace(/"/g, '&quot;')}" required>
         <button type="button" class="btn-remove">✕</button>
@@ -952,7 +1027,8 @@
       const resultTitle = document.getElementById('resultTitle').value.trim();
       const logoTopUrl = document.getElementById('logoTopUrl').value.trim();
       const logoBottomUrl = document.getElementById('logoBottomUrl').value.trim();
-      const choiceInputs = document.querySelectorAll('.choice-item');
+      const choiceInputs = document.querySelectorAll('.choice-item input');
+      const choices = Array.from(choiceInputs).map(input => input.value.trim()).filter(v => v);
 
       const logoTop = logoTopBase64 || logoTopUrl;
       const logoBottom = logoBottomBase64 || logoBottomUrl;
@@ -962,14 +1038,13 @@
         return;
       }
 
-      if (choiceInputs.length < 2) {
+      if (choices.length < 2) {
         showError('Please add at least 2 choices');
         return;
       }
 
       try {
         if (editingPageId) {
-          // MODE ÉDITION - Préserver les votes existants
           const { error: updateError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).update({ 
             titre, 
             description,
@@ -979,40 +1054,14 @@
           }).eq('id', editingPageId);
           if (updateError) throw updateError;
 
-          // Mapper les choix actuels
-          const currentChoices = Array.from(choiceInputs).map((item, index) => {
-            const input = item.querySelector('input');
-            const texte = input.value.trim();
-            const choiceId = item.getAttribute('data-choice-id');
-            return { texte, ordre: index + 1, choiceId };
-          });
+          await sb.from(CONFIG_TRACTEBEL.tables.choix).delete().eq('page_id', editingPageId);
 
-          // Mettre à jour ou créer les choix
-          for (const choice of currentChoices) {
-            if (choice.choiceId) {
-              // Choix existant - UPDATE
-              await sb.from(CONFIG_TRACTEBEL.tables.choix)
-                .update({ texte: choice.texte, ordre: choice.ordre })
-                .eq('id', choice.choiceId);
-            } else {
-              // Nouveau choix - INSERT
-              await sb.from(CONFIG_TRACTEBEL.tables.choix)
-                .insert({ page_id: editingPageId, texte: choice.texte, ordre: choice.ordre });
-            }
-          }
+          const choixData = choices.map((texte, index) => ({ page_id: editingPageId, texte, ordre: index + 1 }));
+          const { error: insertError } = await sb.from(CONFIG_TRACTEBEL.tables.choix).insert(choixData);
+          if (insertError) throw insertError;
 
-          // Supprimer les choix qui ont été retirés
-          const currentIds = currentChoices.map(c => c.choiceId).filter(id => id);
-          const removedChoices = editingChoices.filter(ec => !currentIds.includes(ec.id));
-          for (const removed of removedChoices) {
-            await sb.from(CONFIG_TRACTEBEL.tables.choix).delete().eq('id', removed.id);
-          }
-
-          alert('✅ Page updated! Votes preserved.');
+          alert('✅ Page updated!');
         } else {
-          // MODE CRÉATION
-          const choices = Array.from(choiceInputs).map(item => item.querySelector('input').value.trim()).filter(v => v);
-
           const { data: newPage, error: createError } = await sb.from(CONFIG_TRACTEBEL.tables.pages).insert({ 
             titre, 
             description,
@@ -1040,12 +1089,16 @@
       }
     });
 
-    // Nettoyer l'interval au déchargement de la page
-    window.addEventListener('beforeunload', () => {
-      if (voteCountInterval) clearInterval(voteCountInterval);
-    });
-
-    loadPages();
+    // ============================================
+    // 🚀 INITIALISATION : Vérifier auth PUIS charger les données
+    // ============================================
+    
+    (async function init() {
+      const isAuthenticated = await checkAuthentication();
+      if (isAuthenticated) {
+        await loadPages();
+      }
+    })();
   </script>
 </body>
 </html>
