@@ -518,6 +518,7 @@
   <div class="controls">
     <button class="btn btn-success" id="btnCreate">➕ Create New Page</button>
     <button class="btn" id="btnRefresh">🔄 Refresh</button>
+    <button class="btn btn-warning" id="btnResetVotes">🗑️ Reset All Votes</button>
   </div>
 
   <div class="main-content">
@@ -922,6 +923,20 @@
     document.getElementById('btnRefresh').addEventListener('click', loadPages);
     document.getElementById('btnCancel').addEventListener('click', closeModal);
     document.getElementById('btnAddChoice').addEventListener('click', () => addChoiceField());
+
+    document.getElementById('btnResetVotes').addEventListener('click', async () => {
+      if (!confirm('⚠️ Reset ALL votes for ALL pages?\n\nThis will:\n- Delete all votes\n- Delete all stats\n- Keep all pages and choices\n\nThis action CANNOT be undone!')) return;
+
+      try {
+        await sb.from(CONFIG_TRACTEBEL.tables.stats).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        await sb.from(CONFIG_TRACTEBEL.tables.votes).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        alert('✅ All votes have been reset!');
+        await loadPages();
+      } catch (error) {
+        console.error('Error resetting votes:', error);
+        alert('❌ Error: ' + error.message);
+      }
+    });
 
     document.getElementById('pageForm').addEventListener('submit', async (e) => {
       e.preventDefault();
