@@ -699,86 +699,86 @@
 </head>
 <body>
   <div class="container">
-    <!-- Écran Cookies Consent -->
+    <!-- Cookie Consent Screen -->
     <div id="cookieConsent" class="cookie-consent hidden">
       <div class="consent-content">
         <div class="cookie-icon">🍪</div>
-        <h2 class="consent-title">Consentement aux Cookies</h2>
+        <h2 class="consent-title">Cookie Consent</h2>
         <p class="consent-text">
-          Pour assurer l'intégrité du processus de vote, nous enregistrons des données techniques sur votre appareil. 
+          To ensure the integrity of the voting process, we record technical data from your device.
         </p>
         <p class="consent-text">
-          En continuant, vous acceptez notre <a href="#" id="linkPrivacyPolicy" class="privacy-link">politique de confidentialité</a>.
+          By continuing, you agree to our <a href="#" id="linkPrivacyPolicy" class="privacy-link">privacy policy</a>.
         </p>
         <div class="consent-buttons">
-          <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accepter et Continuer</button>
-          <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Refuser</button>
+          <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accept and Continue</button>
+          <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Decline</button>
         </div>
       </div>
     </div>
 
-    <!-- Politique de Confidentialité -->
+    <!-- Privacy Policy -->
     <div id="privacyPolicy" class="privacy-policy hidden">
       <div class="privacy-content">
         <div class="policy-icon">🔒</div>
-        <h2 class="privacy-title">Politique de Confidentialité</h2>
+        <h2 class="privacy-title">Privacy Policy</h2>
         
         <div class="privacy-section">
-          <h3>📋 Données collectées</h3>
-          <p>Dans le cadre de ce sondage, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote et éviter les votes multiples.</p>
+          <h3>📋 Data Collected</h3>
+          <p>As part of this survey, we use a temporary technical cookie to ensure vote integrity and prevent multiple votes.</p>
         </div>
 
         <div class="privacy-section">
-          <h3>⏱️ Durée de conservation</h3>
-          <p>Le cookie est conservé pendant <strong>24 heures maximum</strong> après votre vote, puis est automatiquement supprimé.</p>
+          <h3>⏱️ Retention Period</h3>
+          <p>The cookie is retained for a <strong>maximum of 24 hours</strong> after your vote, then is automatically deleted.</p>
         </div>
 
         <div class="privacy-section">
-          <h3>🎯 Utilisation des données</h3>
-          <p>Ce cookie sert <strong>uniquement</strong> à :</p>
+          <h3>🎯 Data Usage</h3>
+          <p>This cookie is used <strong>solely</strong> to:</p>
           <ul>
-            <li>Empêcher un même appareil de voter plusieurs fois</li>
-            <li>Assurer la fiabilité des résultats du sondage</li>
+            <li>Prevent the same device from voting multiple times</li>
+            <li>Ensure the reliability of survey results</li>
           </ul>
         </div>
 
         <div class="privacy-section">
-          <h3>🛡️ Protection de vos données</h3>
-          <p><strong>Aucune donnée personnelle</strong> n'est collectée, stockée, transférée, vendue ou partagée avec des tiers. Le cookie contient uniquement un identifiant technique anonyme.</p>
+          <h3>🛡️ Data Protection</h3>
+          <p><strong>No personal data</strong> is collected, stored, transferred, sold, or shared with third parties. The cookie contains only an anonymous technical identifier.</p>
         </div>
 
         <div class="privacy-section">
-          <h3>✋ Vos droits</h3>
-          <p>Vous pouvez à tout moment refuser l'utilisation du cookie (et donc décliner votre participation).</p>
+          <h3>✋ Your Rights</h3>
+          <p>You can refuse the use of the cookie at any time (and therefore decline your participation).</p>
         </div>
 
         <div class="privacy-buttons">
-          <button class="btn-consent btn-back" id="btnBackToConsent">← Retour</button>
+          <button class="btn-consent btn-back" id="btnBackToConsent">← Back</button>
         </div>
       </div>
     </div>
 
-    <!-- Refus de participation -->
+    <!-- Consent Declined -->
     <div id="consentDeclined" class="consent-declined hidden">
       <div class="declined-content">
         <div class="declined-icon">🚫</div>
-        <h2 class="declined-title">Participation non autorisée</h2>
+        <h2 class="declined-title">Participation Not Authorized</h2>
         <p class="declined-text">
-          Nous respectons votre choix de ne pas accepter les cookies techniques.
+          We respect your choice not to accept technical cookies.
         </p>
         <p class="declined-text">
-          Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
+          Unfortunately, without these cookies, we cannot guarantee the integrity of the voting process.
         </p>
         <p class="declined-text-small">
-          Merci de votre compréhension.
+          Thank you for your understanding.
         </p>
         <div class="consent-buttons" style="margin-top: 30px;">
-          <button class="btn-consent btn-back" id="btnRetryConsent">← Changer d'avis</button>
+          <button class="btn-consent btn-back" id="btnRetryConsent">← Change My Mind</button>
         </div>
       </div>
     </div>
 
-    <!-- Formulaire -->
+    <!-- Survey Form -->
     <div id="surveyForm" class="survey-form hidden">
       <div class="header">
         <div class="logos-grid">
@@ -800,25 +800,25 @@
       <div class="choices-grid" id="choicesContainer"></div>
     </div>
 
-    <!-- Chargement -->
+    <!-- Loading -->
     <div id="submitting" class="submitting hidden">
       <div class="spinner"></div>
       <p>Submitting your vote...</p>
     </div>
 
-    <!-- Succès -->
+    <!-- Success -->
     <div id="successMessage" class="success-message hidden">
       <h2>✓ Thank you!</h2>
       <p>Your vote has been recorded.</p>
     </div>
 
-    <!-- Déjà voté -->
+    <!-- Already Voted -->
     <div id="alreadyVoted" class="already-voted hidden">
       <h2>Already voted!</h2>
       <p>Thank you for your participation.</p>
     </div>
 
-    <!-- Erreur -->
+    <!-- Error -->
     <div id="errorMessage" class="error-message hidden">
       <h2>⚠️ No active survey</h2>
       <p>Please check back later.</p>
@@ -837,7 +837,7 @@
     const sessionId = generateSessionId();
     const COOKIE_CONSENT_NAME = 'tractebel_cookie_consent';
 
-    // Vérifier le consentement au chargement
+    // Check consent on load
     function checkCookieConsent() {
       const consent = getCookie(COOKIE_CONSENT_NAME);
       
@@ -859,7 +859,7 @@
     }
 
     function retryConsent() {
-      // Supprimer le cookie de refus
+      // Delete decline cookie
       deleteCookie(COOKIE_CONSENT_NAME);
       document.getElementById('consentDeclined').classList.add('hidden');
       showCookieConsent();
@@ -876,14 +876,14 @@
     }
 
     function acceptCookies() {
-      console.log('🍪 Acceptation des cookies...');
+      console.log('🍪 Accepting cookies...');
       setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
       document.getElementById('cookieConsent').classList.add('hidden');
       loadActivePage();
     }
 
     function declineCookies() {
-      console.log('❌ Refus des cookies...');
+      console.log('❌ Declining cookies...');
       setCookie(COOKIE_CONSENT_NAME, 'declined', 365);
       document.getElementById('cookieConsent').classList.add('hidden');
       showConsentDeclined();
@@ -899,10 +899,10 @@
     document.getElementById('btnBackToConsent').addEventListener('click', backToConsent);
     document.getElementById('btnRetryConsent').addEventListener('click', retryConsent);
 
-    // Charger la page active
+    // Load active page
     async function loadActivePage() {
       try {
-        console.log('📡 Chargement de la page active...');
+        console.log('📡 Loading active page...');
         
         const { data: pages } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
@@ -911,27 +911,27 @@
           .limit(1);
 
         if (!pages || pages.length === 0) {
-          console.log('❌ Aucune page active trouvée');
+          console.log('❌ No active page found');
           showError();
           return;
         }
 
         activePage = pages[0];
-        console.log('✅ Page active chargée:', activePage.id);
+        console.log('✅ Active page loaded:', activePage.id);
 
         document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
         document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
 
-        // Vérifier si l'utilisateur a déjà voté pour CETTE page spécifique
+        // Check if user has already voted for THIS specific page
         const voteCookieName = `voted_tractebel_${activePage.id}`;
         const hasAlreadyVoted = getCookie(voteCookieName) === 'true';
         
-        console.log('🔍 Vérification du vote pour la page:', activePage.id);
-        console.log('   Cookie recherché:', voteCookieName);
-        console.log('   A déjà voté?', hasAlreadyVoted);
+        console.log('🔍 Checking vote for page:', activePage.id);
+        console.log('   Cookie searched:', voteCookieName);
+        console.log('   Already voted?', hasAlreadyVoted);
         
         if (hasAlreadyVoted) {
-          console.log('⚠️ Utilisateur a déjà voté');
+          console.log('⚠️ User has already voted');
           showAlreadyVoted();
           return;
         }
@@ -943,11 +943,11 @@
           .order('ordre');
 
         choices = choicesData || [];
-        console.log('✅ Choix chargés:', choices.length);
+        console.log('✅ Choices loaded:', choices.length);
         displaySurvey();
 
       } catch (error) {
-        console.error('❌ Erreur chargement:', error);
+        console.error('❌ Loading error:', error);
         showError();
       }
     }
@@ -1002,7 +1002,7 @@
         }, 800);
 
       } catch (error) {
-        console.error('Erreur soumission:', error);
+        console.error('Submission error:', error);
         alert('Error submitting your vote. Please try again.');
         
         document.getElementById('submitting').classList.add('hidden');
@@ -1030,7 +1030,7 @@
     function setCookie(name, value, days) {
       const expires = new Date(Date.now() + days * 864e5).toUTCString();
       document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-      console.log('🍪 Cookie créé:', name, '=', value);
+      console.log('🍪 Cookie created:', name, '=', value);
     }
 
     function getCookie(name) {
@@ -1038,13 +1038,13 @@
         const parts = v.split('=');
         return parts[0] === name ? decodeURIComponent(parts[1]) : r;
       }, '');
-      console.log('🔍 Lecture cookie:', name, '=', value || '(vide)');
+      console.log('🔍 Reading cookie:', name, '=', value || '(empty)');
       return value;
     }
 
     function deleteCookie(name) {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
-      console.log('🗑️ Cookie supprimé:', name);
+      console.log('🗑️ Cookie deleted:', name);
     }
 
     function hasVoted(pageId) {
