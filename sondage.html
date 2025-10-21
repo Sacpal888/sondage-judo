@@ -905,23 +905,16 @@
             if (!supabaseClient) return;
             
             try {
-                // Incrémenter le compteur de votes du joueur
-                const { data: player, error: fetchError } = await supabaseClient
-                    .from('players')
-                    .select('votes')
-                    .eq('id', playerId)
-                    .single();
+                // Insérer un enregistrement dans la table votes
+                const { error: insertError } = await supabaseClient
+                    .from('votes')
+                    .insert({
+                        player_id: playerId,
+                        session_id: sessionId,
+                        voted_at: new Date().toISOString()
+                    });
                 
-                if (fetchError) throw fetchError;
-                
-                const newVoteCount = (player.votes || 0) + 1;
-                
-                const { error: updateError } = await supabaseClient
-                    .from('players')
-                    .update({ votes: newVoteCount })
-                    .eq('id', playerId);
-                
-                if (updateError) throw updateError;
+                if (insertError) throw insertError;
                 
                 // Set cookie to prevent multiple votes
                 setCookie(COOKIE_VOTED_NAME, 'true', 1); // 1 day
