@@ -765,16 +765,6 @@
                 const totalVotes = count || 0;
                 document.getElementById('totalVotesCount').textContent = totalVotes;
                 
-                const { data: allPlayers } = await supabaseClient
-                    .from('players')
-                    .select('*')
-                    .order('id', { ascending: true });
-                
-                if (allPlayers) {
-                    players = allPlayers;
-                    await updatePlayerList();
-                }
-                
             } catch (error) {
                 console.error('Erreur mise à jour votes:', error);
             }
