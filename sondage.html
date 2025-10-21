@@ -26,352 +26,75 @@
         
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 1000px;
             background: rgba(13, 39, 68, 0.95);
             border: 3px solid #d4af37;
             border-radius: 20px;
-            padding: 30px;
+            padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* ========================================
-           COOKIE CONSENT SCREEN
-        ======================================== */
-        .cookie-consent {
-            text-align: center;
-            width: 100%;
-        }
-
-        .consent-content {
-            padding: 40px 30px;
-            background: rgba(26, 47, 74, 0.8);
-            border: 2px solid rgba(212, 175, 55, 0.5);
-            border-radius: 15px;
-        }
-
-        .cookie-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .consent-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #d4af37;
-            margin-bottom: 20px;
-        }
-
-        .consent-text {
-            font-size: 1.1rem;
-            color: #ffffff;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .privacy-link {
-            color: #f0d46f;
-            text-decoration: underline;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .privacy-link:hover {
-            color: #d4af37;
-        }
-
-        .consent-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 25px;
-        }
-
-        .btn-consent {
-            padding: 15px 35px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: 2px solid #ffffff;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-accept {
-            background: #28a745;
-            color: #ffffff;
-        }
-
-        .btn-accept:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-        }
-
-        .btn-decline {
-            background: rgba(220, 53, 69, 0.2);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .btn-decline:hover {
-            background: rgba(220, 53, 69, 0.4);
-            border-color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        .btn-back {
-            background: #0066B3;
-            color: #ffffff;
-        }
-
-        .btn-back:hover {
-            background: #0088cc;
-            transform: translateY(-2px);
-        }
-
-        /* ========================================
-           PRIVACY POLICY SCREEN
-        ======================================== */
-        .privacy-policy {
-            text-align: left;
-            width: 100%;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .privacy-content {
-            padding: 30px 20px;
-        }
-
-        .policy-icon {
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .privacy-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #d4af37;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .privacy-section {
-            background: rgba(26, 47, 74, 0.6);
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-
-        .privacy-section h3 {
-            font-size: 1.2rem;
-            color: #f0d46f;
-            margin-bottom: 10px;
-        }
-
-        .privacy-section p {
-            font-size: 1rem;
-            color: #ffffff;
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
-
-        .privacy-section ul {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-
-        .privacy-section li {
-            font-size: 1rem;
-            color: #ffffff;
-            line-height: 1.6;
-            margin-bottom: 6px;
-        }
-
-        .privacy-buttons {
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        /* ========================================
-           CONSENT DECLINED SCREEN
-        ======================================== */
-        .consent-declined {
-            text-align: center;
-            width: 100%;
-        }
-
-        .declined-content {
-            padding: 40px 30px;
-            background: rgba(26, 47, 74, 0.8);
-            border: 2px solid rgba(212, 175, 55, 0.5);
-            border-radius: 15px;
-        }
-
-        .declined-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-
-        .declined-title {
-            font-size: 1.7rem;
-            font-weight: bold;
-            color: #d4af37;
-            margin-bottom: 20px;
-        }
-
-        .declined-text {
-            font-size: 1.1rem;
-            color: #ffffff;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .declined-text-small {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            margin-top: 20px;
-        }
-
-        /* ========================================
-           MAIN SURVEY
-        ======================================== */
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-            position: relative;
         }
         
-        .title-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container img {
+            max-width: 300px;
+            max-height: 120px;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
         }
         
         h1 {
             color: #d4af37;
-            font-size: 1.8em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin: 0;
-        }
-        
-        .kimono-icon {
-            font-size: 2em;
-        }
-        
-        .logo-container {
-            margin: 20px auto;
             text-align: center;
-            width: 100%;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
-        .logo-container img {
-            max-width: 90%;
-            max-height: 150px;
-            width: auto;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid #d4af37;
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-            display: block;
-            background: transparent;
-            object-fit: contain;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        
-        .logo-placeholder {
-            color: #666;
-            font-size: 0.9em;
+        .subtitle {
+            text-align: center;
+            color: #f0d46f;
+            font-size: 1.2em;
+            margin-bottom: 40px;
             font-style: italic;
         }
         
-        .vote-text {
-            color: #ffffff;
-            text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 25px;
-            font-weight: 500;
-        }
-        
-        /* Cartes des joueurs */
         .players-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
         
         .player-card {
-            background: rgba(26, 47, 74, 0.8);
+            background: rgba(26, 47, 74, 0.6);
             border: 2px solid #d4af37;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s;
         }
         
         .player-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
             border-color: #f0d46f;
-            background: rgba(26, 47, 74, 1);
         }
         
         .player-card.selected {
-            border: 3px solid #f0d46f;
             background: rgba(212, 175, 55, 0.2);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            animation: pulse-gold 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-gold {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);
-            }
+            border-color: #f0d46f;
+            border-width: 3px;
         }
         
         .player-card.disabled {
-            opacity: 0.4;
+            opacity: 0.5;
             cursor: not-allowed;
-            filter: grayscale(1);
-        }
-        
-        .player-card.disabled:hover {
-            transform: none;
-            box-shadow: none;
+            pointer-events: none;
         }
         
         .player-name {
@@ -381,584 +104,296 @@
             margin-bottom: 10px;
         }
         
-        .player-card.selected .player-name {
+        .player-votes {
             color: #f0d46f;
+            font-size: 0.95em;
         }
         
         .vote-button {
-            background: #d4af37;
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto 0;
+            display: block;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #d4af37, #f0d46f);
             color: #0a1828;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
-            display: none;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
         
-        .player-card.selected .vote-button {
-            display: inline-block;
-            animation: fadeIn 0.3s;
+        .vote-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.6);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
+        .vote-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
-        .vote-button:hover {
-            background: #f0d46f;
-            transform: scale(1.05);
-        }
-        
-        .thank-you {
-            display: none;
+        .message {
             text-align: center;
-            color: #ffffff;
-            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #d4af37;
-            animation: fadeInScale 0.5s ease-in;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            display: none;
         }
         
-        .thank-you.show {
+        .message.show {
             display: block;
         }
         
-        .thank-you h2 {
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            color: #a5d6a7;
+        }
+        
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #ef9a9a;
+        }
+        
+        .message.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            color: #90caf9;
+        }
+        
+        .message.warning {
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid #ff9800;
+            color: #ffcc80;
+        }
+        
+        .loading {
+            text-align: center;
             color: #d4af37;
-            margin-bottom: 15px;
+            font-size: 1.3em;
+            padding: 40px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212, 175, 55, 0.3);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .privacy-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .privacy-link a {
+            color: #f0d46f;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: color 0.3s;
+        }
+        
+        .privacy-link a:hover {
+            color: #d4af37;
+            text-decoration: underline;
+        }
+        
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(13, 39, 68, 0.9);
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
             font-size: 1.5em;
         }
         
-        .thank-you p {
-            font-size: 1.1em;
-            line-height: 1.6;
+        .admin-link:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
         
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .votes-frozen {
-            display: none;
-            text-align: center;
-            color: #ffffff;
-            background: linear-gradient(135deg, rgba(100, 149, 237, 0.3), rgba(70, 130, 180, 0.3));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #87CEEB;
-            margin-top: 20px;
-            animation: fadeInScale 0.5s ease-in;
-        }
-        
-        .votes-frozen.show {
-            display: block;
-        }
-        
-        .votes-frozen h3 {
-            color: #87CEEB;
-            font-size: 1.4em;
-            margin-bottom: 15px;
-        }
-        
-        .votes-frozen p {
-            color: #ffffff;
-            font-size: 1.1em;
-            line-height: 1.6;
-        }
-
-        .loading {
-            text-align: center;
-            color: #f0d46f;
-            padding: 20px;
-        }
-
-        .error-message {
-            background: rgba(220, 53, 69, 0.2);
-            border: 2px solid #dc3545;
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        /* Responsive */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                padding: 25px;
             }
             
             h1 {
-                font-size: 1.5em;
+                font-size: 2em;
             }
             
-            .kimono-icon {
-                font-size: 1.8em;
-            }
-            
-            .vote-text {
-                font-size: 1.1em;
+            .subtitle {
+                font-size: 1em;
             }
             
             .players-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .consent-content,
-            .declined-content {
-                padding: 30px 20px;
-            }
-
-            .cookie-icon,
-            .declined-icon {
-                font-size: 3.5rem;
-            }
-
-            .consent-title {
-                font-size: 1.5rem;
-            }
-
-            .consent-text {
-                font-size: 1rem;
-            }
-
-            .btn-consent {
-                padding: 12px 25px;
-                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- ========================================
-             COOKIE CONSENT SCREEN
-        ======================================== -->
-        <div id="cookieConsent" class="cookie-consent hidden">
-            <div class="consent-content">
-                <div class="cookie-icon">🍪</div>
-                <h2 class="consent-title">Consentement aux cookies</h2>
-                <p class="consent-text">
-                    Pour garantir l'intégrité du processus de vote, nous enregistrons des données techniques de votre appareil.
-                </p>
-                <p class="consent-text">
-                    En continuant, vous acceptez notre <a href="#" id="linkPrivacyPolicy" class="privacy-link">politique de confidentialité</a>.
-                </p>
-                <div class="consent-buttons">
-                    <button class="btn-consent btn-accept" id="btnAcceptCookies">✓ Accepter et continuer</button>
-                    <button class="btn-consent btn-decline" id="btnDeclineCookies">✗ Refuser</button>
-                </div>
-            </div>
+        <div class="logo-container" id="logoContainer" style="display: none;"></div>
+        
+        <h1 id="pageTitle">🏆 Coupe virtuelle du public 🏆</h1>
+        <div class="subtitle" id="pageSubtitle">Votez pour votre joueur(euse) favori(te) !</div>
+        
+        <div id="loadingMessage" class="loading">
+            <div class="spinner"></div>
+            <div>Chargement...</div>
         </div>
-
-        <!-- ========================================
-             PRIVACY POLICY
-        ======================================== -->
-        <div id="privacyPolicy" class="privacy-policy hidden">
-            <div class="privacy-content">
-                <div class="policy-icon">🔒</div>
-                <h2 class="privacy-title">Politique de confidentialité</h2>
-                
-                <div class="privacy-section">
-                    <h3>📋 Données collectées</h3>
-                    <p>Dans le cadre de ce vote, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote et empêcher les votes multiples.</p>
-                </div>
-
-                <div class="privacy-section">
-                    <h3>⏱️ Durée de conservation</h3>
-                    <p>Le cookie est conservé pour une durée <strong>maximale de 24 heures</strong> après votre vote, puis est automatiquement supprimé.</p>
-                </div>
-
-                <div class="privacy-section">
-                    <h3>🎯 Utilisation des données</h3>
-                    <p>Ce cookie est utilisé <strong>uniquement</strong> pour :</p>
-                    <ul>
-                        <li>Empêcher le même appareil de voter plusieurs fois</li>
-                        <li>Garantir la fiabilité des résultats du vote</li>
-                    </ul>
-                </div>
-
-                <div class="privacy-section">
-                    <h3>🛡️ Protection des données</h3>
-                    <p><strong>Aucune donnée personnelle</strong> n'est collectée, stockée, transférée, vendue ou partagée avec des tiers. Le cookie ne contient qu'un identifiant technique anonyme.</p>
-                </div>
-
-                <div class="privacy-section">
-                    <h3>✋ Vos droits</h3>
-                    <p>Vous pouvez refuser l'utilisation du cookie à tout moment (et donc refuser votre participation).</p>
-                </div>
-
-                <div class="privacy-buttons">
-                    <button class="btn-consent btn-back" id="btnBackToConsent">← Retour</button>
-                </div>
-            </div>
+        
+        <div id="mainContent" style="display: none;">
+            <div id="messageBox" class="message"></div>
+            
+            <div class="players-grid" id="playersGrid"></div>
+            
+            <button class="vote-button" id="voteButton" onclick="submitVote()" disabled>
+                🗳️ Valider mon vote
+            </button>
         </div>
-
-        <!-- ========================================
-             CONSENT DECLINED
-        ======================================== -->
-        <div id="consentDeclined" class="consent-declined hidden">
-            <div class="declined-content">
-                <div class="declined-icon">🚫</div>
-                <h2 class="declined-title">Participation non autorisée</h2>
-                <p class="declined-text">
-                    Nous respectons votre choix de ne pas accepter les cookies techniques.
-                </p>
-                <p class="declined-text">
-                    Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
-                </p>
-                <p class="declined-text-small">
-                    Merci de votre compréhension.
-                </p>
-                <div class="consent-buttons" style="margin-top: 25px;">
-                    <button class="btn-consent btn-back" id="btnRetryConsent">← Changer d'avis</button>
-                </div>
-            </div>
+        
+        <div class="privacy-link">
+            <a href="rgpd.html" target="_blank">🔒 Politique de confidentialité</a>
         </div>
-
-        <!-- ========================================
-             MAIN SURVEY CONTENT
-        ======================================== -->
-        <div id="mainContent" class="hidden">
-            <div class="header">
-                <div class="title-container">
-                    <h1 id="pageTitle">Coupe virtuelle du public</h1>
-                    <span class="kimono-icon">🥋</span>
-                </div>
-            </div>
-            
-            <div class="logo-container" id="logoContainer">
-                <!-- Le logo sera inséré ici -->
-            </div>
-            
-            <div id="loadingMessage" class="loading">
-                ⏳ Chargement...
-            </div>
-            
-            <div id="voteSection" style="display: none;">
-                <div class="vote-text" id="invitationText">
-                    Votez pour votre joueur(euse) favori(te) !
-                </div>
-                
-                <div class="players-grid" id="playersGrid">
-                    <!-- Les cartes des joueurs seront insérées ici -->
-                </div>
-            </div>
-
-            <div class="votes-frozen" id="votesFrozen">
-                <h3>❄️ Votes figés</h3>
-                <p>
-                    Les votes sont malheureusement figés à présent.<br>
-                    Merci de votre compréhension.
-                </p>
-            </div>
-            
-            <div class="thank-you" id="thankYou">
-                <h2>✨ Merci ! ✨</h2>
-                <p id="thankYouText">
-                    Merci d'avoir voté !<br><br>
-                    N'hésitez pas à vous abonner pour plus de fun encore dans les prochains lives
-                </p>
-            </div>
-        </div>
-
-        <div id="errorMessage" class="error-message" style="display: none;"></div>
     </div>
+    
+    <a href="login.html" class="admin-link" title="Administration">🔐</a>
 
     <script>
-        let supabaseClient;
-        let hasVoted = false;
-        let sessionId = null;
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        
+        let supabaseClient = null;
+        let players = [];
         let selectedPlayerId = null;
-        const COOKIE_CONSENT_NAME = 'judo_cookie_consent';
-        const COOKIE_VOTED_NAME = 'judo_has_voted';
-
+        const COOKIE_NAME = 'vote_cast';
+        const COOKIE_EXPIRY_DAYS = 365; // 1 an
+        
+        // Messages par défaut
+        let MSG_TITLE = '🏆 Coupe virtuelle du public 🏆';
+        let MSG_SUBTITLE = 'Votez pour votre joueur(euse) favori(te) !';
+        let MSG_THANKYOU = 'Merci d\'avoir voté !';
+        let MSG_ALREADY_VOTED = 'Merci, votre vote a déjà été enregistré !';
+        
         // ============================================
-        // COOKIE UTILITIES
+        // GESTION DES COOKIES
         // ============================================
-
+        
         function setCookie(name, value, days) {
-            const expires = new Date(Date.now() + days * 864e5).toUTCString();
-            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-            console.log('🍪 Cookie créé:', name, '=', value);
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/;SameSite=Strict";
         }
-
+        
         function getCookie(name) {
-            const value = document.cookie.split('; ').reduce((r, v) => {
-                const parts = v.split('=');
-                return parts[0] === name ? decodeURIComponent(parts[1]) : r;
-            }, '');
-            console.log('🔍 Lecture cookie:', name, '=', value || '(vide)');
-            return value;
-        }
-
-        function deleteCookie(name) {
-            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
-            console.log('🗑️ Cookie supprimé:', name);
-        }
-
-        function generateSessionId() {
-            return 'judo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // ============================================
-        // CONSENT MANAGEMENT
-        // ============================================
-
-        function checkCookieConsent() {
-            const consent = getCookie(COOKIE_CONSENT_NAME);
-            
-            if (consent === 'accepted') {
-                sessionId = generateSessionId();
-                initSupabase();
-            } else if (consent === 'declined') {
-                showConsentDeclined();
-            } else {
-                showCookieConsent();
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
             }
+            return null;
         }
-
-        function showCookieConsent() {
-            document.getElementById('cookieConsent').classList.remove('hidden');
+        
+        function hasVoted() {
+            return getCookie(COOKIE_NAME) !== null;
         }
-
-        function showConsentDeclined() {
-            document.getElementById('consentDeclined').classList.remove('hidden');
+        
+        function markAsVoted(playerId) {
+            setCookie(COOKIE_NAME, playerId, COOKIE_EXPIRY_DAYS);
         }
-
-        function showPrivacyPolicy() {
-            document.getElementById('cookieConsent').classList.add('hidden');
-            document.getElementById('privacyPolicy').classList.remove('hidden');
+        
+        function getVotedPlayerId() {
+            return getCookie(COOKIE_NAME);
         }
-
-        function backToConsent() {
-            document.getElementById('privacyPolicy').classList.add('hidden');
-            document.getElementById('cookieConsent').classList.remove('hidden');
-        }
-
-        function acceptCookies() {
-            console.log('🍪 Acceptation des cookies...');
-            setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
-            document.getElementById('cookieConsent').classList.add('hidden');
-            sessionId = generateSessionId();
-            initSupabase();
-        }
-
-        function declineCookies() {
-            console.log('❌ Refus des cookies...');
-            setCookie(COOKIE_CONSENT_NAME, 'declined', 365);
-            document.getElementById('cookieConsent').classList.add('hidden');
-            showConsentDeclined();
-        }
-
-        function retryConsent() {
-            deleteCookie(COOKIE_CONSENT_NAME);
-            document.getElementById('consentDeclined').classList.add('hidden');
-            showCookieConsent();
-        }
-
-        // Event listeners for consent
-        document.getElementById('btnAcceptCookies').addEventListener('click', acceptCookies);
-        document.getElementById('btnDeclineCookies').addEventListener('click', declineCookies);
-        document.getElementById('linkPrivacyPolicy').addEventListener('click', function(e) {
-            e.preventDefault();
-            showPrivacyPolicy();
-        });
-        document.getElementById('btnBackToConsent').addEventListener('click', backToConsent);
-        document.getElementById('btnRetryConsent').addEventListener('click', retryConsent);
-
+        
         // ============================================
-        // SUPABASE INITIALIZATION
+        // INITIALISATION SUPABASE
         // ============================================
-
+        
         async function initSupabase() {
             try {
                 if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showError('Configuration manquante. Contactez l\'administrateur.');
-                    return false;
+                    throw new Error('Configuration Supabase manquante');
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
-                document.getElementById('mainContent').classList.remove('hidden');
-                
-                await loadMessages();
-                await checkIfVotesFrozen();
-                
+                console.log('✅ Supabase initialisé');
                 return true;
             } catch (error) {
-                showError('Erreur de connexion: ' + error.message);
+                console.error('❌ Erreur initialisation Supabase:', error);
+                showMessage('Erreur de configuration', 'error');
                 return false;
             }
         }
-
+        
         // ============================================
-        // CHECK IF VOTES ARE FROZEN
+        // CHARGEMENT DES DONNÉES
         // ============================================
-
-        async function checkIfVotesFrozen() {
+        
+        async function loadCustomMessages() {
             try {
                 const { data, error } = await supabaseClient
                     .from('settings')
-                    .select('value')
-                    .eq('key', 'votes_frozen')
-                    .maybeSingle();
-                
-                if (data && data.value === 'true') {
-                    console.log('❄️ Les votes sont figés');
-                    document.getElementById('loadingMessage').style.display = 'none';
-                    document.getElementById('votesFrozen').classList.add('show');
-                    await loadLogo();
-                    return;
-                }
-                
-                // Votes not frozen, check if already voted
-                const alreadyVoted = getCookie(COOKIE_VOTED_NAME) === 'true';
-                
-                if (alreadyVoted) {
-                    console.log('✓ Utilisateur a déjà voté');
-                    document.getElementById('loadingMessage').style.display = 'none';
-                    document.getElementById('thankYou').classList.add('show');
-                    await loadLogo();
-                    return;
-                }
-                
-                // Load the voting interface
-                await loadData();
-                
-            } catch (error) {
-                console.error('Erreur vérification gel:', error);
-                await loadData();
-            }
-        }
-
-        // ============================================
-        // LOAD SURVEY DATA
-        // ============================================
-
-        async function loadData() {
-            if (!supabaseClient) return;
-            
-            try {
-                document.getElementById('loadingMessage').style.display = 'block';
-                
-                await loadLogo();
-                
-                const { data: playersData, error: playersError } = await supabaseClient
-                    .from('players')
-                    .select('*')
-                    .order('nom', { ascending: true });
-                
-                if (playersError) throw playersError;
-                
-                const grid = document.getElementById('playersGrid');
-                grid.innerHTML = '';
-                
-                if (playersData && playersData.length > 0) {
-                    playersData.forEach(player => {
-                        const card = document.createElement('div');
-                        card.className = 'player-card';
-                        card.dataset.playerId = player.id;
-                        card.innerHTML = `
-                            <div class="player-name">${escapeHtml(player.nom)}</div>
-                            <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
-                        `;
-                        
-                        card.addEventListener('click', (e) => {
-                            if (!e.target.classList.contains('vote-button')) {
-                                selectPlayer(player.id);
-                            }
-                        });
-                        
-                        grid.appendChild(card);
-                    });
-                } else {
-                    grid.innerHTML = '<p style="color: #ffffff; text-align: center;">Aucun candidat disponible</p>';
-                }
-                
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('voteSection').style.display = 'block';
-                
-            } catch (error) {
-                showError('Erreur de chargement: ' + error.message);
-            }
-        }
-
-        function selectPlayer(playerId) {
-            if (hasVoted) return;
-            
-            document.querySelectorAll('.player-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('selected');
-                selectedPlayerId = playerId;
-            }
-        }
-        
-        async function confirmVote(playerId) {
-            if (hasVoted) return;
-            
-            document.querySelectorAll('.player-card').forEach(card => {
-                if (card.dataset.playerId != playerId) {
-                    card.classList.add('disabled');
-                }
-            });
-            
-            await saveVote(playerId);
-        }
-
-        async function saveVote(playerId) {
-            if (!supabaseClient || !sessionId) return;
-            
-            try {
-                // Insert vote in database
-                const { error } = await supabaseClient
-                    .from('votes')
-                    .insert({
-                        player_id: playerId,
-                        ip_address: sessionId
-                    });
+                    .select('key, value')
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
                 
                 if (error) throw error;
                 
-                // Set cookie to prevent multiple votes
-                setCookie(COOKIE_VOTED_NAME, 'true', 1); // 1 day
+                const messages = {};
+                if (data) {
+                    data.forEach(item => messages[item.key] = item.value);
+                }
                 
-                hasVoted = true;
-                
-                setTimeout(() => {
-                    document.getElementById('voteSection').style.display = 'none';
-                    document.getElementById('thankYou').classList.add('show');
-                }, 800);
-                
+                if (messages.msg_title) {
+                    MSG_TITLE = messages.msg_title;
+                    document.getElementById('pageTitle').innerHTML = MSG_TITLE;
+                }
+                if (messages.msg_invitation) {
+                    MSG_SUBTITLE = messages.msg_invitation;
+                    document.getElementById('pageSubtitle').innerHTML = MSG_SUBTITLE;
+                }
+                if (messages.msg_thankyou) {
+                    MSG_THANKYOU = messages.msg_thankyou;
+                }
+                if (messages.msg_alreadyvoted) {
+                    MSG_ALREADY_VOTED = messages.msg_alreadyvoted;
+                }
             } catch (error) {
-                console.error('Erreur lors du vote:', error);
-                alert('Erreur lors de l\'enregistrement de votre vote. Veuillez réessayer.');
-                
-                document.querySelectorAll('.player-card').forEach(card => {
-                    card.classList.remove('disabled');
-                });
+                console.warn('⚠️ Utilisation des messages par défaut');
             }
         }
-
+        
         async function loadLogo() {
             try {
-                const { data: logoData, error: logoError } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
@@ -966,68 +401,229 @@
                 
                 const logoContainer = document.getElementById('logoContainer');
                 
-                if (logoError || !logoData || !logoData.value) {
-                    logoContainer.innerHTML = '';
-                    return;
+                if (data && data.value) {
+                    logoContainer.innerHTML = `<img src="${data.value}" alt="Logo">`;
+                    logoContainer.style.display = 'block';
+                } else {
+                    logoContainer.style.display = 'none';
                 }
-                
-                logoContainer.innerHTML = `<img src="${logoData.value}" alt="Logo">`;
             } catch (error) {
-                console.error('Erreur chargement logo:', error);
-                document.getElementById('logoContainer').innerHTML = '';
+                console.warn('⚠️ Aucun logo configuré');
+                document.getElementById('logoContainer').style.display = 'none';
             }
         }
-
-        async function loadMessages() {
+        
+        async function checkIfVotesFrozen() {
             try {
-                if (!supabaseClient) return;
                 const { data, error } = await supabaseClient
                     .from('settings')
-                    .select('key, value')
-                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou']);
+                    .select('value')
+                    .eq('key', 'votes_frozen')
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') throw error;
+                
+                return data && data.value === 'true';
+            } catch (error) {
+                console.error('Erreur vérification gel des votes:', error);
+                return false;
+            }
+        }
+        
+        async function loadPlayers() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('players')
+                    .select('*')
+                    .order('id', { ascending: true });
                 
                 if (error) throw error;
                 
-                const map = {};
-                (data || []).forEach(row => {
-                    map[row.key] = row.value;
-                });
+                players = data || [];
+                displayPlayers();
                 
-                if (map['msg_title']) {
-                    document.getElementById('pageTitle').textContent = map['msg_title'];
-                    document.title = map['msg_title'];
-                }
-                if (map['msg_invitation']) {
-                    document.getElementById('invitationText').innerHTML = map['msg_invitation'].replace(/\n/g, '<br>');
-                }
-                if (map['msg_thankyou']) {
-                    document.getElementById('thankYouText').innerHTML = map['msg_thankyou'].replace(/\n/g, '<br>');
-                }
-            } catch (e) {
-                console.warn('Erreur chargement messages:', e);
+            } catch (error) {
+                console.error('❌ Erreur chargement joueurs:', error);
+                showMessage('Erreur de chargement des joueurs', 'error');
             }
         }
-
-        function showError(message) {
-            document.getElementById('loadingMessage').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorMessage').style.display = 'block';
+        
+        // ============================================
+        // AFFICHAGE DES JOUEURS
+        // ============================================
+        
+        function displayPlayers() {
+            const grid = document.getElementById('playersGrid');
+            
+            if (players.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; color: #f0d46f; grid-column: 1 / -1; padding: 40px;">Aucun candidat disponible pour le moment.</div>';
+                return;
+            }
+            
+            const votedPlayerId = getVotedPlayerId();
+            const hasAlreadyVoted = hasVoted();
+            
+            grid.innerHTML = players.map(player => {
+                const isVotedFor = hasAlreadyVoted && votedPlayerId == player.id;
+                const classes = ['player-card'];
+                if (isVotedFor) classes.push('selected');
+                if (hasAlreadyVoted && !isVotedFor) classes.push('disabled');
+                
+                return `
+                    <div class="${classes.join(' ')}" 
+                         data-player-id="${player.id}"
+                         onclick="${hasAlreadyVoted ? '' : `selectPlayer(${player.id})`}">
+                        <div class="player-name">${escapeHtml(player.name)}</div>
+                        ${isVotedFor ? '<div class="player-votes">✓ Votre vote</div>' : ''}
+                    </div>
+                `;
+            }).join('');
         }
-
+        
+        function selectPlayer(playerId) {
+            if (hasVoted()) return;
+            
+            selectedPlayerId = playerId;
+            
+            // Mise à jour visuelle
+            document.querySelectorAll('.player-card').forEach(card => {
+                card.classList.remove('selected');
+                if (parseInt(card.dataset.playerId) === playerId) {
+                    card.classList.add('selected');
+                }
+            });
+            
+            // Activer le bouton de vote
+            document.getElementById('voteButton').disabled = false;
+        }
+        
+        // ============================================
+        // SOUMISSION DU VOTE
+        // ============================================
+        
+        async function submitVote() {
+            if (hasVoted()) {
+                showMessage('Vous avez déjà voté !', 'warning');
+                return;
+            }
+            
+            if (!selectedPlayerId) {
+                showMessage('Veuillez sélectionner un joueur', 'warning');
+                return;
+            }
+            
+            // Vérifier si les votes sont gelés
+            const frozen = await checkIfVotesFrozen();
+            if (frozen) {
+                showMessage('⚠️ Les votes sont actuellement fermés', 'warning');
+                return;
+            }
+            
+            try {
+                const voteButton = document.getElementById('voteButton');
+                voteButton.disabled = true;
+                voteButton.textContent = '⏳ Enregistrement...';
+                
+                // Incrémenter le compteur de votes du joueur
+                const { data: player, error: fetchError } = await supabaseClient
+                    .from('players')
+                    .select('votes')
+                    .eq('id', selectedPlayerId)
+                    .single();
+                
+                if (fetchError) throw fetchError;
+                
+                const newVoteCount = (player.votes || 0) + 1;
+                
+                const { error: updateError } = await supabaseClient
+                    .from('players')
+                    .update({ votes: newVoteCount })
+                    .eq('id', selectedPlayerId);
+                
+                if (updateError) throw updateError;
+                
+                // Enregistrer un cookie pour marquer que l'utilisateur a voté
+                markAsVoted(selectedPlayerId);
+                
+                // Afficher le message de succès
+                showMessage(MSG_THANKYOU, 'success');
+                
+                // Actualiser l'affichage
+                displayPlayers();
+                
+                // Désactiver définitivement le bouton
+                voteButton.textContent = '✓ Vote enregistré';
+                voteButton.disabled = true;
+                
+                console.log('✅ Vote enregistré avec succès');
+                
+            } catch (error) {
+                console.error('❌ Erreur lors du vote:', error);
+                showMessage('Erreur lors de l\'enregistrement de votre vote. Veuillez réessayer.', 'error');
+                
+                const voteButton = document.getElementById('voteButton');
+                voteButton.textContent = '🗳️ Valider mon vote';
+                voteButton.disabled = false;
+            }
+        }
+        
+        // ============================================
+        // UTILITAIRES
+        // ============================================
+        
+        function showMessage(text, type = 'info') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = text;
+            messageBox.className = 'message show ' + type;
+            
+            // Faire défiler vers le message
+            messageBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function hideMessage() {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.classList.remove('show');
+        }
+        
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
+        
         // ============================================
-        // INITIALIZATION
+        // INITIALISATION
         // ============================================
-
-        window.addEventListener('DOMContentLoaded', () => {
-            checkCookieConsent();
-        });
+        
+        async function initApp() {
+            console.log('🚀 Initialisation de l\'application...');
+            
+            const initialized = await initSupabase();
+            if (!initialized) return;
+            
+            // Charger les données
+            await loadCustomMessages();
+            await loadLogo();
+            await loadPlayers();
+            
+            // Vérifier si l'utilisateur a déjà voté
+            if (hasVoted()) {
+                const votedPlayerId = getVotedPlayerId();
+                console.log('ℹ️ L\'utilisateur a déjà voté (joueur ID:', votedPlayerId, ')');
+                showMessage(MSG_ALREADY_VOTED, 'info');
+                document.getElementById('voteButton').disabled = true;
+                document.getElementById('voteButton').textContent = '✓ Vous avez déjà voté';
+            }
+            
+            // Afficher le contenu principal
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            console.log('✅ Application initialisée');
+        }
+        
+        // Démarrer l'application au chargement de la page
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
