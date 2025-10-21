@@ -256,33 +256,19 @@
         .header {
             text-align: center;
             margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
             position: relative;
-        }
-        
-        .title-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
         }
         
         h1 {
             color: #d4af37;
             font-size: 1.8em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin: 0;
-        }
-        
-        .kimono-icon {
-            font-size: 2em;
+            margin: 0 0 15px 0;
         }
         
         .logo-container {
-            margin: 20px auto;
             text-align: center;
+            margin-bottom: 30px;
             width: 100%;
             min-height: 80px;
             display: flex;
@@ -573,7 +559,7 @@
                 
                 <div class="privacy-section">
                     <h3>📋 Données collectées</h3>
-                    <p>Dans le cadre de ce vote, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote et empêcher les votes multiples.</p>
+                    <p>Dans le cadre de ce vote, nous utilisons un cookie technique temporaire pour garantir l'intégrité du vote.</p>
                 </div>
 
                 <div class="privacy-section">
@@ -583,11 +569,7 @@
 
                 <div class="privacy-section">
                     <h3>🎯 Utilisation des données</h3>
-                    <p>Ce cookie est utilisé <strong>uniquement</strong> pour :</p>
-                    <ul>
-                        <li>Empêcher le même appareil de voter plusieurs fois</li>
-                        <li>Garantir la fiabilité des résultats du vote</li>
-                    </ul>
+                    <p>Ce cookie est utilisé <strong>uniquement</strong> pour garantir la fiabilité des résultats du vote.</p>
                 </div>
 
                 <div class="privacy-section">
@@ -632,15 +614,12 @@
              MAIN SURVEY CONTENT
         ======================================== -->
         <div id="mainContent" class="hidden">
-            <div class="header">
-                <div class="title-container">
-                    <h1 id="pageTitle">Coupe virtuelle du public</h1>
-                    <span class="kimono-icon">🥋</span>
-                </div>
-            </div>
-            
             <div class="logo-container" id="logoContainer">
                 <!-- Le logo sera inséré ici -->
+            </div>
+            
+            <div class="header">
+                <h1 id="pageTitle">Coupe virtuelle du public</h1>
             </div>
             
             <div id="loadingMessage" class="loading">
@@ -923,18 +902,26 @@
         }
 
         async function saveVote(playerId) {
-            if (!supabaseClient || !sessionId) return;
+            if (!supabaseClient) return;
             
             try {
-                // Insert vote in database
-                const { error } = await supabaseClient
-                    .from('votes')
-                    .insert({
-                        player_id: playerId,
-                        ip_address: sessionId
-                    });
+                // Incrémenter le compteur de votes du joueur
+                const { data: player, error: fetchError } = await supabaseClient
+                    .from('players')
+                    .select('votes')
+                    .eq('id', playerId)
+                    .single();
                 
-                if (error) throw error;
+                if (fetchError) throw fetchError;
+                
+                const newVoteCount = (player.votes || 0) + 1;
+                
+                const { error: updateError } = await supabaseClient
+                    .from('players')
+                    .update({ votes: newVoteCount })
+                    .eq('id', playerId);
+                
+                if (updateError) throw updateError;
                 
                 // Set cookie to prevent multiple votes
                 setCookie(COOKIE_VOTED_NAME, 'true', 1); // 1 day
