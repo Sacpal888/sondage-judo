@@ -770,6 +770,9 @@
         <p class="declined-text-small">
           Merci de votre compréhension.
         </p>
+        <div class="consent-buttons" style="margin-top: 30px;">
+          <button class="btn-consent btn-back" id="btnRetryConsent">← Changer d'avis</button>
+        </div>
       </div>
     </div>
 
@@ -853,6 +856,13 @@
       document.getElementById('consentDeclined').classList.remove('hidden');
     }
 
+    function retryConsent() {
+      // Supprimer le cookie de refus
+      deleteCookie(COOKIE_CONSENT_NAME);
+      document.getElementById('consentDeclined').classList.add('hidden');
+      showCookieConsent();
+    }
+
     function showPrivacyPolicy() {
       document.getElementById('cookieConsent').classList.add('hidden');
       document.getElementById('privacyPolicy').classList.remove('hidden');
@@ -864,12 +874,14 @@
     }
 
     function acceptCookies() {
+      console.log('🍪 Acceptation des cookies...');
       setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
       document.getElementById('cookieConsent').classList.add('hidden');
       loadActivePage();
     }
 
     function declineCookies() {
+      console.log('❌ Refus des cookies...');
       setCookie(COOKIE_CONSENT_NAME, 'declined', 365);
       document.getElementById('cookieConsent').classList.add('hidden');
       showConsentDeclined();
@@ -883,10 +895,13 @@
       showPrivacyPolicy();
     });
     document.getElementById('btnBackToConsent').addEventListener('click', backToConsent);
+    document.getElementById('btnRetryConsent').addEventListener('click', retryConsent);
 
     // Charger la page active
     async function loadActivePage() {
       try {
+        console.log('📡 Chargement de la page active...');
+        
         const { data: pages } = await sb
           .from(CONFIG_TRACTEBEL.tables.pages)
           .select('*')
@@ -894,16 +909,27 @@
           .limit(1);
 
         if (!pages || pages.length === 0) {
+          console.log('❌ Aucune page active trouvée');
           showError();
           return;
         }
 
         activePage = pages[0];
+        console.log('✅ Page active chargée:', activePage.id);
 
         document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
         document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
 
-        if (hasVoted(activePage.id)) {
+        // Vérifier si l'utilisateur a déjà voté pour CETTE page spécifique
+        const voteCookieName = `voted_tractebel_${activePage.id}`;
+        const hasAlreadyVoted = getCookie(voteCookieName) === 'true';
+        
+        console.log('🔍 Vérification du vote pour la page:', activePage.id);
+        console.log('   Cookie recherché:', voteCookieName);
+        console.log('   A déjà voté?', hasAlreadyVoted);
+        
+        if (hasAlreadyVoted) {
+          console.log('⚠️ Utilisateur a déjà voté');
           showAlreadyVoted();
           return;
         }
@@ -915,10 +941,11 @@
           .order('ordre');
 
         choices = choicesData || [];
+        console.log('✅ Choix chargés:', choices.length);
         displaySurvey();
 
       } catch (error) {
-        console.error('Erreur chargement:', error);
+        console.error('❌ Erreur chargement:', error);
         showError();
       }
     }
@@ -1001,13 +1028,21 @@
     function setCookie(name, value, days) {
       const expires = new Date(Date.now() + days * 864e5).toUTCString();
       document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+      console.log('🍪 Cookie créé:', name, '=', value);
     }
 
     function getCookie(name) {
-      return document.cookie.split('; ').reduce((r, v) => {
+      const value = document.cookie.split('; ').reduce((r, v) => {
         const parts = v.split('=');
         return parts[0] === name ? decodeURIComponent(parts[1]) : r;
       }, '');
+      console.log('🔍 Lecture cookie:', name, '=', value || '(vide)');
+      return value;
+    }
+
+    function deleteCookie(name) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+      console.log('🗑️ Cookie supprimé:', name);
     }
 
     function hasVoted(pageId) {
