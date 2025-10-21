@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1920, height=1080">
-    <title>RÃ©sultats - Coupe virtuelle du public</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Gestion des Candidats</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -14,511 +14,1655 @@
         }
         
         body {
-            width: 1920px;
-            height: 1080px;
-            background: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Overlay de chargement */
+        #authLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        #authLoading.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ðŸ”’ NOUVEAU : Ã‰cran d'accÃ¨s refusÃ© */
+        .access-denied {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .access-denied-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
         .container {
-            width: 1200px;
-            height: 950px;
-            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
-            border: 5px solid #d4af37;
-            border-radius: 25px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
+        /* Header avec bouton de dÃ©connexion */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .admin-header h1 {
+            color: #333;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-email {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
         }
         
         h1 {
-            color: #d4af37;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
         }
         
-        .subtitle {
-            color: #f0d46f;
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .section h2 {
+            color: #555;
+            margin-bottom: 15px;
             font-size: 1.3em;
         }
         
-        /* Ligne supÃ©rieure avec logo et statistiques - 2 cases alignÃ©es avec les colonnes */
-        .top-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-box, .logo-container {
-            background: rgba(26, 47, 74, 0.6);
-            border: 2px solid #d4af37;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            height: 140px;
-            /* Pas d'animation au survol */
-        }
-        
-        .logo-container {
-            padding: 5%;  /* Marge de sÃ©curitÃ© de 5% */
-        }
-        
-        .logo-container img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
+        input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            object-fit: contain;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .player-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .player-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .player-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .edit-btn {
+            background: #ffc107;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #000;
+        }
+        
+        .edit-btn:hover {
+            background: #e0a800;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        #statusMessage {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        #statusMessage.loading {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        #statusMessage.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        #statusMessage.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .logo-preview {
+            margin-top: 15px;
+            max-width: 300px;
+        }
+        
+        .logo-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+
+        .config-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .config-notice.error {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .rgpd-stats {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .stat-number {
-            font-size: 3em;
-            color: #d4af37;
+            font-size: 2em;
             font-weight: bold;
-            line-height: 1;
+            color: #667eea;
         }
         
         .stat-label {
-            color: #ffffff;
-            margin-top: 10px;
-            font-size: 1em;
-        }
-        
-        /* Grille des rÃ©sultats - 2 colonnes, remplissage ligne par ligne */
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            flex: 1;
-        }
-        
-        .player-result {
-            background: rgba(26, 47, 74, 0.6);
-            border: 2px solid #d4af37;
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .player-result:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
-            border-color: #f0d46f;
-        }
-        
-        .player-result.first-place {
-            border: 3px solid #FFD700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-        
-        .player-result.first-place .rank-badge {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-        }
-        
-        .player-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .player-name-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex: 1;
-        }
-        
-        .rank-badge {
-            background: linear-gradient(135deg, #d4af37, #f0d46f);
-            color: #0a1828;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.8em;
-            flex-shrink: 0;
-        }
-        
-        .player-name {
-            color: #ffffff;
-            font-size: 1.8em;
-            font-weight: 600;
-            word-break: break-word;
-            line-height: 1.1;
-        }
-        
-        .player-stats {
-            text-align: right;
-            flex-shrink: 0;
-        }
-        
-        .vote-count {
-            color: #f0d46f;
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
-        
-        .percentage {
-            color: #d4af37;
-            font-size: 2.2em;
-            font-weight: bold;
-        }
-        
-        .progress-bar-container {
-            background: rgba(10, 24, 40, 0.7);
-            border-radius: 8px;
-            height: 30px;
-            overflow: hidden;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #d4af37, #f0d46f);
-            border-radius: 8px;
-            transition: width 0.8s ease;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-        
-        .progress-bar.first-place {
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-        }
-        
-        .no-votes {
-            text-align: center;
-            color: #ffffff;
-            padding: 40px;
-            font-size: 1.3em;
-            grid-column: 1 / -1;
-        }
-        
-        .refresh-notice {
-            text-align: center;
-            color: #f0d46f;
-            margin-top: 10px;
-            padding: 0;
-            font-size: 1em;
-        }
-        
-        .loading {
-            text-align: center;
-            color: #d4af37;
-            font-size: 1.5em;
-            padding: 40px;
-        }
-        
-        .error-message {
-            background: rgba(220, 53, 69, 0.2);
-            border: 2px solid #dc3545;
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-            grid-column: 1 / -1;
-        }
-        
-        .logo-placeholder {
-            color: #999;
-            font-style: italic;
             font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Modal pour Ã©diter */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 id="resultsTitle">ðŸ† RÃ©sultats du Vote ðŸ†</h1>
-            <div class="subtitle" id="resultsSubtitle">Coupe virtuelle du public</div>
+    <!-- Overlay de chargement de l'authentification -->
+    <div id="authLoading">
+        <div style="text-align: center;">
+            <div class="spinner"></div>
+            <div>VÃ©rification de l'authentification...</div>
+        </div>
+    </div>
+
+    <!-- ðŸ”’ NOUVEAU : Ã‰cran d'accÃ¨s refusÃ© -->
+    <div id="accessDenied" class="access-denied" style="display: none;">
+        <div class="access-denied-content">
+            <div style="font-size: 4em; margin-bottom: 20px;">ðŸš«</div>
+            <h2 style="color: #dc3545; margin-bottom: 15px;">AccÃ¨s RefusÃ©</h2>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+                Vous n'avez pas les permissions nÃ©cessaires pour accÃ©der Ã  cette page.<br><br>
+                Seuls les administrateurs autorisÃ©s peuvent accÃ©der au panneau d'administration.
+            </p>
+            <p style="font-size: 0.9em; color: #999;">
+                ConnectÃ© en tant que : <strong id="deniedUserEmail"></strong>
+            </p>
+            <button onclick="handleLogout()" style="background: #667eea; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">
+                Retour Ã  la connexion
+            </button>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
+        <!-- Header avec info utilisateur et bouton dÃ©connexion -->
+        <div class="admin-header">
+            <h1>ðŸ› ï¸ Administration</h1>
+            <div class="user-info">
+                <div>
+                    <div style="font-size: 0.85em; color: #999;">ConnectÃ© en tant que</div>
+                    <div class="user-email" id="userEmail">-</div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    ðŸšª Se dÃ©connecter
+                </button>
+            </div>
         </div>
         
-        <div class="top-row">
-            <div class="logo-container" id="logoContainer">
-                <!-- Le logo sera insÃ©rÃ© ici -->
-            </div>
+        <div id="configNotice" class="config-notice" style="display: none;">
+            âš ï¸ Configuration Supabase requise dans config.js
+        </div>
+
+        <div id="statusMessage"></div>
+        
+        <!-- Section Upload Logo -->
+        <div class="section">
+            <h2>ðŸ“· Logo du Sondage</h2>
+            <input type="file" id="logoUpload" accept="image/*">
+            <div class="logo-preview" id="logoPreview"></div>
+            <button onclick="deleteLogo()" id="deleteLogoBtn" style="background: #dc3545; display: none; margin-top: 10px;">ðŸ—‘ï¸ Supprimer le logo</button>
+        </div>
+        
+        <!-- Section Ajout Manuel -->
+        <div class="section">
+            <h2>âœï¸ Ajout Manuel de Candidats</h2>
+            <input type="text" id="playerName" placeholder="Nom du joueur">
+            <button onclick="addPlayer()">Ajouter</button>
+        </div>
+        
+        <!-- Liste des Joueurs -->
+        <div class="section">
+            <h2>ðŸ‘¥ Liste des Candidats (<span id="playerCount">0</span>)</h2>
+            <ul class="player-list" id="playerList"></ul>
             
-            <div class="stat-box">
-                <div class="stat-number" id="totalVotes">0</div>
-                <div class="stat-label">Total des votes</div>
+            <div class="export-section">
+                <button onclick="clearAll()" style="background: #dc3545;">ðŸ—‘ï¸ Tout Effacer</button>
+                <button onclick="refreshData()">ðŸ”„ Actualiser</button>
             </div>
         </div>
         
-        <div id="mainContent" style="display: flex; flex-direction: column; flex: 1;">
-            <div id="loadingMessage" class="loading">
-                â³ Chargement des rÃ©sultats...
+        <!-- Section Gestion des Votes -->
+        <div class="section">
+            <h2>âš™ï¸ ParamÃ¨tres de Vote</h2>
+            
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="singleVoteToggle" onchange="toggleSingleVote()" style="width: auto; margin-right: 10px; transform: scale(1.5);">
+                    <span style="font-weight: normal; color: #333;">
+                        <strong>Limiter Ã  1 vote par personne (IP)</strong><br>
+                        <small style="color: #666;">DÃ©cochez pour autoriser les votes multiples (utile pour les tests)</small>
+                    </span>
+                </label>
+                <div id="voteStatusMessage" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
             </div>
             
-            <div class="results-grid" id="resultsGrid">
-                <!-- Les rÃ©sultats seront insÃ©rÃ©s ici -->
+            <div style="background: white; padding: 15px; border-radius: 8px;">
+                <p style="color: #555; margin-bottom: 10px;">
+                    <strong>Votes actuels :</strong> <span id="totalVotesCount" style="color: #667eea; font-size: 1.2em; font-weight: bold;">0</span>
+                </p>
+                <button onclick="resetVotes()" style="background: #ffc107; color: #000;">
+                    ðŸ”„ RÃ©initialiser tous les votes
+                </button>
+                <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                    âš ï¸ Cette action supprime tous les votes mais garde les candidats
+                </p>
+            </div>
+        </div>
+        
+        <!-- Section Messages du Sondage -->
+        <div class="section">
+            <h2>âœï¸ Messages du Sondage</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les messages affichÃ©s sur la page de vote (sondage.html)
+            </p>
+            
+            <label for="msgTitle">Titre principal de la page de vote :</label>
+            <input type="text" id="msgTitle" placeholder="Coupe virtuelle du public" maxlength="100">
+            
+            <label for="msgInvitation">Message d'invitation au vote :</label>
+            <textarea id="msgInvitation" placeholder="Votez pour votre joueur(euse) favori(te) !" rows="2" maxlength="200"></textarea>
+            
+            <label for="msgThankYou">Message de remerciement (aprÃ¨s le vote) :</label>
+            <textarea id="msgThankYou" placeholder="Merci d'avoir votÃ© !" rows="3" maxlength="300"></textarea>
+            
+            <label for="msgAlreadyVoted">Message si dÃ©jÃ  votÃ© :</label>
+            <textarea id="msgAlreadyVoted" placeholder="Merci, votre vote a dÃ©jÃ  Ã©tÃ© enregistrÃ© !" rows="3" maxlength="300"></textarea>
+            
+            <button onclick="saveMessages()" style="background: #28a745; margin-top: 15px;">ðŸ’¾ Enregistrer les messages du sondage</button>
+            <button onclick="resetMessagesToDefault()" style="background: #6c757d;">ðŸ”„ Restaurer par dÃ©faut</button>
+            
+            <div id="messagesStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+        </div>
+        
+        <!-- Section Messages des RÃ©sultats -->
+        <div class="section">
+            <h2>ðŸ“Š Messages des RÃ©sultats</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les messages affichÃ©s sur la page de rÃ©sultats (resultats.html)
+            </p>
+            
+            <label for="msgResultsTitle">Titre de la page des rÃ©sultats :</label>
+            <input type="text" id="msgResultsTitle" placeholder="ðŸ† RÃ©sultats du Vote ðŸ†" maxlength="100">
+            
+            <label for="msgResultsSubtitle">Sous-titre de la page :</label>
+            <input type="text" id="msgResultsSubtitle" placeholder="Coupe virtuelle du public" maxlength="100">
+            
+            <label for="msgResultsNoVotes">Message si aucun vote :</label>
+            <textarea id="msgResultsNoVotes" placeholder="Aucun vote pour le moment... Soyez le premier Ã  voter ! ðŸ¥‹" rows="2" maxlength="200"></textarea>
+            
+            <label for="msgResultsRefresh">Message de mise Ã  jour en temps rÃ©el :</label>
+            <input type="text" id="msgResultsRefresh" placeholder="Mise Ã  jour en temps rÃ©el" maxlength="100">
+            
+            <button onclick="saveResultsMessages()" style="background: #28a745; margin-top: 15px;">ðŸ’¾ Enregistrer les messages des rÃ©sultats</button>
+            <button onclick="resetResultsMessagesToDefault()" style="background: #6c757d;">ðŸ”„ Restaurer par dÃ©faut</button>
+            
+            <div id="resultsMessagesStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+        </div>
+        
+        <!-- Section RGPD -->
+        <div class="section">
+            <h2>ðŸ”’ ConformitÃ© RGPD - Gestion des DonnÃ©es</h2>
+            
+            <div class="info-box">
+                <strong>ðŸ“‹ Informations collectÃ©es :</strong><br>
+                Pour empÃªcher les votes multiples, nous stockons les adresses IP des votants.<br>
+                <strong>Base lÃ©gale :</strong> IntÃ©rÃªt lÃ©gitime (prÃ©vention de la fraude Ã©lectorale)<br>
+                <strong>DurÃ©e de conservation :</strong> LimitÃ©e dans le temps (recommandÃ© : 30 jours maximum)
             </div>
             
-            <div class="refresh-notice">
-                ðŸ”„ Les rÃ©sultats se rafraÃ®chissent automatiquement toutes les 3 secondes
+            <div class="rgpd-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="ipCount">-</div>
+                    <div class="stat-label">Adresses IP stockÃ©es</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="oldestVote">-</div>
+                    <div class="stat-label">Vote le plus ancien (jours)</div>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <strong>âš ï¸ Recommandations RGPD :</strong><br>
+                â€¢ Informez les utilisateurs sur la page de vote (banniÃ¨re d'information)<br>
+                â€¢ Supprimez rÃ©guliÃ¨rement les IPs anciennes (tous les 30 jours recommandÃ©)<br>
+                â€¢ Ne partagez jamais ces donnÃ©es avec des tiers<br>
+                â€¢ Les utilisateurs peuvent demander la suppression de leurs donnÃ©es
+            </div>
+            
+            <button onclick="anonymizeOldIPs()" style="background: #17a2b8; margin-top: 15px;">
+                ðŸ—‘ï¸ Anonymiser les IPs de plus de 30 jours
+            </button>
+            <button onclick="deleteAllIPs()" style="background: #dc3545;">
+                âš ï¸ Supprimer TOUTES les IPs (rÃ©initialisation complÃ¨te)
+            </button>
+            
+            <div id="rgpdStatus" style="margin-top: 10px; padding: 8px; border-radius: 6px; display: none; font-size: 14px;"></div>
+            
+            <div class="info-box" style="margin-top: 15px;">
+                <strong>ðŸ’¡ Conseils :</strong><br>
+                â€¢ Ajoutez une mention sur votre page de vote : "En votant, vous acceptez que votre adresse IP soit temporairement stockÃ©e pour prÃ©venir les votes multiples"<br>
+                â€¢ CrÃ©ez une page "Politique de confidentialitÃ©" expliquant vos pratiques<br>
+                â€¢ Respectez les demandes de suppression des utilisateurs
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal d'Ã©dition -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>âœï¸ Modifier le Candidat</h3>
+            <input type="text" id="editPlayerName" placeholder="Nouveau nom">
+            <div class="modal-buttons">
+                <button onclick="saveEdit()" style="background: #28a745;">ðŸ’¾ Enregistrer</button>
+                <button onclick="closeEditModal()" style="background: #6c757d;">âŒ Annuler</button>
             </div>
         </div>
     </div>
 
     <script>
+        let supabaseClient;
+        let players = [];
+        let editingPlayerId = null;
+        let currentUser = null;
+        
         // ============================================
-        // CONFIGURATION SUPABASE
+        // ðŸ”’ NOUVELLES FONCTIONS DE SÃ‰CURITÃ‰
         // ============================================
         
-        let supabaseClient = null;
+        async function checkIfAdmin() {
+    try {
+        if (!supabaseClient || !currentUser) {
+            console.error('âŒ Pas de client ou utilisateur');
+            console.log('supabaseClient:', !!supabaseClient);
+            console.log('currentUser:', currentUser);
+            return false;
+        }
         
-        // Messages personnalisables (chargÃ©s depuis la DB)
-        let TITLE_HTML = 'ðŸ† RÃ©sultats du Vote ðŸ†';
-        let SUBTITLE_HTML = 'Coupe virtuelle du public';
-        let NOVOTES_HTML = 'Aucun vote pour le moment...<br>Soyez le premier Ã  voter !';
+        console.log('ðŸ” VÃ©rification admin pour user_id:', currentUser.id);
+        
+        // VÃ©rifier si l'utilisateur est dans admin_users
+        const { data, error } = await supabaseClient
+            .from('admin_users')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .eq('is_active', true);
+        
+        if (error) {
+            console.error('âŒ Erreur requÃªte admin_users:', error);
+            console.error('DÃ©tails:', error.message, error.details, error.hint);
+            return false;
+        }
+        
+        console.log('ðŸ“Š RÃ©sultat requÃªte admin_users:', data);
+        
+        if (!data || data.length === 0) {
+            console.log('âŒ Aucune ligne trouvÃ©e dans admin_users pour ce user_id');
+            console.log('VÃ©rifiez que la ligne existe avec user_id:', currentUser.id);
+            return false;
+        }
+        
+        console.log('âœ… Utilisateur admin vÃ©rifiÃ© !');
+        return true;
+        
+    } catch (error) {
+        console.error('âŒ Exception dans checkIfAdmin:', error);
+        return false;
+    }
+}    
+        function showAccessDenied(email) {
+            document.getElementById('authLoading').classList.add('hidden');
+            document.getElementById('mainContainer').style.display = 'none';
+            document.getElementById('deniedUserEmail').textContent = email;
+            document.getElementById('accessDenied').style.display = 'flex';
+        }
+        
+        async function validateAdminBeforeAction() {
+            const isAdmin = await checkIfAdmin();
+            if (!isAdmin) {
+                alert('âš ï¸ AccÃ¨s refusÃ© : Vous n\'Ãªtes pas administrateur');
+                await handleLogout();
+                return false;
+            }
+            return true;
+        }
+        
+        // ============================================
+        // AUTHENTIFICATION (MODIFIÃ‰E)
+        // ============================================
+        
+		async function checkAuth() {
+			try {
+				// âœ… VÃ‰RIFIER QUE SUPABASE EST CHARGÃ‰
+				if (typeof window.supabase === 'undefined') {
+					console.error('âŒ BibliothÃ¨que Supabase non chargÃ©e');
+					
+					// Attendre un peu et rÃ©essayer
+					await new Promise(resolve => setTimeout(resolve, 1000));
+					
+					if (typeof window.supabase === 'undefined') {
+						const authLoading = document.getElementById('authLoading');
+						if (authLoading) {
+							authLoading.innerHTML = `
+								<div style="text-align: center; color: white;">
+									<div style="font-size: 3em; margin-bottom: 20px;">âŒ</div>
+									<div style="font-size: 1.2em; margin-bottom: 15px;">Erreur de chargement</div>
+									<div style="font-size: 0.9em; opacity: 0.8;">Veuillez rafraÃ®chir la page</div>
+								</div>
+							`;
+						}
+						return false;
+					}
+				}
+				
+				if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+					console.error('Configuration Supabase manquante');
+					redirectToLogin();
+					return false;
+				}
+				
+				supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+				
+				// âœ… VÃ‰RIFIER QUE LE CLIENT EST CRÃ‰Ã‰
+				if (!supabaseClient || !supabaseClient.auth) {
+					console.error('âŒ Impossible de crÃ©er le client Supabase');
+					const authLoading = document.getElementById('authLoading');
+					if (authLoading) {
+						authLoading.innerHTML = `
+							<div style="text-align: center; color: white;">
+								<div style="font-size: 3em; margin-bottom: 20px;">âŒ</div>
+								<div style="font-size: 1.2em; margin-bottom: 15px;">Erreur de connexion</div>
+								<div style="font-size: 0.9em; opacity: 0.8;">Veuillez rafraÃ®chir la page</div>
+							</div>
+						`;
+					}
+					return false;
+				}
+				
+				// VÃ©rifier la session
+				const { data: { session }, error } = await supabaseClient.auth.getSession();
+				
+				if (error) {
+					console.error('Erreur vÃ©rification session:', error);
+					redirectToLogin();
+					return false;
+				}
+				
+				if (!session) {
+					console.log('Pas de session active');
+					redirectToLogin();
+					return false;
+				}
+				
+				// Session valide !
+				currentUser = session.user;
+				console.log('Utilisateur connectÃ©:', currentUser.email);
+				
+				// ðŸ”’ VÃ©rifier si c'est un admin
+				const isAdmin = await checkIfAdmin();
+				
+				if (!isAdmin) {
+					console.error('âŒ Utilisateur non autorisÃ©');
+					showAccessDenied(currentUser.email);
+					return false;
+				}
+				
+				// âœ… Admin vÃ©rifiÃ©, afficher l'interface
+				document.getElementById('userEmail').textContent = currentUser.email;
+				document.getElementById('authLoading').classList.add('hidden');
+				document.getElementById('mainContainer').style.display = 'block';
+				
+				return true;
+				
+			} catch (error) {
+				console.error('Erreur authentification:', error);
+				const authLoading = document.getElementById('authLoading');
+				if (authLoading) {
+					authLoading.innerHTML = `
+						<div style="text-align: center; color: white;">
+							<div style="font-size: 3em; margin-bottom: 20px;">âŒ</div>
+							<div style="font-size: 1.2em; margin-bottom: 15px;">Erreur: ${error.message}</div>
+							<div style="font-size: 0.9em; opacity: 0.8;">Redirection vers la connexion...</div>
+						</div>
+					`;
+				}
+				
+				setTimeout(() => {
+					redirectToLogin();
+				}, 3000);
+				
+				return false;
+			}
+		}
+        
+        function redirectToLogin() {
+            window.location.href = 'login.html';
+        }
+        
+        async function handleLogout() {
+            if (!confirm('ÃŠtes-vous sÃ»r de vouloir vous dÃ©connecter ?')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                window.location.href = 'login.html';
+                
+            } catch (error) {
+                console.error('Erreur dÃ©connexion:', error);
+                alert('Erreur lors de la dÃ©connexion: ' + error.message);
+            }
+        }
+        
+        // ============================================
+        // INITIALISATION SUPABASE
+        // ============================================
         
         async function initSupabase() {
             try {
-                if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-                    throw new Error('Configuration Supabase manquante (config.js)');
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    document.getElementById('configNotice').style.display = 'block';
+                    document.getElementById('configNotice').className = 'config-notice error';
+                    document.getElementById('configNotice').innerHTML = 'âŒ Erreur: config.js introuvable ou incomplet. VÃ©rifiez vos clÃ©s Supabase.';
+                    return false;
                 }
                 
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('âœ… Supabase initialisÃ©');
+                showStatus('âœ… ConnectÃ© Ã  Supabase', 'success');
                 return true;
             } catch (error) {
-                console.error('âŒ Erreur initialisation Supabase:', error);
-                showError('Erreur de configuration: ' + error.message);
+                showStatus('âŒ Erreur de connexion: ' + error.message, 'error');
                 return false;
             }
         }
         
-        // ============================================
-        // INITIALISATION DE L'APPLICATION
-        // ============================================
-        
-        async function initApp() {
-            const initialized = await initSupabase();
-            if (!initialized) return;
+        function showStatus(message, type = 'loading') {
+            const status = document.getElementById('statusMessage');
+            status.className = type;
+            status.textContent = message;
+            status.style.display = 'block';
             
-            await loadCustomMessages();
-            await loadResults();
-            
-            // RafraÃ®chissement automatique toutes les 3 secondes
-            setInterval(loadResults, 3000);
-        }
-        
-        // ============================================
-        // CHARGEMENT DES MESSAGES PERSONNALISÃ‰S
-        // ============================================
-        
-        async function loadCustomMessages() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('key, value')
-                    .in('key', ['msg_results_title', 'msg_results_subtitle', 'msg_results_novotes']);
-                
-                if (error) throw error;
-                
-                const map = {};
-                (data || []).forEach(row => {
-                    map[row.key] = row.value;
-                });
-                
-                // Appliquer les messages
-                if (map['msg_results_title']) {
-                    TITLE_HTML = map['msg_results_title'];
-                    document.getElementById('resultsTitle').innerHTML = TITLE_HTML;
-                }
-                if (map['msg_results_subtitle']) {
-                    SUBTITLE_HTML = map['msg_results_subtitle'];
-                    document.getElementById('resultsSubtitle').innerHTML = SUBTITLE_HTML;
-                }
-                if (map['msg_results_novotes']) {
-                    NOVOTES_HTML = map['msg_results_novotes'].replace(/\n/g, '<br>');
-                }
-                
-                console.log('âœ… Messages personnalisÃ©s chargÃ©s');
-            } catch (e) {
-                console.warn('âš ï¸ Utilisation des messages par dÃ©faut', e);
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
             }
         }
-
+        
         // ============================================
-        // CHARGEMENT DES RÃ‰SULTATS DEPUIS v_results
+        // CHARGEMENT DES DONNÃ‰ES
         // ============================================
         
-        async function loadResults() {
+        async function loadData() {
             if (!supabaseClient) return;
             
             try {
-                // Charger le logo (une seule fois au dÃ©but, pas Ã  chaque refresh)
-                if (!document.getElementById('logoContainer').querySelector('img')) {
-                    await loadLogo();
-                }
+                showStatus('â³ Chargement des donnÃ©es...', 'loading');
                 
-                // Charger les rÃ©sultats depuis la vue v_results
-                // On trie par votes DESC pour avoir le classement mÃªme sans colonne rank
-                const { data: resultsData, error: resultsError } = await supabaseClient
-                    .from('v_results')
+                const { data: playersData, error: playersError } = await supabaseClient
+                    .from('players')
                     .select('*')
-                    .order('votes', { ascending: false })
-                    .order('name', { ascending: true })
-                    .limit(6);
+                    .order('id', { ascending: true });
                 
-                if (resultsError) {
-                    console.error('Erreur chargement v_results:', resultsError);
-                    throw resultsError;
-                }
+                if (playersError) throw playersError;
                 
-                // Calculer les statistiques
-                let totalVotes = 0;
-                let totalPlayers = 0;
+                players = playersData || [];
+                updatePlayerList();
                 
-                if (resultsData && resultsData.length > 0) {
-                    // Compter le nombre total de votes (somme des votes de tous les joueurs)
-                    totalVotes = resultsData.reduce((sum, r) => sum + (r.votes || 0), 0);
-                    totalPlayers = resultsData.length;
-                }
-                
-                // Si aucun rÃ©sultat, charger le nombre de joueurs depuis players
-                if (!resultsData || resultsData.length === 0) {
-                    const { data: playersData, error: playersError } = await supabaseClient
-                        .from('players')
-                        .select('id', { count: 'exact', head: true });
-                    
-                    if (!playersError && playersData) {
-                        totalPlayers = playersData.length || 0;
-                    }
-                }
-                
-                // Afficher les rÃ©sultats
-                displayResults(resultsData || [], totalVotes, totalPlayers);
-                
-                // Afficher le contenu principal
-                document.getElementById('loadingMessage').style.display = 'none';
-                const mainContent = document.getElementById('mainContent');
-                mainContent.style.display = 'flex';
-                mainContent.style.flexDirection = 'column';
-                mainContent.style.flex = '1';
-                
-                console.log(`ðŸ”„ RÃ©sultats mis Ã  jour : ${totalVotes} votes, ${totalPlayers} candidats`);
-                
-            } catch (error) {
-                console.error('âŒ Erreur:', error);
-                showError('Erreur de chargement: ' + error.message);
-            }
-        }
-        
-        // ============================================
-        // CHARGEMENT DU LOGO
-        // ============================================
-        
-        async function loadLogo() {
-            try {
-                const { data, error } = await supabaseClient
+                const { data: settingsData, error: settingsError } = await supabaseClient
                     .from('settings')
                     .select('*')
                     .eq('key', 'logo')
                     .single();
                 
-                const container = document.getElementById('logoContainer');
-                
-                if (data && data.value) {
-                    container.innerHTML = `<img src="${data.value}" alt="Logo">`;
+                if (settingsData && settingsData.value) {
+                    displayLogo(settingsData.value);
                 } else {
-                    container.innerHTML = '<div class="logo-placeholder">Logo</div>';
+                    displayLogo(null);
+                }
+                
+                await loadSingleVoteSetting();
+                await loadVotesCount();
+                await loadCustomMessages();
+                await loadResultsMessages();
+                await loadRGPDStats();
+                
+                showStatus('âœ… DonnÃ©es chargÃ©es', 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur de chargement: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadVotesCount() {
+            try {
+                const { data, error, count } = await supabaseClient
+                    .from('votes')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (error) throw error;
+                
+                document.getElementById('totalVotesCount').textContent = count || 0;
+            } catch (error) {
+                console.error('Erreur chargement nombre de votes:', error);
+                document.getElementById('totalVotesCount').textContent = '?';
+            }
+        }
+        
+        async function loadSingleVoteSetting() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                const checkbox = document.getElementById('singleVoteToggle');
+                
+                if (data && data.value !== null) {
+                    checkbox.checked = data.value === 'true';
+                } else {
+                    checkbox.checked = true;
                 }
             } catch (error) {
-                console.error('Erreur chargement logo:', error);
-                document.getElementById('logoContainer').innerHTML = '<div class="logo-placeholder">Logo</div>';
+                console.error('Erreur chargement paramÃ¨tre single vote:', error);
+                document.getElementById('singleVoteToggle').checked = true;
             }
         }
         
         // ============================================
-        // AFFICHAGE DES RÃ‰SULTATS
+        // GESTION DES CANDIDATS (SÃ‰CURISÃ‰ES)
         // ============================================
         
-        function displayResults(results, totalVotes, totalPlayers) {
-            // Mettre Ã  jour le total des votes
-            document.getElementById('totalVotes').textContent = totalVotes;
+        async function addPlayer() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
             
-            const resultsGrid = document.getElementById('resultsGrid');
+            if (!supabaseClient) return;
             
-            if (!results || results.length === 0) {
-                resultsGrid.innerHTML = `<div class="no-votes">${NOVOTES_HTML}</div>`;
+            const input = document.getElementById('playerName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Veuillez entrer un nom');
                 return;
             }
             
-            // Afficher les rÃ©sultats
-            resultsGrid.innerHTML = results.map((result, index) => {
-                const rank = index + 1;
-                const percentage = totalVotes > 0 
-                    ? Math.round((result.votes / totalVotes) * 100) 
-                    : 0;
-                const isFirst = rank === 1;
+            if (players.some(p => p.name === name)) {
+                alert('Ce joueur existe dÃ©jÃ  !');
+                return;
+            }
+            
+            try {
+                showStatus('â³ Ajout du joueur...', 'loading');
                 
-                return `
-                    <div class="player-result ${isFirst ? 'first-place' : ''}">
-                        <div class="player-header">
-                            <div class="player-name-container">
-                                <div class="rank-badge">${rank}</div>
-                                <div class="player-name">${result.name || 'Joueur ' + result.player_id}</div>
-                            </div>
-                            <div class="player-stats">
-                                <div class="vote-count">${result.votes || 0} vote${result.votes > 1 ? 's' : ''}</div>
-                                <div class="percentage">${percentage}%</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar ${isFirst ? 'first-place' : ''}" style="width: ${percentage}%;"></div>
-                        </div>
+                const { data, error } = await supabaseClient
+                    .from('players')
+                    .insert({ name: name })
+                    .select();
+                
+                if (error) throw error;
+                
+                input.value = '';
+                await loadData();
+                showStatus('âœ… Joueur ajoutÃ©', 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        function updatePlayerList() {
+            const list = document.getElementById('playerList');
+            const count = document.getElementById('playerCount');
+            
+            count.textContent = players.length;
+            
+            if (players.length === 0) {
+                list.innerHTML = '<li style="text-align: center; color: #999;">Aucun candidat pour le moment</li>';
+                return;
+            }
+            
+            list.innerHTML = players.map(player => `
+                <li class="player-item">
+                    <span>${player.name}</span>
+                    <div class="player-actions">
+                        <button class="edit-btn" onclick="editPlayer(${player.id}, '${player.name.replace(/'/g, "\\'")}')">âœï¸ Modifier</button>
+                        <button class="delete-btn" onclick="deletePlayer(${player.id})">ðŸ—‘ï¸ Supprimer</button>
                     </div>
-                `;
-            }).join('');
+                </li>
+            `).join('');
+        }
+        
+        function editPlayer(playerId, playerName) {
+            editingPlayerId = playerId;
+            document.getElementById('editPlayerName').value = playerName;
+            document.getElementById('editModal').classList.add('show');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingPlayerId = null;
+        }
+        
+        async function saveEdit() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            if (!supabaseClient || !editingPlayerId) return;
+            
+            const newName = document.getElementById('editPlayerName').value.trim();
+            
+            if (!newName) {
+                alert('Veuillez entrer un nom');
+                return;
+            }
+            
+            if (players.some(p => p.name === newName && p.id !== editingPlayerId)) {
+                alert('Ce nom existe dÃ©jÃ  pour un autre joueur !');
+                return;
+            }
+            
+            try {
+                showStatus('â³ Modification en cours...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('players')
+                    .update({ name: newName })
+                    .eq('id', editingPlayerId);
+                
+                if (error) throw error;
+                
+                closeEditModal();
+                await loadData();
+                showStatus('âœ… Joueur modifiÃ© avec succÃ¨s', 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function deletePlayer(playerId) {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            if (!confirm('Supprimer ce joueur ?')) return;
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('â³ Suppression...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('players')
+                    .delete()
+                    .eq('id', playerId);
+                
+                if (error) throw error;
+                
+                await loadData();
+                showStatus('âœ… Joueur supprimÃ©', 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function clearAll() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            if (!confirm('ÃŠtes-vous sÃ»r de vouloir tout effacer (joueurs, votes, logo) ?')) return;
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('â³ Suppression en cours...', 'loading');
+                
+                await supabaseClient.from('players').delete().neq('id', 0);
+                await supabaseClient.from('votes').delete().neq('id', 0);
+                await supabaseClient.from('settings').delete().eq('key', 'logo');
+                
+                players = [];
+                updatePlayerList();
+                document.getElementById('logoPreview').innerHTML = '';
+                
+                showStatus('âœ… Tout a Ã©tÃ© effacÃ©', 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function refreshData() {
+            await loadData();
         }
         
         // ============================================
-        // GESTION DES ERREURS
+        // GESTION DU LOGO (SÃ‰CURISÃ‰E)
         // ============================================
         
-        function showError(message) {
-            document.getElementById('loadingMessage').style.display = 'none';
-            const resultsGrid = document.getElementById('resultsGrid');
-            resultsGrid.innerHTML = `
-                <div class="error-message">
-                    âŒ ${message}
-                </div>
-            `;
+        document.getElementById('logoUpload').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file || !supabaseClient) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Veuillez sÃ©lectionner une image (PNG, JPG, etc.)');
+                return;
+            }
+            
+            showStatus('â³ Optimisation de l\'image...', 'loading');
+            
+            try {
+                const compressedData = await compressImage(file);
+                const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
+                showStatus(`â³ Enregistrement du logo (${sizeKB} Ko)...`, 'loading');
+                
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'logo')
+                    .single();
+                
+                if (existing) {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .update({ value: compressedData })
+                        .eq('key', 'logo');
+                    
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'logo', value: compressedData });
+                    
+                    if (error) throw error;
+                }
+                
+                displayLogo(compressedData);
+                showStatus(`âœ… Logo enregistrÃ© (${sizeKB} Ko)`, 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
+        });
+        
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = new Image();
+                    
+                    img.onload = function() {
+                        let width = img.width;
+                        let height = img.height;
+                        const maxSize = 500;
+                        
+                        if (width > maxSize || height > maxSize) {
+                            if (width > height) {
+                                height = (height / width) * maxSize;
+                                width = maxSize;
+                            } else {
+                                width = (width / height) * maxSize;
+                                height = maxSize;
+                            }
+                        }
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        const isPNG = file.type === 'image/png';
+                        let compressedData;
+                        
+                        if (isPNG) {
+                            compressedData = canvas.toDataURL('image/png', 0.9);
+                        } else {
+                            compressedData = canvas.toDataURL('image/jpeg', 0.85);
+                        }
+                        
+                        const sizeKB = Math.round((compressedData.length * 3/4) / 1024);
+                        
+                        if (sizeKB > 400 && isPNG) {
+                            const finalData = canvas.toDataURL('image/png', 0.7);
+                            resolve(finalData);
+                        } else if (sizeKB > 400 && !isPNG) {
+                            const finalData = canvas.toDataURL('image/jpeg', 0.6);
+                            resolve(finalData);
+                        } else {
+                            resolve(compressedData);
+                        }
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('Impossible de charger l\'image'));
+                    };
+                    
+                    img.src = e.target.result;
+                };
+                
+                reader.onerror = function() {
+                    reject(new Error('Impossible de lire le fichier'));
+                };
+                
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function displayLogo(logoData) {
+            const preview = document.getElementById('logoPreview');
+            const deleteBtn = document.getElementById('deleteLogoBtn');
+            
+            if (logoData) {
+                preview.innerHTML = `<img src="${logoData}" alt="Logo">`;
+                deleteBtn.style.display = 'inline-block';
+            } else {
+                preview.innerHTML = '';
+                deleteBtn.style.display = 'none';
+            }
+        }
+        
+        async function deleteLogo() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            if (!confirm('ÃŠtes-vous sÃ»r de vouloir supprimer le logo ?')) return;
+            if (!supabaseClient) return;
+            
+            try {
+                showStatus('â³ Suppression du logo...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('settings')
+                    .delete()
+                    .eq('key', 'logo');
+                
+                if (error) throw error;
+                
+                document.getElementById('logoPreview').innerHTML = '';
+                document.getElementById('deleteLogoBtn').style.display = 'none';
+                document.getElementById('logoUpload').value = '';
+                
+                showStatus('âœ… Logo supprimÃ©', 'success');
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
         }
         
         // ============================================
-        // DÃ‰MARRAGE DE L'APPLICATION
+        // GESTION DES VOTES (SÃ‰CURISÃ‰E)
         // ============================================
         
-        // Initialiser dÃ¨s que le DOM est prÃªt
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
+        async function toggleSingleVote() {
+            const checkbox = document.getElementById('singleVoteToggle');
+            const enabled = checkbox.checked;
+            const statusDiv = document.getElementById('voteStatusMessage');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = 'â³ Enregistrement...';
+                
+                const { data: existing } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'single_vote_enabled')
+                    .single();
+                
+                if (existing) {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .update({ value: enabled.toString() })
+                        .eq('key', 'single_vote_enabled');
+                    
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseClient
+                        .from('settings')
+                        .insert({ key: 'single_vote_enabled', value: enabled.toString() });
+                    
+                    if (error) throw error;
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = enabled 
+                    ? 'âœ… Limite activÃ©e : 1 vote par IP' 
+                    : 'âœ… Votes multiples autorisÃ©s (mode test)';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = 'âŒ Erreur: ' + error.message;
+                checkbox.checked = !enabled;
+            }
         }
+        
+        async function resetVotes() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            if (!confirm('âš ï¸ ATTENTION : Supprimer TOUS les votes ?\n\nLes candidats seront conservÃ©s, seuls les votes seront effacÃ©s.')) {
+                return;
+            }
+            
+            try {
+                showStatus('â³ Suppression de tous les votes...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .neq('id', 0);
+                
+                if (error) throw error;
+                
+                await loadVotesCount();
+                await loadRGPDStats();
+                showStatus('âœ… Tous les votes ont Ã©tÃ© supprimÃ©s', 'success');
+                
+            } catch (error) {
+                showStatus('âŒ Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        // ============================================
+        // MESSAGES DU SONDAGE (SÃ‰CURISÃ‰S)
+        // ============================================
+        
+        const DEFAULT_MESSAGES = {
+            title: 'Coupe virtuelle du public',
+            invitation: 'Votez pour votre joueur(euse) favori(te) !',
+            thankYou: 'Merci d\'avoir votÃ© !\n\nN\'hÃ©sitez pas Ã  vous abonner pour plus de fun encore dans les prochains lives',
+            alreadyVoted: 'Merci, votre vote a dÃ©jÃ  Ã©tÃ© enregistrÃ© !\n\nNous avons bien pris en compte votre participation.'
+        };
+        
+        async function loadCustomMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
+                
+                if (error) throw error;
+                
+                const messages = {};
+                if (data) {
+                    data.forEach(item => {
+                        messages[item.key] = item.value;
+                    });
+                }
+                
+                document.getElementById('msgTitle').value = messages.msg_title || DEFAULT_MESSAGES.title;
+                document.getElementById('msgInvitation').value = messages.msg_invitation || DEFAULT_MESSAGES.invitation;
+                document.getElementById('msgThankYou').value = messages.msg_thankyou || DEFAULT_MESSAGES.thankYou;
+                document.getElementById('msgAlreadyVoted').value = messages.msg_alreadyvoted || DEFAULT_MESSAGES.alreadyVoted;
+                
+            } catch (error) {
+                console.error('Erreur chargement messages:', error);
+                document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
+                document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
+                document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
+                document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
+            }
+        }
+        
+        async function saveMessages() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            const statusDiv = document.getElementById('messagesStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = 'â³ Enregistrement des messages...';
+                
+                const messages = [
+                    { key: 'msg_title', value: document.getElementById('msgTitle').value || DEFAULT_MESSAGES.title },
+                    { key: 'msg_invitation', value: document.getElementById('msgInvitation').value || DEFAULT_MESSAGES.invitation },
+                    { key: 'msg_thankyou', value: document.getElementById('msgThankYou').value || DEFAULT_MESSAGES.thankYou },
+                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
+                ];
+                
+                for (const msg of messages) {
+                    const { data: existing } = await supabaseClient
+                        .from('settings')
+                        .select('*')
+                        .eq('key', msg.key)
+                        .single();
+                    
+                    if (existing) {
+                        await supabaseClient
+                            .from('settings')
+                            .update({ value: msg.value })
+                            .eq('key', msg.key);
+                    } else {
+                        await supabaseClient
+                            .from('settings')
+                            .insert({ key: msg.key, value: msg.value });
+                    }
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = 'âœ… Messages du sondage enregistrÃ©s !';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = 'âŒ Erreur: ' + error.message;
+            }
+        }
+        
+        async function resetMessagesToDefault() {
+            if (!confirm('Restaurer tous les messages du sondage Ã  leurs valeurs par dÃ©faut ?')) {
+                return;
+            }
+            
+            document.getElementById('msgTitle').value = DEFAULT_MESSAGES.title;
+            document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
+            document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
+            document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
+            
+            await saveMessages();
+        }
+        
+        // ============================================
+        // MESSAGES DES RÃ‰SULTATS (SÃ‰CURISÃ‰S)
+        // ============================================
+        
+        const DEFAULT_RESULTS_MESSAGES = {
+            title: 'ðŸ† RÃ©sultats du Vote ðŸ†',
+            subtitle: 'Coupe virtuelle du public',
+            noVotes: 'Aucun vote pour le moment...\nSoyez le premier Ã  voter ! ðŸ¥‹',
+            refresh: 'Mise Ã  jour en temps rÃ©el'
+        };
+        
+        async function loadResultsMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .in('key', ['msg_results_title', 'msg_results_subtitle', 'msg_results_no_votes', 'msg_results_refresh']);
+                
+                if (error) throw error;
+                
+                const messages = {};
+                if (data) {
+                    data.forEach(item => {
+                        messages[item.key] = item.value;
+                    });
+                }
+                
+                document.getElementById('msgResultsTitle').value = messages.msg_results_title || DEFAULT_RESULTS_MESSAGES.title;
+                document.getElementById('msgResultsSubtitle').value = messages.msg_results_subtitle || DEFAULT_RESULTS_MESSAGES.subtitle;
+                document.getElementById('msgResultsNoVotes').value = messages.msg_results_no_votes || DEFAULT_RESULTS_MESSAGES.noVotes;
+                document.getElementById('msgResultsRefresh').value = messages.msg_results_refresh || DEFAULT_RESULTS_MESSAGES.refresh;
+                
+            } catch (error) {
+                console.error('Erreur chargement messages rÃ©sultats:', error);
+                document.getElementById('msgResultsTitle').value = DEFAULT_RESULTS_MESSAGES.title;
+                document.getElementById('msgResultsSubtitle').value = DEFAULT_RESULTS_MESSAGES.subtitle;
+                document.getElementById('msgResultsNoVotes').value = DEFAULT_RESULTS_MESSAGES.noVotes;
+                document.getElementById('msgResultsRefresh').value = DEFAULT_RESULTS_MESSAGES.refresh;
+            }
+        }
+        
+        async function saveResultsMessages() {
+            // ðŸ”’ VÃ©rifier les droits admin
+            if (!await validateAdminBeforeAction()) return;
+            
+            const statusDiv = document.getElementById('resultsMessagesStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = 'â³ Enregistrement des messages...';
+                
+                const messages = [
+                    { key: 'msg_results_title', value: document.getElementById('msgResultsTitle').value || DEFAULT_RESULTS_MESSAGES.title },
+                    { key: 'msg_results_subtitle', value: document.getElementById('msgResultsSubtitle').value || DEFAULT_RESULTS_MESSAGES.subtitle },
+                    { key: 'msg_results_no_votes', value: document.getElementById('msgResultsNoVotes').value || DEFAULT_RESULTS_MESSAGES.noVotes },
+                    { key: 'msg_results_refresh', value: document.getElementById('msgResultsRefresh').value || DEFAULT_RESULTS_MESSAGES.refresh }
+                ];
+                
+                for (const msg of messages) {
+                    const { data: existing } = await supabaseClient
+                        .from('settings')
+                        .select('*')
+                        .eq('key', msg.key)
+                        .single();
+                    
+                    if (existing) {
+                        await supabaseClient
+                            .from('settings')
+                            .update({ value: msg.value })
+                            .eq('key', msg.key);
+                    } else {
+                        await supabaseClient
+                            .from('settings')
+                            .insert({ key: msg.key, value: msg.value });
+                    }
+                }
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = 'âœ… Messages des rÃ©sultats enregistrÃ©s !';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = 'âŒ Erreur: ' + error.message;
+            }
+        }
+        
+        async function resetResultsMessagesToDefault() {
+            if (!confirm('Restaurer tous les messages des rÃ©sultats Ã  leurs valeurs par dÃ©faut ?')) {
+                return;
+            }
+            
+            document.getElementById('msgResultsTitle').value = DEFAULT_RESULTS_MESSAGES.title;
+            document.getElementById('msgResultsSubtitle').value = DEFAULT_RESULTS_MESSAGES.subtitle;
+            document.getElementById('msgResultsNoVotes').value = DEFAULT_RESULTS_MESSAGES.noVotes;
+            document.getElementById('msgResultsRefresh').value = DEFAULT_RESULTS_MESSAGES.refresh;
+            
+            await saveResultsMessages();
+        }
+        
+        // ============================================
+        // GESTION RGPD
+        // ============================================
+        
+        async function loadRGPDStats() {
+            try {
+                const { data: votes, error: votesError, count } = await supabaseClient
+                    .from('votes')
+                    .select('voted_at', { count: 'exact' })
+                    .order('voted_at', { ascending: true });
+                
+                if (votesError) throw votesError;
+                
+                document.getElementById('ipCount').textContent = count || 0;
+                
+                if (votes && votes.length > 0) {
+                    const oldestVote = new Date(votes[0].voted_at);
+                    const today = new Date();
+                    const daysDiff = Math.floor((today - oldestVote) / (1000 * 60 * 60 * 24));
+                    document.getElementById('oldestVote').textContent = daysDiff;
+                } else {
+                    document.getElementById('oldestVote').textContent = '0';
+                }
+                
+            } catch (error) {
+                console.error('Erreur chargement stats RGPD:', error);
+                document.getElementById('ipCount').textContent = '?';
+                document.getElementById('oldestVote').textContent = '?';
+            }
+        }
+        
+        async function anonymizeOldIPs() {
+            if (!confirm('Anonymiser toutes les adresses IP de plus de 30 jours ?\n\nLes votes seront conservÃ©s mais les IPs seront remplacÃ©es par "anonymized".')) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('rgpdStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = 'â³ Anonymisation en cours...';
+                
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                
+                const { data, error } = await supabaseClient
+                    .from('votes')
+                    .update({ ip_address: 'anonymized' })
+                    .lt('voted_at', thirtyDaysAgo.toISOString());
+                
+                if (error) throw error;
+                
+                await loadRGPDStats();
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = 'âœ… IPs anciennes anonymisÃ©es avec succÃ¨s';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = 'âŒ Erreur: ' + error.message;
+            }
+        }
+        
+        async function deleteAllIPs() {
+            if (!confirm('âš ï¸ ATTENTION : Supprimer TOUTES les adresses IP ?\n\nLes votes seront supprimÃ©s. Cette action est IRRÃ‰VERSIBLE.')) {
+                return;
+            }
+            
+            if (!confirm('ÃŠtes-vous ABSOLUMENT SÃ›R ? Cette action supprime tous les votes.')) {
+                return;
+            }
+            
+            const statusDiv = document.getElementById('rgpdStatus');
+            
+            try {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color = '#856404';
+                statusDiv.textContent = 'â³ Suppression en cours...';
+                
+                const { error } = await supabaseClient
+                    .from('votes')
+                    .delete()
+                    .neq('id', 0);
+                
+                if (error) throw error;
+                
+                await loadVotesCount();
+                await loadRGPDStats();
+                
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.textContent = 'âœ… Toutes les IPs ont Ã©tÃ© supprimÃ©es';
+                
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+                
+            } catch (error) {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.textContent = 'âŒ Erreur: ' + error.message;
+            }
+        }
+        
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        
+        window.addEventListener('DOMContentLoaded', async () => {
+            // VÃ©rifier l'authentification AVANT tout
+            const authenticated = await checkAuth();
+            
+            if (authenticated) {
+                // Si authentifiÃ© ET admin, initialiser et charger les donnÃ©es
+                const initialized = await initSupabase();
+                if (initialized) {
+                    await loadData();
+                }
+            }
+        });
     </script>
 </body>
 </html>
