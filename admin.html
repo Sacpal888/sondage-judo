@@ -700,19 +700,32 @@
         
         async function loadPlayers() {
             try {
+                console.log('🔍 Chargement des joueurs...');
+                
+                if (!supabaseClient) {
+                    console.error('❌ Supabase client non initialisé');
+                    showStatus('❌ Client Supabase non initialisé', 'error');
+                    return;
+                }
+                
                 const { data, error } = await supabaseClient
                     .from('players')
                     .select('*')
                     .order('ordre');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Erreur Supabase:', error);
+                    throw error;
+                }
                 
+                console.log('✅ Joueurs chargés:', data);
                 players = data || [];
                 displayPlayers();
                 
             } catch (error) {
-                console.error('Erreur chargement joueurs:', error);
-                showStatus('Erreur chargement des données', 'error');
+                console.error('❌ Erreur chargement joueurs:', error);
+                console.error('Détails:', error.message, error.code, error.details);
+                showStatus('❌ Erreur: ' + (error.message || 'Erreur inconnue'), 'error');
             }
         }
         
