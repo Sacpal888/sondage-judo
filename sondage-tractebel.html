@@ -1,4 +1,702 @@
-<div class="container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tractebel Survey - No Mind at Risk</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config-tractebel.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #00AAFF 0%, #0066B3 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #FFFFFF;
+    }
+
+    .container {
+      max-width: 1600px;
+      width: 95%;
+      background: linear-gradient(180deg, #0066B3 0%, #00AAFF 100%);
+      border: 4px solid #FFFFFF;
+      border-radius: 30px;
+      padding: 30px 40px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.4);
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Cookie Consent Screen */
+    .cookie-consent {
+      text-align: center;
+      width: 100%;
+    }
+
+    .consent-content {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 50px 40px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .cookie-icon {
+      font-size: 5rem;
+      margin-bottom: 25px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .consent-title {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #FFED00;
+      margin-bottom: 25px;
+      font-family: Arial, sans-serif;
+    }
+
+    .consent-text {
+      font-size: 1.2rem;
+      color: #FFFFFF;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      font-family: Arial, sans-serif;
+    }
+
+    .privacy-link {
+      color: #FFED00;
+      text-decoration: underline;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .privacy-link:hover {
+      color: #FFD700;
+    }
+
+    .consent-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 35px;
+    }
+
+    .btn-consent {
+      padding: 18px 40px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: 3px solid #FFFFFF;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: Arial, sans-serif;
+      width: 100%;
+    }
+
+    .btn-accept {
+      background: #28a745;
+      color: #FFFFFF;
+    }
+
+    .btn-accept:hover {
+      background: #218838;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+    }
+
+    .btn-decline {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-decline:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: #FFFFFF;
+      transform: translateY(-3px);
+    }
+
+    .btn-back {
+      background: #00AAFF;
+      color: #FFFFFF;
+    }
+
+    .btn-back:hover {
+      background: #0088cc;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 170, 255, 0.5);
+    }
+
+    /* Privacy Policy Screen */
+    .privacy-policy {
+      text-align: left;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .privacy-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 30px;
+    }
+
+    .policy-icon {
+      font-size: 4rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .privacy-title {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: #FFED00;
+      margin-bottom: 35px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .privacy-section {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .privacy-section:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .privacy-section h3 {
+      font-size: 1.4rem;
+      color: #FFED00;
+      margin-bottom: 12px;
+      font-family: Arial, sans-serif;
+    }
+
+    .privacy-section p {
+      font-size: 1.05rem;
+      color: #FFFFFF;
+      line-height: 1.7;
+      margin-bottom: 10px;
+      font-family: Arial, sans-serif;
+    }
+
+    .privacy-section ul {
+      margin-left: 25px;
+      margin-top: 10px;
+    }
+
+    .privacy-section li {
+      font-size: 1.05rem;
+      color: #FFFFFF;
+      line-height: 1.7;
+      margin-bottom: 8px;
+      font-family: Arial, sans-serif;
+    }
+
+    .privacy-buttons {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    /* Consent Declined Screen */
+    .consent-declined {
+      text-align: center;
+      width: 100%;
+    }
+
+    .declined-content {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 50px 40px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .declined-icon {
+      font-size: 5rem;
+      margin-bottom: 25px;
+      opacity: 0.8;
+    }
+
+    .declined-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFED00;
+      margin-bottom: 25px;
+      font-family: Arial, sans-serif;
+    }
+
+    .declined-text {
+      font-size: 1.2rem;
+      color: #FFFFFF;
+      line-height: 1.7;
+      margin-bottom: 15px;
+      font-family: Arial, sans-serif;
+    }
+
+    .declined-text-small {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-style: italic;
+      margin-top: 25px;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Survey Form */
+    .survey-form {
+      width: 100%;
+    }
+
+    /* Layout Desktop */
+    @media (min-width: 769px) {
+      .header {
+        margin-bottom: 15px;
+      }
+
+      .logos-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 15px;
+        align-items: center;
+      }
+
+      .logo-column {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+      }
+
+      .logo-top, .logo-bottom {
+        max-width: 400px;
+        max-height: 200px;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+
+      .logo-bottom {
+        max-width: 300px;
+      }
+
+      .separator {
+        display: none;
+      }
+
+      .question-section {
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .question-title {
+        font-size: 2.3rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 10px;
+        color: #FFED00;
+        font-family: Arial, sans-serif;
+      }
+
+      .question-description {
+        font-size: 1.4rem;
+        text-align: center;
+        margin-bottom: 0;
+        color: #FFFFFF;
+        font-family: Arial, sans-serif;
+      }
+
+      .choices-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 30px;
+      }
+
+      .choice-btn {
+        background: #00AAFF;
+        border: 3px solid #FFFFFF;
+        border-radius: 15px;
+        padding: 10px 16px;
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #FFFFFF;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        min-height: 70px;
+      }
+
+      .choice-btn:hover {
+        background: #0066B3;
+        transform: translateX(5px);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    /* Layout Mobile */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100%;
+        width: 95%;
+        padding: 20px 15px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .logos-grid {
+        display: block;
+      }
+
+      .logo-column {
+        text-align: center;
+      }
+
+      .logo-top {
+        max-width: 200px;
+        width: 80%;
+        height: auto;
+        margin-bottom: 15px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .separator {
+        width: 80%;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.5);
+        margin: 0 auto 15px;
+        display: block;
+      }
+
+      .logo-bottom {
+        max-width: 150px;
+        width: 70%;
+        height: auto;
+        margin-bottom: 20px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .question-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 15px;
+        color: #FFED00;
+        font-family: Arial, sans-serif;
+      }
+
+      .question-description {
+        font-size: 1.1rem;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #FFFFFF;
+        font-family: Arial, sans-serif;
+      }
+
+      .choices-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      .choice-btn {
+        background: #00AAFF;
+        border: 3px solid #FFFFFF;
+        border-radius: 12px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #FFFFFF;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 55px;
+        line-height: 1.4;
+      }
+
+      .choice-btn:hover {
+        background: rgba(0, 170, 255, 0.85);
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.25);
+      }
+
+      .consent-content,
+      .declined-content {
+        padding: 35px 25px;
+      }
+
+      .cookie-icon,
+      .declined-icon {
+        font-size: 4rem;
+      }
+
+      .consent-title {
+        font-size: 1.7rem;
+      }
+
+      .consent-text {
+        font-size: 1.05rem;
+      }
+
+      .btn-consent {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+      }
+
+      .privacy-content {
+        padding: 30px 20px;
+      }
+
+      .policy-icon {
+        font-size: 3rem;
+      }
+
+      .privacy-title {
+        font-size: 1.7rem;
+      }
+
+      .privacy-section {
+        padding: 20px;
+      }
+
+      .privacy-section h3 {
+        font-size: 1.2rem;
+      }
+
+      .privacy-section p,
+      .privacy-section li {
+        font-size: 0.95rem;
+      }
+
+      .declined-title {
+        font-size: 1.6rem;
+      }
+
+      .declined-text {
+        font-size: 1.05rem;
+      }
+
+      .declined-text-small {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .container {
+        padding: 15px 10px;
+      }
+
+      .logo-top {
+        max-width: 180px;
+      }
+
+      .logo-bottom {
+        max-width: 130px;
+      }
+
+      .question-title {
+        font-size: 1.3rem;
+      }
+
+      .question-description {
+        font-size: 1rem;
+      }
+
+      .choice-btn {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+        min-height: 50px;
+      }
+
+      .consent-content,
+      .declined-content {
+        padding: 25px 20px;
+      }
+
+      .cookie-icon,
+      .declined-icon {
+        font-size: 3.5rem;
+      }
+
+      .consent-title {
+        font-size: 1.5rem;
+      }
+
+      .consent-text {
+        font-size: 1rem;
+      }
+
+      .privacy-title {
+        font-size: 1.5rem;
+      }
+
+      .declined-title {
+        font-size: 1.4rem;
+      }
+    }
+
+    .choice-btn.selected {
+      background: #0066B3;
+      border-color: #FFED00;
+      border-width: 4px;
+      box-shadow: 0 0 20px rgba(255, 237, 0, 0.5);
+    }
+
+    .choice-btn.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .success-message, .error-message, .already-voted {
+      text-align: center;
+      padding: 60px 40px;
+      width: 100%;
+    }
+
+    .success-message h2 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #FFED00;
+      font-family: Arial, sans-serif;
+    }
+
+    .success-message p {
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+    }
+
+    .already-voted h2 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #FFED00;
+      font-family: Arial, sans-serif;
+    }
+
+    .already-voted p {
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+    }
+
+    .error-message h2 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFED00;
+      font-family: Arial, sans-serif;
+    }
+
+    .error-message p {
+      font-size: 1.2rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .success-message h2 {
+        font-size: 2rem;
+      }
+
+      .success-message p {
+        font-size: 1.1rem;
+      }
+
+      .already-voted h2 {
+        font-size: 1.8rem;
+      }
+
+      .already-voted p {
+        font-size: 1.1rem;
+      }
+
+      .error-message h2 {
+        font-size: 1.6rem;
+      }
+
+      .error-message p {
+        font-size: 1rem;
+      }
+    }
+
+    .submitting {
+      text-align: center;
+      padding: 40px;
+      width: 100%;
+    }
+
+    .submitting p {
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+    }
+
+    .spinner {
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #FFED00;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
     <!-- Écran Cookies Consent -->
     <div id="cookieConsent" class="cookie-consent hidden">
       <div class="consent-content">
@@ -76,7 +774,7 @@
     </div>
 
     <!-- Formulaire -->
-    <div id="surveyForm" class="hidden">
+    <div id="surveyForm" class="survey-form hidden">
       <div class="header">
         <div class="logos-grid">
           <div class="logo-column">
@@ -100,13 +798,13 @@
     <!-- Chargement -->
     <div id="submitting" class="submitting hidden">
       <div class="spinner"></div>
-      <p style="font-size: 1.3rem; color: #FFFFFF;">Submitting your vote...</p>
+      <p>Submitting your vote...</p>
     </div>
 
     <!-- Succès -->
     <div id="successMessage" class="success-message hidden">
       <h2>✓ Thank you!</h2>
-      <p style="font-size: 1.3rem; color: #FFFFFF;">Your vote has been recorded.</p>
+      <p>Your vote has been recorded.</p>
     </div>
 
     <!-- Déjà voté -->
@@ -118,6 +816,212 @@
     <!-- Erreur -->
     <div id="errorMessage" class="error-message hidden">
       <h2>⚠️ No active survey</h2>
-      <p style="color: #FFFFFF;">Please check back later.</p>
+      <p>Please check back later.</p>
     </div>
   </div>
+
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      CONFIG_TRACTEBEL.supabase.url,
+      CONFIG_TRACTEBEL.supabase.anon_key
+    );
+
+    let activePage = null;
+    let choices = [];
+    const sessionId = generateSessionId();
+    const COOKIE_CONSENT_NAME = 'tractebel_cookie_consent';
+
+    // Vérifier le consentement au chargement
+    function checkCookieConsent() {
+      const consent = getCookie(COOKIE_CONSENT_NAME);
+      
+      if (consent === 'accepted') {
+        loadActivePage();
+      } else if (consent === 'declined') {
+        showConsentDeclined();
+      } else {
+        showCookieConsent();
+      }
+    }
+
+    function showCookieConsent() {
+      document.getElementById('cookieConsent').classList.remove('hidden');
+    }
+
+    function showConsentDeclined() {
+      document.getElementById('consentDeclined').classList.remove('hidden');
+    }
+
+    function showPrivacyPolicy() {
+      document.getElementById('cookieConsent').classList.add('hidden');
+      document.getElementById('privacyPolicy').classList.remove('hidden');
+    }
+
+    function backToConsent() {
+      document.getElementById('privacyPolicy').classList.add('hidden');
+      document.getElementById('cookieConsent').classList.remove('hidden');
+    }
+
+    function acceptCookies() {
+      setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
+      document.getElementById('cookieConsent').classList.add('hidden');
+      loadActivePage();
+    }
+
+    function declineCookies() {
+      setCookie(COOKIE_CONSENT_NAME, 'declined', 365);
+      document.getElementById('cookieConsent').classList.add('hidden');
+      showConsentDeclined();
+    }
+
+    // Event listeners
+    document.getElementById('btnAcceptCookies').addEventListener('click', acceptCookies);
+    document.getElementById('btnDeclineCookies').addEventListener('click', declineCookies);
+    document.getElementById('linkPrivacyPolicy').addEventListener('click', function(e) {
+      e.preventDefault();
+      showPrivacyPolicy();
+    });
+    document.getElementById('btnBackToConsent').addEventListener('click', backToConsent);
+
+    // Charger la page active
+    async function loadActivePage() {
+      try {
+        const { data: pages } = await sb
+          .from(CONFIG_TRACTEBEL.tables.pages)
+          .select('*')
+          .eq('active', true)
+          .limit(1);
+
+        if (!pages || pages.length === 0) {
+          showError();
+          return;
+        }
+
+        activePage = pages[0];
+
+        document.getElementById('logoTop').src = activePage.logo_top || 'assets/logo-nmar.png';
+        document.getElementById('logoBottom').src = activePage.logo_bottom || 'assets/logo-tractebel.png';
+
+        if (hasVoted(activePage.id)) {
+          showAlreadyVoted();
+          return;
+        }
+
+        const { data: choicesData } = await sb
+          .from(CONFIG_TRACTEBEL.tables.choix)
+          .select('*')
+          .eq('page_id', activePage.id)
+          .order('ordre');
+
+        choices = choicesData || [];
+        displaySurvey();
+
+      } catch (error) {
+        console.error('Erreur chargement:', error);
+        showError();
+      }
+    }
+
+    function displaySurvey() {
+      document.getElementById('surveyForm').classList.remove('hidden');
+      document.getElementById('questionTitle').textContent = activePage.titre;
+      document.getElementById('questionDescription').textContent = activePage.description || '';
+
+      const container = document.getElementById('choicesContainer');
+      container.innerHTML = '';
+
+      choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = formatMarkdown(choice.texte);
+        btn.onclick = () => selectChoice(choice, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    async function selectChoice(choice, buttonElement) {
+      document.querySelectorAll('.choice-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('disabled');
+      });
+
+      buttonElement.classList.add('selected');
+
+      await new Promise(resolve => setTimeout(resolve, 300));
+      await submitVote(choice);
+    }
+
+    async function submitVote(choice) {
+      document.getElementById('surveyForm').classList.add('hidden');
+      document.getElementById('submitting').classList.remove('hidden');
+
+      try {
+        await sb.from(CONFIG_TRACTEBEL.tables.votes).insert({
+          page_id: activePage.id,
+          choix_id: choice.id,
+          session_id: sessionId
+        });
+
+        await sb.rpc('calculer_stats_page', { page_uuid: activePage.id });
+
+        setCookie(`voted_tractebel_${activePage.id}`, 'true', 1);
+
+        setTimeout(() => {
+          document.getElementById('submitting').classList.add('hidden');
+          document.getElementById('successMessage').classList.remove('hidden');
+        }, 800);
+
+      } catch (error) {
+        console.error('Erreur soumission:', error);
+        alert('Error submitting your vote. Please try again.');
+        
+        document.getElementById('submitting').classList.add('hidden');
+        document.getElementById('surveyForm').classList.remove('hidden');
+        
+        document.querySelectorAll('.choice-btn').forEach(btn => {
+          btn.disabled = false;
+          btn.classList.remove('disabled');
+        });
+      }
+    }
+
+    function showError() {
+      document.getElementById('errorMessage').classList.remove('hidden');
+    }
+
+    function showAlreadyVoted() {
+      document.getElementById('alreadyVoted').classList.remove('hidden');
+    }
+
+    function generateSessionId() {
+      return 'tractebel_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function setCookie(name, value, days) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+    }
+
+    function getCookie(name) {
+      return document.cookie.split('; ').reduce((r, v) => {
+        const parts = v.split('=');
+        return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+      }, '');
+    }
+
+    function hasVoted(pageId) {
+      return getCookie(`voted_tractebel_${pageId}`) === 'true';
+    }
+
+    function formatMarkdown(text) {
+      if (!text) return text;
+      text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      return text;
+    }
+
+    checkCookieConsent();
+  </script>
+</body>
+</html>
