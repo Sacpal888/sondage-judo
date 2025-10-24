@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sondage</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(13, 39, 68, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========================================
+           COOKIE CONSENT SCREEN
+        ======================================== */
+        .cookie-consent {
+            text-align: center;
+            width: 100%;
+        }
+
+        .consent-content {
+            padding: 40px 30px;
+            background: rgba(26, 47, 74, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 15px;
+        }
+
+        .cookie-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .consent-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+
+        .consent-text {
+            font-size: 1.1rem;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .privacy-link {
+            color: #f0d46f;
+            text-decoration: underline;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .privacy-link:hover {
+            color: #d4af37;
+        }
+
+        .consent-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-consent {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-accept {
+            background: #28a745;
+            color: #ffffff;
+        }
+
+        .btn-accept:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-decline {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-decline:hover {
+            background: rgba(220, 53, 69, 0.4);
+            border-color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: #0066B3;
+            color: #ffffff;
+        }
+
+        .btn-back:hover {
+            background: #0088cc;
+            transform: translateY(-2px);
+        }
+
+        /* ========================================
+           PRIVACY POLICY SCREEN
+        ======================================== */
+        .privacy-policy {
+            text-align: left;
+            width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .privacy-content {
+            padding: 30px 20px;
+        }
+
+        .policy-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .privacy-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .privacy-section {
+            background: rgba(26, 47, 74, 0.6);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .privacy-section h3 {
+            font-size: 1.2rem;
+            color: #f0d46f;
+            margin-bottom: 10px;
+        }
+
+        .privacy-section p {
+            font-size: 1rem;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .privacy-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .privacy-section li {
+            font-size: 1rem;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 6px;
+        }
+
+        .privacy-buttons {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        /* ========================================
+           CONSENT DECLINED SCREEN
+        ======================================== */
+        .consent-declined {
+            text-align: center;
+            width: 100%;
+        }
+
+        .declined-content {
+            padding: 40px 30px;
+            background: rgba(26, 47, 74, 0.8);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 15px;
+        }
+
+        .declined-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .declined-title {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+
+        .declined-text {
+            font-size: 1.1rem;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .declined-text-small {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        /* ========================================
+           MAIN SURVEY
+        ======================================== */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        h1 {
+            color: #d4af37;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0 0 15px 0;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+        
+        .logo-container img {
+            max-width: 90%;
+            max-height: 150px;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            display: block;
+            background: transparent;
+            object-fit: contain;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .vote-text {
+            color: #ffffff;
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        /* Cartes des joueurs - Affichage en colonnes verticales */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-flow: column;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .player-card {
+            background: rgba(26, 47, 74, 0.8);
+            border: 2px solid #d4af37;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            border-color: #f0d46f;
+            background: rgba(26, 47, 74, 1);
+        }
+        
+        .player-card.selected {
+            border: 3px solid #f0d46f;
+            background: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            animation: pulse-gold 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-gold {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);
+            }
+        }
+        
+        .player-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        
+        .player-card.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .player-name {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            hyphens: auto;
+            line-height: 1.2;
+            width: 100%;
+        }
+        
+        .player-card.selected .player-name {
+            color: #f0d46f;
+        }
+        
+        .vote-button {
+            background: #d4af37;
+            color: #0a1828;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .player-card.selected .vote-button {
+            display: inline-block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .vote-button:hover {
+            background: #f0d46f;
+            transform: scale(1.05);
+        }
+        
+        .thank-you {
+            display: none;
+            text-align: center;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #d4af37;
+            animation: fadeInScale 0.5s ease-in;
+        }
+        
+        .thank-you.show {
+            display: block;
+        }
+        
+        .thank-you h2 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .thank-you p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .votes-frozen {
+            display: none;
+            text-align: center;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(100, 149, 237, 0.3), rgba(70, 130, 180, 0.3));
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #87CEEB;
+            margin-top: 20px;
+            animation: fadeInScale 0.5s ease-in;
+        }
+        
+        .votes-frozen.show {
+            display: block;
+        }
+
+        .votes-frozen h3 {
+            color: #87CEEB;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .votes-frozen p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #d4af37;
+            font-size: 1.3em;
+            padding: 20px;
+        }
+        
+        .error-message {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .vote-text {
+                font-size: 1.3em;
+            }
+            
+            .players-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                grid-auto-flow: row;
+            }
+            
+            .player-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ========================================
+             COOKIE CONSENT
+        ======================================== -->
+        <div id="cookieConsent" class="cookie-consent hidden">
+            <div class="consent-content">
+                <div class="cookie-icon">🍪</div>
+                <h2 class="consent-title" id="consentTitle">Cookies et Participation</h2>
+                <p class="consent-text" id="consentText1">
+                    Pour garantir l'intégrité du vote et éviter les abus, nous utilisons un cookie technique.
+                </p>
+                <p class="consent-text" id="consentText2">
+                    Ce cookie ne contient aucune donnée personnelle et sert uniquement à vérifier que vous n'avez pas déjà voté.
+                </p>
+                <p class="consent-text">
+                    <a class="privacy-link" id="linkPrivacyPolicy">📄 En savoir plus</a>
+                </p>
+                <div class="consent-buttons">
+                    <button class="btn-consent btn-accept" id="btnAcceptCookies">✅ Accepter et participer</button>
+                    <button class="btn-consent btn-decline" id="btnDeclineCookies">❌ Refuser</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             PRIVACY POLICY
+        ======================================== -->
+        <div id="privacyPolicy" class="privacy-policy hidden">
+            <div class="privacy-content">
+                <div class="policy-icon">🔒</div>
+                <h2 class="privacy-title" id="privacyPolicyTitle">Politique de Confidentialité</h2>
+
+                <div class="privacy-section">
+                    <h3 id="privacyDataTitle">📊 Données collectées</h3>
+                    <p id="privacyDataText">
+                        Nous collectons uniquement les informations nécessaires au fonctionnement du vote :
+                        votre choix de candidat et un identifiant de session anonyme.
+                    </p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3 id="privacyPurposeTitle">🎯 Finalité</h3>
+                    <p id="privacyPurposeText">
+                        Ces données servent exclusivement à comptabiliser les votes et à empêcher les votes multiples.
+                    </p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3 id="privacyCookieTitle">🍪 Le cookie technique</h3>
+                    <p id="privacyCookieText">
+                        Le cookie ne contient qu'un identifiant technique anonyme.
+                    </p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3 id="privacyRightsTitle">✋ Vos droits</h3>
+                    <p id="privacyRightsText">
+                        Vous pouvez refuser l'utilisation du cookie à tout moment (et donc refuser votre participation).
+                    </p>
+                </div>
+
+                <div class="privacy-buttons">
+                    <button class="btn-consent btn-back" id="btnBackToConsent">← Retour</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             CONSENT DECLINED
+        ======================================== -->
+        <div id="consentDeclined" class="consent-declined hidden">
+            <div class="declined-content">
+                <div class="declined-icon">🚫</div>
+                <h2 class="declined-title" id="declinedTitle">Participation non autorisée</h2>
+                <p class="declined-text" id="declinedText1">
+                    Nous respectons votre choix de ne pas accepter les cookies techniques.
+                </p>
+                <p class="declined-text" id="declinedText2">
+                    Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
+                </p>
+                <p class="declined-text-small" id="declinedText3">
+                    Merci de votre compréhension.
+                </p>
+                <div class="consent-buttons" style="margin-top: 25px;">
+                    <button class="btn-consent btn-back" id="btnRetryConsent">← Changer d'avis</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================
+             MAIN SURVEY CONTENT
+        ======================================== -->
+        <div id="mainContent" class="hidden">
+            <div class="logo-container" id="logoContainer">
+                <!-- Le logo sera inséré ici -->
+            </div>
+            
+            <div class="header">
+                <h1 id="pageTitle">Sondage</h1>
+            </div>
+            
+            <div id="loadingMessage" class="loading">
+                ⏳ Chargement...
+            </div>
+            
+            <div id="voteSection" style="display: none;">
+                <div class="vote-text" id="invitationText">
+                    Votez pour votre choix !
+                </div>
+                
+                <div class="players-grid" id="playersGrid">
+                    <!-- Les cartes des joueurs seront insérées ici -->
+                </div>
+            </div>
+
+            <div class="votes-frozen" id="votesFrozen">
+                <h3 id="votesFrozenTitle">❄️ Votes figés</h3>
+                <p id="votesFrozenText">
+                    Les votes sont malheureusement figés à présent.<br>
+                    Merci de votre compréhension.
+                </p>
+            </div>
+            
+            <div class="thank-you" id="thankYou">
+                <h2>✨ Merci !</h2>
+                <p id="thankYouText">
+                    Votre vote a été enregistré avec succès !
+                </p>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        const COOKIE_CONSENT_NAME = 'survey_consent';
+        const COOKIE_VOTED_PREFIX = 'survey_voted_';
+        
+        let supabaseClient = null;
+        let sessionId = null;
+        let hasVoted = false;
+        let selectedPlayerId = null;
+        let currentSurveyId = null;
+        let currentLanguage = 'fr';
+
+        // ============================================
+        // GET URL PARAMETERS
+        // ============================================
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const surveyId = params.get('id');
+            const lang = params.get('lang') || 'fr';
+            
+            if (!surveyId) {
+                showError('Erreur: ID de sondage manquant dans l\'URL');
+                return null;
+            }
+
+            return { surveyId: parseInt(surveyId), lang };
+        }
+
+        // ============================================
+        // COOKIES MANAGEMENT
+        // ============================================
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+        }
+
+        // ============================================
+        // CONSENT MANAGEMENT
+        // ============================================
+        function checkCookieConsent() {
+            const consent = getCookie(COOKIE_CONSENT_NAME);
+            
+            if (consent === 'accepted') {
+                console.log('✅ Consentement déjà donné');
+                sessionId = generateSessionId();
+                initSupabase();
+            } else if (consent === 'declined') {
+                console.log('❌ Consentement refusé');
+                document.getElementById('consentDeclined').classList.remove('hidden');
+            } else {
+                console.log('❓ Pas de consentement, affichage de la popup');
+                document.getElementById('cookieConsent').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('btnAcceptCookies').addEventListener('click', () => {
+            setCookie(COOKIE_CONSENT_NAME, 'accepted', 30);
+            sessionId = generateSessionId();
+            document.getElementById('cookieConsent').classList.add('hidden');
+            initSupabase();
+        });
+
+        document.getElementById('btnDeclineCookies').addEventListener('click', () => {
+            setCookie(COOKIE_CONSENT_NAME, 'declined', 30);
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('consentDeclined').classList.remove('hidden');
+        });
+
+        document.getElementById('btnRetryConsent').addEventListener('click', () => {
+            deleteCookie(COOKIE_CONSENT_NAME);
+            document.getElementById('consentDeclined').classList.add('hidden');
+            document.getElementById('cookieConsent').classList.remove('hidden');
+        });
+
+        document.getElementById('linkPrivacyPolicy').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('privacyPolicy').classList.remove('hidden');
+        });
+
+        document.getElementById('btnBackToConsent').addEventListener('click', () => {
+            document.getElementById('privacyPolicy').classList.add('hidden');
+            document.getElementById('cookieConsent').classList.remove('hidden');
+        });
+
+        // ============================================
+        // SUPABASE INITIALIZATION
+        // ============================================
+        async function initSupabase() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    showError('Configuration manquante. Contactez l\'administrateur.');
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                document.getElementById('mainContent').classList.remove('hidden');
+                
+                await loadSurveyData();
+                
+                return true;
+            } catch (error) {
+                showError('Erreur de connexion: ' + error.message);
+                return false;
+            }
+        }
+
+        // ============================================
+        // LOAD SURVEY DATA
+        // ============================================
+        async function loadSurveyData() {
+            if (!supabaseClient) return;
+            
+            const urlParams = getUrlParams();
+            if (!urlParams) return;
+
+            currentSurveyId = urlParams.surveyId;
+            currentLanguage = urlParams.lang;
+
+            try {
+                document.getElementById('loadingMessage').style.display = 'block';
+
+                // Charger le sondage
+                const { data: survey, error: surveyError } = await supabaseClient
+                    .from('surveys')
+                    .select('*')
+                    .eq('id', currentSurveyId)
+                    .single();
+
+                if (surveyError) throw surveyError;
+                if (!survey) throw new Error('Sondage introuvable');
+
+                // Vérifier si le sondage est actif
+                if (!survey.active) {
+                    showError('Ce sondage n\'est pas actif actuellement.');
+                    return;
+                }
+
+                // Charger la traduction si langue NL
+                let messages = {
+                    title: survey.msg_title || survey.titre,
+                    invitation: survey.msg_invitation || 'Votez pour votre choix !',
+                    thankyou: survey.msg_thankyou || 'Merci pour votre vote !'
+                };
+
+                if (currentLanguage === 'nl') {
+                    const { data: translation } = await supabaseClient
+                        .from('survey_translations')
+                        .select('*')
+                        .eq('survey_id', currentSurveyId)
+                        .eq('language_code', 'nl')
+                        .maybeSingle();
+
+                    if (translation && translation.active) {
+                        messages = {
+                            title: translation.msg_title || messages.title,
+                            invitation: translation.msg_invitation || messages.invitation,
+                            thankyou: translation.msg_thankyou || messages.thankyou
+                        };
+                        document.documentElement.lang = 'nl';
+                    }
+                }
+
+                // Appliquer les messages
+                document.getElementById('pageTitle').textContent = messages.title;
+                document.title = messages.title;
+                document.getElementById('invitationText').innerHTML = messages.invitation.replace(/\n/g, '<br>');
+                document.getElementById('thankYouText').innerHTML = messages.thankyou.replace(/\n/g, '<br>');
+
+                // Charger le logo
+                if (survey.logo_url) {
+                    document.getElementById('logoContainer').style.display = 'flex';
+                    document.getElementById('logoContainer').innerHTML = `<img src="${survey.logo_url}" alt="Logo">`;
+                } else {
+                    document.getElementById('logoContainer').style.display = 'none';
+                }
+
+                // Vérifier si l'utilisateur a déjà voté
+                const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
+                if (votedCookie === 'true') {
+                    console.log('✓ Utilisateur a déjà voté');
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('thankYou').classList.add('show');
+                    return;
+                }
+
+                // Charger les candidats
+                const { data: players, error: playersError } = await supabaseClient
+                    .from('survey_players')
+                    .select('*')
+                    .eq('survey_id', currentSurveyId)
+                    .order('ordre', { ascending: true });
+
+                if (playersError) throw playersError;
+
+                if (!players || players.length === 0) {
+                    showError('Aucun candidat disponible pour ce sondage.');
+                    return;
+                }
+
+                // Afficher les candidats
+                const grid = document.getElementById('playersGrid');
+                grid.innerHTML = '';
+
+                players.forEach(player => {
+                    const card = document.createElement('div');
+                    card.className = 'player-card';
+                    card.dataset.playerId = player.id;
+                    card.innerHTML = `
+                        <div class="player-name">${escapeHtml(player.nom)}</div>
+                        <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
+                    `;
+                    
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('vote-button')) {
+                            selectPlayer(player.id);
+                        }
+                    });
+                    
+                    grid.appendChild(card);
+                });
+
+                // Ajuster la taille de police
+                adjustFontSize();
+
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('voteSection').style.display = 'block';
+
+            } catch (error) {
+                console.error('Erreur chargement sondage:', error);
+                showError('Erreur de chargement: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // FONT SIZE ADJUSTMENT
+        // ============================================
+        function adjustFontSize() {
+            const playerNames = document.querySelectorAll('.player-name');
+            if (playerNames.length === 0) return;
+
+            let maxLength = 0;
+            playerNames.forEach(nameEl => {
+                const length = nameEl.textContent.length;
+                if (length > maxLength) {
+                    maxLength = length;
+                }
+            });
+
+            let fontSize;
+            if (maxLength <= 15) {
+                fontSize = 1.3;
+            } else if (maxLength <= 20) {
+                fontSize = 1.15;
+            } else if (maxLength <= 25) {
+                fontSize = 1.0;
+            } else if (maxLength <= 30) {
+                fontSize = 0.9;
+            } else {
+                fontSize = 0.8;
+            }
+
+            playerNames.forEach(nameEl => {
+                nameEl.style.fontSize = fontSize + 'em';
+            });
+
+            console.log(`🔍 Taille de police ajustée à ${fontSize}em pour max length: ${maxLength}`);
+        }
+
+        // ============================================
+        // VOTING
+        // ============================================
+        function selectPlayer(playerId) {
+            if (hasVoted) return;
+            
+            document.querySelectorAll('.player-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                selectedPlayerId = playerId;
+            }
+        }
+        
+        async function confirmVote(playerId) {
+            if (hasVoted) return;
+            
+            document.querySelectorAll('.player-card').forEach(card => {
+                if (card.dataset.playerId != playerId) {
+                    card.classList.add('disabled');
+                }
+            });
+            
+            await saveVote(playerId);
+        }
+
+        async function saveVote(playerId) {
+            if (!supabaseClient) return;
+            
+            try {
+                // Insérer le vote
+                const { error: insertError } = await supabaseClient
+                    .from('votes')
+                    .insert({
+                        survey_id: currentSurveyId,
+                        player_id: playerId,
+                        language_code: currentLanguage,
+                        session_id: sessionId,
+                        voted_at: new Date().toISOString()
+                    });
+                
+                if (insertError) throw insertError;
+                
+                // Set cookie pour empêcher les votes multiples
+                setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
+                
+                hasVoted = true;
+                
+                setTimeout(() => {
+                    document.getElementById('voteSection').style.display = 'none';
+                    document.getElementById('thankYou').classList.add('show');
+                }, 800);
+                
+            } catch (error) {
+                console.error('Erreur lors du vote:', error);
+                alert('Erreur lors de l\'enregistrement de votre vote. Veuillez réessayer.');
+                
+                document.querySelectorAll('.player-card').forEach(card => {
+                    card.classList.remove('disabled');
+                });
+            }
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        function showError(message) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('voteSection').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = getUrlParams();
+            if (urlParams) {
+                checkCookieConsent();
+            }
+        });
+    </script>
+</body>
+</html>
