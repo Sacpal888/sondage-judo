@@ -947,9 +947,9 @@
 
                 // Charger les messages (FR par défaut, puis NL si sélectionné)
                 let messages = {
-                    title: survey.msg_title || 'Sondage',
-                    invitation: survey.msg_invitation || 'Votez pour votre choix !',
-                    thankyou: survey.msg_thankyou || 'Merci pour votre vote !'
+                    title: survey.titre || 'Sondage',
+                    invitation: survey.description || 'Votez pour votre choix !',
+                    thankyou: 'Merci pour votre vote !'
                 };
 
                 if (currentLanguage === 'nl') {
@@ -962,9 +962,9 @@
 
                     if (translation && translation.active) {
                         messages = {
-                            title: translation.msg_title || messages.title,
-                            invitation: translation.msg_invitation || messages.invitation,
-                            thankyou: translation.msg_thankyou || messages.thankyou
+                            title: translation.titre || messages.title,
+                            invitation: translation.description || messages.invitation,
+                            thankyou: 'Bedankt voor uw stem!'
                         };
                         document.documentElement.lang = 'nl';
                     }
