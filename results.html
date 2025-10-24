@@ -46,26 +46,29 @@
             font-size: 4rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
+            text-align: center;
+            line-height: 1.2;
         }
         
         h1 .title-fr {
             color: #ffffff;
+            display: block;
         }
         
         h1 .title-nl {
             color: #f4d03f;
+            display: block;
+            margin-top: 5px;
         }
         
         .subtitle {
             font-size: 3.3rem;
+            text-align: center;
             display: flex;
             gap: 15px;
             justify-content: center;
             align-items: center;
+            line-height: 1.2;
         }
         
         .subtitle .subtitle-fr {
@@ -243,8 +246,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 id="resultsTitle"><span class="title-fr">Résultats du Sondage</span><span class="title-nl">Enquêteresultaten</span></h1>
-            <p class="subtitle" id="resultsSubtitle"><span class="subtitle-fr">En temps réel</span><span class="subtitle-nl">In real-time</span></p>
+            <h1 id="resultsTitle"></h1>
+            <p class="subtitle" id="resultsSubtitle"></p>
         </div>
         
         <div id="loadingMessage" class="loading">
@@ -341,15 +344,15 @@
                 }
 
                 // Construire le titre avec FR + NL si bilingue
-                let displayTitle = 'ðŸ† ' + titleFr + ' ðŸ†';
+                let displayTitle = '<span class="title-fr">' + titleFr + '</span>';
                 if (isBilingualMode && titleNl) {
-                    displayTitle = 'ðŸ† ' + titleFr + ' <span style="color: #f4d03f;">' + titleNl + '</span> ðŸ†';
+                    displayTitle += '<span class="title-nl">' + titleNl + '</span>';
                 }
 
                 // Construire le sous-titre avec FR + NL si bilingue
-                let displayInvitation = invitationFr;
+                let displayInvitation = '<span class="subtitle-fr">' + invitationFr + '</span>';
                 if (isBilingualMode && invitationNl) {
-                    displayInvitation = invitationFr + ' <span style="color: #f4d03f;">' + invitationNl + '</span>';
+                    displayInvitation += '<span class="subtitle-nl">' + invitationNl + '</span>';
                 }
 
                 // Mettre Ã  jour les titres
