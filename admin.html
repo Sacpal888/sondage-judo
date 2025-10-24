@@ -664,6 +664,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Description (NL)</label>
+                        <textarea class="form-textarea" id="surveyDescriptionNl" placeholder="Nederlandse beschrijving"></textarea>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Message titre (NL)</label>
                         <input type="text" class="form-input" id="msgTitleNl" placeholder="Ex: Virtuele publieksbeker">
                     </div>
@@ -1042,6 +1047,7 @@
                 document.getElementById('enableNL').checked = true;
                 document.getElementById('nlFieldsContainer').style.display = 'block';
                 document.getElementById('surveyTitleNl').value = translations.titre || '';
+                document.getElementById('surveyDescriptionNl').value = translations.description || '';
                 document.getElementById('msgTitleNl').value = translations.msg_title || '';
                 document.getElementById('msgInvitationNl').value = translations.msg_invitation || '';
                 document.getElementById('msgThankyouNl').value = translations.msg_thankyou || '';
@@ -1191,6 +1197,7 @@
                     // Insérer les nouveaux candidats
                     const playersData = players.map((nom, index) => ({
                         survey_id: editingSurveyId,
+                        user_id: currentUser.id,
                         nom,
                         ordre: index + 1
                     }));
@@ -1209,6 +1216,7 @@
                             language_code: 'nl',
                             active: true,
                             titre: document.getElementById('surveyTitleNl').value.trim(),
+                            description: document.getElementById('surveyDescriptionNl').value.trim(),
                             msg_title: document.getElementById('msgTitleNl').value.trim(),
                             msg_invitation: document.getElementById('msgInvitationNl').value.trim(),
                             msg_thankyou: document.getElementById('msgThankyouNl').value.trim()
@@ -1288,6 +1296,7 @@
                     // Insérer les candidats
                     const playersData = players.map((nom, index) => ({
                         survey_id: newSurvey.id,
+                        user_id: currentUser.id,
                         nom,
                         ordre: index + 1
                     }));
@@ -1306,6 +1315,7 @@
                             language_code: 'nl',
                             active: true,
                             titre: document.getElementById('surveyTitleNl').value.trim(),
+                            description: document.getElementById('surveyDescriptionNl').value.trim(),
                             msg_title: document.getElementById('msgTitleNl').value.trim(),
                             msg_invitation: document.getElementById('msgInvitationNl').value.trim(),
                             msg_thankyou: document.getElementById('msgThankyouNl').value.trim()
