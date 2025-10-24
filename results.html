@@ -335,33 +335,99 @@
                 document.getElementById('resultsTitle').innerHTML = '🏆 ' + (survey.msg_title || survey.titre) + ' 🏆';
                 document.getElementById('resultsSubtitle').textContent = survey.description || survey.titre;
 
-                // Charger les résultats depuis la vue v_survey_results
-                const { data: results, error: resultsError } = await supabaseClient
-                    .from('v_survey_results')
-                    .select('*')
+                // Charger les joueurs du sondage
+                const { data: players, error: playersError } = await supabaseClient
+                    .from('survey_players')
+                    .select('id, nom, ordre')
                     .eq('survey_id', currentSurveyId)
-                    .order('total_votes', { ascending: false })
-                    .order('player_name', { ascending: true });
+                    .order('ordre', { ascending: true });
 
-                if (resultsError) {
-                    console.error('Erreur chargement v_survey_results:', resultsError);
-                    throw resultsError;
+                if (playersError) throw playersError;
+                if (!players || players.length === 0) {
+                    throw new Error('Aucun candidat trouvé pour ce sondage');
                 }
 
-                // Calculer les statistiques
+                // Charger les traductions NL des joueurs
+                const { data: translations } = await supabaseClient
+                    .from('survey_player_translations')
+                    .select('player_id, nom')
+                    .in('player_id', players.map(p => p.id))
+                    .eq('language_code', 'nl');
+
+                const translationsMap = {};
+                if (translations) {
+                    translations.forEach(t => {
+                        translationsMap[t.player_id] = t.nom;
+                    });
+                }
+
+                // Charger TOUS les votes pour ce sondage
+                const { data: votes, error: votesError } = await supabaseClient
+                    .from('votes')
+                    .select('player_id, language_code')
+                    .eq('survey_id', currentSurveyId);
+
+                if (votesError) {
+                    console.error('Erreur chargement votes:', votesError);
+                    throw votesError;
+                }
+
+                console.log(`📊 ${votes ? votes.length : 0} votes trouvés pour le sondage #${currentSurveyId}`);
+
+                // Calculer les résultats par joueur
+                const resultsMap = {};
                 let totalVotes = 0;
                 let totalVotesFr = 0;
                 let totalVotesNl = 0;
-                let totalPlayers = 0;
 
-                if (results && results.length > 0) {
-                    totalPlayers = results.length;
-                    results.forEach(r => {
-                        totalVotes += r.total_votes || 0;
-                        totalVotesFr += r.votes_fr || 0;
-                        totalVotesNl += r.votes_nl || 0;
+                // Initialiser tous les joueurs avec 0 votes
+                players.forEach(player => {
+                    resultsMap[player.id] = {
+                        player_id: player.id,
+                        player_name: player.nom,
+                        player_name_nl: translationsMap[player.id] || null,
+                        ordre: player.ordre,
+                        total_votes: 0,
+                        votes_fr: 0,
+                        votes_nl: 0,
+                        percentage: 0
+                    };
+                });
+
+                // Compter les votes
+                if (votes && votes.length > 0) {
+                    votes.forEach(vote => {
+                        if (resultsMap[vote.player_id]) {
+                            resultsMap[vote.player_id].total_votes++;
+                            totalVotes++;
+                            
+                            if (vote.language_code === 'fr') {
+                                resultsMap[vote.player_id].votes_fr++;
+                                totalVotesFr++;
+                            } else if (vote.language_code === 'nl') {
+                                resultsMap[vote.player_id].votes_nl++;
+                                totalVotesNl++;
+                            }
+                        }
                     });
                 }
+
+                // Calculer les pourcentages
+                Object.values(resultsMap).forEach(result => {
+                    if (totalVotes > 0) {
+                        result.percentage = (result.total_votes / totalVotes) * 100;
+                    }
+                });
+
+                // Convertir en tableau et trier par nombre de votes
+                const results = Object.values(resultsMap).sort((a, b) => {
+                    if (b.total_votes !== a.total_votes) {
+                        return b.total_votes - a.total_votes;
+                    }
+                    return a.player_name.localeCompare(b.player_name);
+                });
+
+                console.log('📊 Résultats calculés:', results);
 
                 // Afficher les stats
                 document.getElementById('totalVotes').textContent = totalVotes;
@@ -375,11 +441,32 @@
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('resultsGrid').style.display = 'grid';
 
+                const totalPlayers = results.length;
                 console.log(`📊 Résultats mis à jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
             } catch (error) {
-                console.error('❌ Erreur:', error);
-                showError('Erreur de chargement: ' + error.message);
+                console.error('❌ Erreur lors du chargement des résultats:', error);
+                console.error('Details:', {
+                    message: error.message,
+                    code: error.code,
+                    hint: error.hint,
+                    details: error.details
+                });
+                
+                let errorMessage = 'Erreur lors du chargement des résultats';
+                
+                if (error.message) {
+                    errorMessage += ': ' + error.message;
+                }
+                
+                // Afficher des conseils selon le type d'erreur
+                if (error.message && error.message.includes('permission denied')) {
+                    errorMessage += '\n\n⚠️ Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
+                } else if (error.message && error.message.includes('Aucun candidat')) {
+                    errorMessage += '\n\n⚠️ Ajoutez des candidats au sondage #' + currentSurveyId;
+                }
+                
+                showError(errorMessage);
             }
         }
 
