@@ -871,26 +871,34 @@
         async function toggleActive(surveyId, currentActive) {
             try {
                 if (!currentActive) {
-                    // Désactiver tous les autres sondages
-                    await supabaseClient
+                    // Désactiver tous les autres sondages de l'utilisateur
+                    console.log('🔄 Désactivation des autres sondages...');
+                    const { error: deactivateError } = await supabaseClient
                         .from('surveys')
                         .update({ active: false })
+                        .eq('user_id', currentUser.id)
                         .neq('id', surveyId);
+                    
+                    if (deactivateError) {
+                        console.error('Erreur désactivation:', deactivateError);
+                    }
                 }
 
                 // Activer/désactiver le sondage actuel
+                console.log('🔄 Mise à jour du sondage #' + surveyId);
                 const { error } = await supabaseClient
                     .from('surveys')
                     .update({ active: !currentActive })
-                    .eq('id', surveyId);
+                    .eq('id', surveyId)
+                    .eq('user_id', currentUser.id);
 
                 if (error) throw error;
 
-                alert(currentActive ? '⏸️ Sondage désactivé' : '✅ Sondage activé (les autres ont été désactivés)');
+                alert(currentActive ? '⏸️ Sondage désactivé' : '✅ Sondage activé (vos autres sondages ont été désactivés)');
                 await loadSurveys();
 
             } catch (error) {
-                console.error('Erreur:', error);
+                console.error('❌ Erreur toggleActive:', error);
                 alert('❌ Erreur: ' + error.message);
             }
         }
@@ -1043,7 +1051,10 @@
                 .eq('language_code', 'nl')
                 .maybeSingle();
 
-            if (translations) {
+            // Vérifier le mode bilingue (priorité au champ bilingual_mode de la table surveys)
+            const isBilingual = survey.bilingual_mode === true || translations;
+            
+            if (isBilingual) {
                 document.getElementById('enableNL').checked = true;
                 document.getElementById('nlFieldsContainer').style.display = 'block';
                 document.getElementById('surveyTitleNl').value = translations.titre || '';
@@ -1182,6 +1193,7 @@
                             msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
                             logo_base64: currentLogoBase64,
+                            bilingual_mode: enableNL,
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', editingSurveyId);
@@ -1283,6 +1295,7 @@
                             msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
                             logo_base64: currentLogoBase64,
+                            bilingual_mode: enableNL,
                             active: false,
                             ordre: allSurveys.length + 1,
                             user_id: currentUser.id
