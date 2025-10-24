@@ -838,9 +838,9 @@
                 document.getElementById('thankYouText').innerHTML = messages.thankyou.replace(/\n/g, '<br>');
 
                 // Charger le logo
-                if (survey.logo_url) {
+                if (survey.logo_base64) {
                     document.getElementById('logoContainer').style.display = 'flex';
-                    document.getElementById('logoContainer').innerHTML = `<img src="${survey.logo_url}" alt="Logo">`;
+                    document.getElementById('logoContainer').innerHTML = `<img src="${survey.logo_base64}" alt="Logo">`;
                 } else {
                     document.getElementById('logoContainer').style.display = 'none';
                 }
@@ -868,16 +868,35 @@
                     return;
                 }
 
+                // Si langue NL, charger les traductions des candidats
+                let playerTranslationsMap = {};
+                if (currentLanguage === 'nl') {
+                    const { data: translations } = await supabaseClient
+                        .from('survey_player_translations')
+                        .select('player_id, nom')
+                        .in('player_id', players.map(p => p.id))
+                        .eq('language_code', 'nl');
+                    
+                    if (translations) {
+                        translations.forEach(t => {
+                            playerTranslationsMap[t.player_id] = t.nom;
+                        });
+                    }
+                }
+
                 // Afficher les candidats
                 const grid = document.getElementById('playersGrid');
                 grid.innerHTML = '';
 
                 players.forEach(player => {
+                    // Utiliser la traduction NL si disponible, sinon le nom FR
+                    const playerName = playerTranslationsMap[player.id] || player.nom;
+                    
                     const card = document.createElement('div');
                     card.className = 'player-card';
                     card.dataset.playerId = player.id;
                     card.innerHTML = `
-                        <div class="player-name">${escapeHtml(player.nom)}</div>
+                        <div class="player-name">${escapeHtml(playerName)}</div>
                         <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
                     `;
                     
