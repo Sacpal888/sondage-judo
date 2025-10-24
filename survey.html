@@ -40,7 +40,7 @@
         }
 
         /* ========================================
-           COOKIE CONSENT SCREEN
+           COOKIE CONSENT SCREEN - BILINGUAL
         ======================================== */
         .cookie-consent {
             text-align: center;
@@ -65,18 +65,49 @@
             50% { transform: translateY(-10px); }
         }
 
-        .consent-title {
+        /* Titres bilingues */
+        .consent-title-bilingual {
+            margin-bottom: 25px;
+        }
+
+        .consent-title-fr {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #d4af37;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .consent-title-nl {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f4d03f;
+            margin-bottom: 5px;
+        }
+
+        /* Textes bilingues */
+        .consent-text-container {
             margin-bottom: 20px;
         }
 
-        .consent-text {
-            font-size: 1.1rem;
+        .consent-text-fr {
+            font-size: 1rem;
             color: #ffffff;
             line-height: 1.6;
             margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #ffffff;
+        }
+
+        .consent-text-nl {
+            font-size: 1rem;
+            color: #f4d03f;
+            line-height: 1.6;
+            padding: 15px;
+            background: rgba(244, 208, 63, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #f4d03f;
         }
 
         .privacy-link {
@@ -91,39 +122,86 @@
             color: #d4af37;
         }
 
-        .consent-buttons {
+        /* Boutons linguistiques */
+        .consent-buttons-bilingual {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 25px;
+            gap: 15px;
+            margin-top: 30px;
         }
 
-        .btn-consent {
-            padding: 15px 35px;
-            font-size: 1.1rem;
+        .language-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .btn-consent-lang {
+            flex: 1;
+            padding: 18px 25px;
+            font-size: 1.15rem;
             font-weight: bold;
-            border: 2px solid #ffffff;
-            border-radius: 10px;
+            border: 3px solid;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-consent-lang::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: left 0.3s ease;
         }
 
-        .btn-accept {
-            background: #28a745;
+        .btn-consent-lang:hover::before {
+            left: 100%;
+        }
+
+        /* Bouton Français (blanc) */
+        .btn-accept-fr {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: #ffffff;
+            border-color: #ffffff;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
         }
 
-        .btn-accept:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        .btn-accept-fr:hover {
+            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        }
+
+        /* Bouton Néerlandais (jaune) */
+        .btn-accept-nl {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            color: #1a2f4a;
+            border-color: #f4d03f;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-accept-nl:hover {
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5);
         }
 
         .btn-decline {
             background: rgba(220, 53, 69, 0.2);
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .btn-decline:hover {
@@ -135,11 +213,24 @@
         .btn-back {
             background: #0066B3;
             color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .btn-back:hover {
             background: #0088cc;
             transform: translateY(-2px);
+        }
+
+        /* Indicateur de langue dans le bouton */
+        .lang-flag {
+            font-size: 1.3rem;
+            margin-right: 8px;
         }
 
         /* ========================================
@@ -240,271 +331,220 @@
             font-size: 1.1rem;
             color: #ffffff;
             line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .declined-text-small {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            margin-top: 20px;
+            margin-bottom: 15px;
         }
 
         /* ========================================
-           MAIN SURVEY
+           LOGO
         ======================================== */
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        h1 {
-            color: #d4af37;
-            font-size: 1.8em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin: 0 0 15px 0;
-        }
-        
         .logo-container {
-            text-align: center;
-            margin-bottom: 15px;
-            width: 100%;
-            min-height: 0;
             display: flex;
-            align-items: center;
             justify-content: center;
-            background: transparent;
+            margin-bottom: 20px;
         }
         
         .logo-container img {
-            max-width: 90%;
-            max-height: 150px;
-            width: auto;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid #d4af37;
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-            display: block;
-            background: transparent;
+            max-width: 200px;
+            max-height: 100px;
             object-fit: contain;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.05);
         }
-        
-        .vote-text {
+
+        /* ========================================
+           MAIN SURVEY SECTION
+        ======================================== */
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .invitation-text {
+            font-size: 1.3rem;
             color: #ffffff;
             text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            font-weight: 500;
+            margin-bottom: 30px;
+            line-height: 1.6;
         }
-        
-        /* Cartes des joueurs - Affichage en colonnes verticales */
+
         .players-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-auto-flow: column;
-            grid-template-rows: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
-        
+
         .player-card {
-            background: rgba(26, 47, 74, 0.8);
-            border: 2px solid #d4af37;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #1a2f4a 0%, #0d2744 100%);
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            border-radius: 15px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            min-height: 140px;
         }
-        
+
         .player-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-            border-color: #f0d46f;
-            background: rgba(26, 47, 74, 1);
+            border-color: #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
         }
-        
+
         .player-card.selected {
-            border: 3px solid #f0d46f;
-            background: rgba(212, 175, 55, 0.2);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            animation: pulse-gold 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-gold {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(212, 175, 55, 0.8);
-            }
-        }
-        
-        .player-card.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            filter: grayscale(1);
-        }
-        
-        .player-card.disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .player-name {
-            color: #ffffff;
-            font-weight: 600;
-            margin-bottom: 10px;
-            word-wrap: break-word;
-            hyphens: auto;
-            line-height: 1.2;
-            width: 100%;
-        }
-        
-        .player-card.selected .player-name {
-            color: #f0d46f;
-        }
-        
-        .vote-button {
-            background: #d4af37;
-            color: #0a1828;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .player-card.selected .vote-button {
-            display: inline-block;
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .vote-button:hover {
-            background: #f0d46f;
+            background: linear-gradient(135deg, #d4af37 0%, #f0d46f 100%);
+            border-color: #ffffff;
             transform: scale(1.05);
         }
-        
-        .thank-you {
-            display: none;
-            text-align: center;
-            color: #ffffff;
-            background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #d4af37;
-            animation: fadeInScale 0.5s ease-in;
-        }
-        
-        .thank-you.show {
-            display: block;
-        }
-        
-        .thank-you h2 {
-            color: #d4af37;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-        
-        .thank-you p {
-            font-size: 1.1em;
-            line-height: 1.6;
-        }
-        
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+
+        .player-card.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
-        .votes-frozen {
-            display: none;
-            text-align: center;
-            color: #ffffff;
-            background: linear-gradient(135deg, rgba(100, 149, 237, 0.3), rgba(70, 130, 180, 0.3));
-            padding: 30px;
-            border-radius: 15px;
-            border: 2px solid #87CEEB;
-            margin-top: 20px;
-            animation: fadeInScale 0.5s ease-in;
-        }
-        
-        .votes-frozen.show {
-            display: block;
-        }
-
-        .votes-frozen h3 {
-            color: #87CEEB;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .votes-frozen p {
-            font-size: 1.1em;
-            line-height: 1.6;
-        }
-        
-        .loading {
-            text-align: center;
-            color: #d4af37;
+        .player-name {
             font-size: 1.3em;
-            padding: 20px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 15px;
+            word-wrap: break-word;
         }
-        
+
+        .player-card.selected .player-name {
+            color: #0a1828;
+        }
+
+        .vote-button {
+            background: #28a745;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vote-button:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .player-card.selected .vote-button {
+            background: #0a1828;
+            color: #d4af37;
+            border-color: #0a1828;
+        }
+
+        /* ========================================
+           THANK YOU SECTION
+        ======================================== */
+        .thank-you {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(26, 47, 74, 0.8);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .thank-you.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .thank-you-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: celebrate 1s ease;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-10deg); }
+            75% { transform: scale(1.2) rotate(10deg); }
+        }
+
+        .thank-you-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+
+        .thank-you-text {
+            font-size: 1.3rem;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           LOADING & ERROR MESSAGES
+        ======================================== */
+        .loading-message {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #d4af37;
+            padding: 40px;
+        }
+
         .error-message {
             background: rgba(220, 53, 69, 0.2);
             border: 2px solid #dc3545;
-            color: #ff6b6b;
-            padding: 15px;
             border-radius: 10px;
+            padding: 20px;
+            color: #ffffff;
             text-align: center;
-            margin-top: 20px;
+            font-size: 1.2rem;
         }
 
-        /* Responsive */
-        @media (max-width: 600px) {
+        /* ========================================
+           RESPONSIVE
+        ======================================== */
+        @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
-            
-            h1 {
-                font-size: 1.5em;
+
+            .consent-title-fr,
+            .consent-title-nl {
+                font-size: 1.4rem;
             }
-            
-            .vote-text {
-                font-size: 1.3em;
+
+            .consent-text-fr,
+            .consent-text-nl {
+                font-size: 0.95rem;
             }
-            
+
+            .language-buttons {
+                flex-direction: column;
+            }
+
+            .btn-consent-lang {
+                font-size: 1rem;
+                padding: 15px 20px;
+            }
+
+            .page-title {
+                font-size: 1.6rem;
+            }
+
+            .invitation-text {
+                font-size: 1.1rem;
+            }
+
             .players-grid {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto;
-                grid-auto-flow: row;
-            }
-            
-            .player-card {
-                padding: 15px;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
             }
         }
     </style>
@@ -512,67 +552,119 @@
 <body>
     <div class="container">
         <!-- ========================================
-             COOKIE CONSENT
+             BILINGUAL COOKIE CONSENT
         ======================================== -->
         <div id="cookieConsent" class="cookie-consent hidden">
             <div class="consent-content">
                 <div class="cookie-icon">🍪</div>
-                <h2 class="consent-title" id="consentTitle">Cookies et Participation</h2>
-                <p class="consent-text" id="consentText1">
-                    Pour garantir l'intégrité du vote et éviter les abus, nous utilisons un cookie technique.
-                </p>
-                <p class="consent-text" id="consentText2">
-                    Ce cookie ne contient aucune donnée personnelle et sert uniquement à vérifier que vous n'avez pas déjà voté.
-                </p>
-                <p class="consent-text">
-                    <a class="privacy-link" id="linkPrivacyPolicy">📄 En savoir plus</a>
-                </p>
-                <div class="consent-buttons">
-                    <button class="btn-consent btn-accept" id="btnAcceptCookies">✅ Accepter et participer</button>
-                    <button class="btn-consent btn-decline" id="btnDeclineCookies">❌ Refuser</button>
+                
+                <div class="consent-title-bilingual">
+                    <div class="consent-title-fr">🇫🇷 Cookies et Confidentialité</div>
+                    <div class="consent-title-nl">🇳🇱 Cookies en Privacy</div>
+                </div>
+
+                <div class="consent-text-container">
+                    <div class="consent-text-fr">
+                        <strong>Français :</strong> Nous utilisons des cookies essentiels pour enregistrer votre vote et garantir l'intégrité de ce sondage. 
+                        En cliquant sur le bouton de votre langue, vous acceptez notre utilisation des cookies et accédez au sondage dans votre langue préférée.
+                        <br><br>
+                        <a class="privacy-link" onclick="showPrivacyPolicy()">📄 Politique de confidentialité complète</a>
+                    </div>
+
+                    <div class="consent-text-nl">
+                        <strong>Nederlands :</strong> We gebruiken essentiële cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
+                        Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquête in uw voorkeurtaal.
+                        <br><br>
+                        <a class="privacy-link" onclick="showPrivacyPolicy()">📄 Volledig privacybeleid</a>
+                    </div>
+                </div>
+
+                <div class="consent-buttons-bilingual">
+                    <div class="language-buttons">
+                        <button class="btn-consent-lang btn-accept-fr" onclick="acceptConsent('fr')">
+                            <span class="lang-flag">🇫🇷</span>
+                            J'accepte (Français)
+                        </button>
+                        <button class="btn-consent-lang btn-accept-nl" onclick="acceptConsent('nl')">
+                            <span class="lang-flag">🇳🇱</span>
+                            Ik accepteer (Nederlands)
+                        </button>
+                    </div>
+                    <button class="btn-decline" onclick="declineConsent()">
+                        ❌ Je refuse / Ik weiger
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- ========================================
-             PRIVACY POLICY
+             PRIVACY POLICY (BILINGUAL)
         ======================================== -->
         <div id="privacyPolicy" class="privacy-policy hidden">
             <div class="privacy-content">
                 <div class="policy-icon">🔒</div>
-                <h2 class="privacy-title" id="privacyPolicyTitle">Politique de Confidentialité</h2>
+                <h2 class="privacy-title">Politique de Confidentialité / Privacybeleid</h2>
 
                 <div class="privacy-section">
-                    <h3 id="privacyDataTitle">📊 Données collectées</h3>
-                    <p id="privacyDataText">
-                        Nous collectons uniquement les informations nécessaires au fonctionnement du vote :
-                        votre choix de candidat et un identifiant de session anonyme.
-                    </p>
+                    <h3>🇫🇷 Français - Utilisation des Cookies</h3>
+                    <p>Ce sondage utilise des cookies techniques strictement nécessaires pour :</p>
+                    <ul>
+                        <li>Enregistrer votre consentement aux cookies</li>
+                        <li>Garantir qu'une personne ne peut voter qu'une seule fois</li>
+                        <li>Assurer l'intégrité et la validité des résultats du sondage</li>
+                    </ul>
+                    <p><strong>Durée de conservation :</strong> Les cookies expirent après 1 jour.</p>
                 </div>
 
                 <div class="privacy-section">
-                    <h3 id="privacyPurposeTitle">🎯 Finalité</h3>
-                    <p id="privacyPurposeText">
-                        Ces données servent exclusivement à comptabiliser les votes et à empêcher les votes multiples.
-                    </p>
+                    <h3>🇳🇱 Nederlands - Gebruik van Cookies</h3>
+                    <p>Deze enquête gebruikt strikt noodzakelijke technische cookies om:</p>
+                    <ul>
+                        <li>Uw toestemming voor cookies te registreren</li>
+                        <li>Ervoor te zorgen dat een persoon slechts één keer kan stemmen</li>
+                        <li>De integriteit en geldigheid van de enquêteresultaten te waarborgen</li>
+                    </ul>
+                    <p><strong>Bewaartermijn:</strong> Cookies verlopen na 1 dag.</p>
                 </div>
 
                 <div class="privacy-section">
-                    <h3 id="privacyCookieTitle">🍪 Le cookie technique</h3>
-                    <p id="privacyCookieText">
-                        Le cookie ne contient qu'un identifiant technique anonyme.
-                    </p>
+                    <h3>🇫🇷 Données Collectées</h3>
+                    <p>Les informations suivantes sont collectées :</p>
+                    <ul>
+                        <li>Votre vote (candidat sélectionné)</li>
+                        <li>Date et heure du vote</li>
+                        <li>Langue choisie (FR ou NL)</li>
+                        <li>Identifiant de session anonyme (pour éviter les votes multiples)</li>
+                    </ul>
+                    <p><strong>Aucune donnée personnelle identifiable n'est collectée.</strong></p>
                 </div>
 
                 <div class="privacy-section">
-                    <h3 id="privacyRightsTitle">✋ Vos droits</h3>
-                    <p id="privacyRightsText">
-                        Vous pouvez refuser l'utilisation du cookie à tout moment (et donc refuser votre participation).
-                    </p>
+                    <h3>🇳🇱 Verzamelde Gegevens</h3>
+                    <p>De volgende informatie wordt verzameld:</p>
+                    <ul>
+                        <li>Uw stem (geselecteerde kandidaat)</li>
+                        <li>Datum en tijd van stemming</li>
+                        <li>Gekozen taal (FR of NL)</li>
+                        <li>Anonieme sessie-ID (om meerdere stemmen te voorkomen)</li>
+                    </ul>
+                    <p><strong>Er worden geen identificeerbare persoonlijke gegevens verzameld.</strong></p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>🇫🇷 Vos Droits</h3>
+                    <p>Vous avez le droit de refuser l'utilisation de cookies. Dans ce cas, vous ne pourrez pas participer au sondage.</p>
+                    <p>Les données sont stockées de manière sécurisée et ne sont jamais partagées avec des tiers.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h3>🇳🇱 Uw Rechten</h3>
+                    <p>U heeft het recht om het gebruik van cookies te weigeren. In dat geval kunt u niet deelnemen aan de enquête.</p>
+                    <p>Gegevens worden veilig opgeslagen en worden nooit met derden gedeeld.</p>
                 </div>
 
                 <div class="privacy-buttons">
-                    <button class="btn-consent btn-back" id="btnBackToConsent">← Retour</button>
+                    <button class="btn-back" onclick="backToConsent()">← Retour / Terug</button>
                 </div>
             </div>
         </div>
@@ -582,106 +674,75 @@
         ======================================== -->
         <div id="consentDeclined" class="consent-declined hidden">
             <div class="declined-content">
-                <div class="declined-icon">🚫</div>
-                <h2 class="declined-title" id="declinedTitle">Participation non autorisée</h2>
-                <p class="declined-text" id="declinedText1">
-                    Nous respectons votre choix de ne pas accepter les cookies techniques.
+                <div class="declined-icon">😔</div>
+                <h2 class="declined-title">Participation Impossible / Deelname Onmogelijk</h2>
+                <p class="declined-text">
+                    <strong>🇫🇷 Français :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l'intégrité du sondage. Vous ne pouvez pas participer.
                 </p>
-                <p class="declined-text" id="declinedText2">
-                    Malheureusement, sans ces cookies, nous ne pouvons pas garantir l'intégrité du processus de vote.
+                <p class="declined-text">
+                    <strong>🇳🇱 Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentiële cookies de integriteit van de enquête niet garanderen. U kunt niet deelnemen.
                 </p>
-                <p class="declined-text-small" id="declinedText3">
-                    Merci de votre compréhension.
-                </p>
-                <div class="consent-buttons" style="margin-top: 25px;">
-                    <button class="btn-consent btn-back" id="btnRetryConsent">← Changer d'avis</button>
+                <div style="margin-top: 25px;">
+                    <button class="btn-back" onclick="backToConsent()">← Reconsidérer / Heroverwegen</button>
                 </div>
             </div>
         </div>
 
         <!-- ========================================
-             MAIN SURVEY CONTENT
+             SURVEY SECTION
         ======================================== -->
-        <div id="mainContent" class="hidden">
-            <div class="logo-container" id="logoContainer">
-                <!-- Le logo sera inséré ici -->
-            </div>
+        <div id="surveySection" class="hidden">
+            <div id="logoContainer" class="logo-container" style="display: none;"></div>
             
-            <div class="header">
-                <h1 id="pageTitle">Sondage</h1>
-            </div>
-            
-            <div id="loadingMessage" class="loading">
-                ⏳ Chargement...
-            </div>
-            
-            <div id="voteSection" style="display: none;">
-                <div class="vote-text" id="invitationText">
-                    Votez pour votre choix !
-                </div>
-                
-                <div class="players-grid" id="playersGrid">
-                    <!-- Les cartes des joueurs seront insérées ici -->
-                </div>
+            <div id="loadingMessage" class="loading-message">
+                ⏳ Chargement du sondage...
             </div>
 
-            <div class="votes-frozen" id="votesFrozen">
-                <h3 id="votesFrozenTitle">❄️ Votes figés</h3>
-                <p id="votesFrozenText">
-                    Les votes sont malheureusement figés à présent.<br>
-                    Merci de votre compréhension.
-                </p>
+            <div id="voteSection" style="display: none;">
+                <h1 id="pageTitle" class="page-title">Titre du sondage</h1>
+                <p id="invitationText" class="invitation-text">Votez pour votre choix !</p>
+                <div id="playersGrid" class="players-grid"></div>
             </div>
-            
-            <div class="thank-you" id="thankYou">
-                <h2>✨ Merci !</h2>
-                <p id="thankYouText">
-                    Votre vote a été enregistré avec succès !
-                </p>
+
+            <div id="thankYou" class="thank-you">
+                <div class="thank-you-icon">🎉</div>
+                <h2 class="thank-you-title">Merci !</h2>
+                <p id="thankYouText" class="thank-you-text">Votre vote a été enregistré avec succès.</p>
             </div>
-            
+
             <div id="errorMessage" class="error-message" style="display: none;"></div>
         </div>
     </div>
 
     <script>
         // ============================================
-        // VARIABLES GLOBALES
+        // CONFIGURATION
         // ============================================
-        const COOKIE_CONSENT_NAME = 'survey_consent';
-        const COOKIE_VOTED_PREFIX = 'survey_voted_';
-        
+        const COOKIE_CONSENT_NAME = 'onlive_cookie_consent';
+        const COOKIE_VOTED_PREFIX = 'onlive_voted_';
+        const COOKIE_LANG_NAME = 'onlive_preferred_lang';
+
         let supabaseClient = null;
-        let sessionId = null;
+        let currentSurveyId = null;
+        let currentLanguage = 'fr'; // Default
         let hasVoted = false;
         let selectedPlayerId = null;
-        let currentSurveyId = null;
-        let currentLanguage = 'fr';
+        let sessionId = generateSessionId();
 
         // ============================================
-        // GET URL PARAMETERS
+        // SESSION ID GENERATION
         // ============================================
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const surveyId = params.get('id');
-            const lang = params.get('lang') || 'fr';
-            
-            if (!surveyId) {
-                showError('Erreur: ID de sondage manquant dans l\'URL');
-                return null;
-            }
-
-            return { surveyId: parseInt(surveyId), lang };
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
         // ============================================
-        // COOKIES MANAGEMENT
+        // COOKIE MANAGEMENT
         // ============================================
         function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = "expires=" + date.toUTCString();
-            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
         }
 
         function getCookie(name) {
@@ -695,12 +756,21 @@
             return null;
         }
 
-        function deleteCookie(name) {
-            document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        }
-
-        function generateSessionId() {
-            return 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+        // ============================================
+        // URL PARAMETERS
+        // ============================================
+        function getUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            
+            if (!id) {
+                showError('ID de sondage manquant dans l\'URL.');
+                return null;
+            }
+            
+            currentSurveyId = parseInt(id);
+            
+            return { id: currentSurveyId };
         }
 
         // ============================================
@@ -710,87 +780,78 @@
             const consent = getCookie(COOKIE_CONSENT_NAME);
             
             if (consent === 'accepted') {
-                console.log('✅ Consentement déjà donné');
-                sessionId = generateSessionId();
-                initSupabase();
-            } else if (consent === 'declined') {
-                console.log('❌ Consentement refusé');
-                document.getElementById('consentDeclined').classList.remove('hidden');
-            } else {
-                console.log('❓ Pas de consentement, affichage de la popup');
-                document.getElementById('cookieConsent').classList.remove('hidden');
-            }
-        }
-
-        document.getElementById('btnAcceptCookies').addEventListener('click', () => {
-            setCookie(COOKIE_CONSENT_NAME, 'accepted', 30);
-            sessionId = generateSessionId();
-            document.getElementById('cookieConsent').classList.add('hidden');
-            initSupabase();
-        });
-
-        document.getElementById('btnDeclineCookies').addEventListener('click', () => {
-            setCookie(COOKIE_CONSENT_NAME, 'declined', 30);
-            document.getElementById('cookieConsent').classList.add('hidden');
-            document.getElementById('consentDeclined').classList.remove('hidden');
-        });
-
-        document.getElementById('btnRetryConsent').addEventListener('click', () => {
-            deleteCookie(COOKIE_CONSENT_NAME);
-            document.getElementById('consentDeclined').classList.add('hidden');
-            document.getElementById('cookieConsent').classList.remove('hidden');
-        });
-
-        document.getElementById('linkPrivacyPolicy').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('cookieConsent').classList.add('hidden');
-            document.getElementById('privacyPolicy').classList.remove('hidden');
-        });
-
-        document.getElementById('btnBackToConsent').addEventListener('click', () => {
-            document.getElementById('privacyPolicy').classList.add('hidden');
-            document.getElementById('cookieConsent').classList.remove('hidden');
-        });
-
-        // ============================================
-        // SUPABASE INITIALIZATION
-        // ============================================
-        async function initSupabase() {
-            try {
-                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showError('Configuration manquante. Contactez l\'administrateur.');
-                    return false;
+                // Vérifier la langue préférée sauvegardée
+                const savedLang = getCookie(COOKIE_LANG_NAME);
+                if (savedLang) {
+                    currentLanguage = savedLang;
                 }
                 
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                
-                document.getElementById('mainContent').classList.remove('hidden');
-                
-                await loadSurveyData();
-                
-                return true;
-            } catch (error) {
-                showError('Erreur de connexion: ' + error.message);
-                return false;
+                // Charger le sondage directement
+                document.getElementById('cookieConsent').classList.add('hidden');
+                document.getElementById('surveySection').classList.remove('hidden');
+                initializeSurvey();
+            } else {
+                // Afficher l'écran de consentement bilingue
+                document.getElementById('cookieConsent').classList.remove('hidden');
+                document.getElementById('surveySection').classList.add('hidden');
             }
         }
 
-        // ============================================
-        // LOAD SURVEY DATA
-        // ============================================
-        async function loadSurveyData() {
-            if (!supabaseClient) return;
+        function acceptConsent(language) {
+            console.log(`✓ Consentement accepté avec langue: ${language}`);
             
-            const urlParams = getUrlParams();
-            if (!urlParams) return;
+            // Sauvegarder le consentement
+            setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
+            
+            // Sauvegarder la langue choisie
+            currentLanguage = language;
+            setCookie(COOKIE_LANG_NAME, language, 365);
+            
+            // Masquer l'écran de consentement et afficher le sondage
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('surveySection').classList.remove('hidden');
+            
+            // Initialiser le sondage dans la langue choisie
+            initializeSurvey();
+        }
 
-            currentSurveyId = urlParams.surveyId;
-            currentLanguage = urlParams.lang;
+        function declineConsent() {
+            console.log('✗ Consentement refusé');
+            setCookie(COOKIE_CONSENT_NAME, 'declined', 1);
+            
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('consentDeclined').classList.remove('hidden');
+        }
 
+        function showPrivacyPolicy() {
+            document.getElementById('cookieConsent').classList.add('hidden');
+            document.getElementById('privacyPolicy').classList.remove('hidden');
+        }
+
+        function backToConsent() {
+            document.getElementById('privacyPolicy').classList.add('hidden');
+            document.getElementById('consentDeclined').classList.add('hidden');
+            document.getElementById('cookieConsent').classList.remove('hidden');
+        }
+
+        // ============================================
+        // SURVEY INITIALIZATION
+        // ============================================
+        async function initializeSurvey() {
+            console.log(`🚀 Initialisation du sondage #${currentSurveyId} en ${currentLanguage}`);
+            
             try {
-                document.getElementById('loadingMessage').style.display = 'block';
+                // Initialiser Supabase
+                if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                    throw new Error('Configuration Supabase manquante');
+                }
 
-                // Charger le sondage
+                supabaseClient = supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+
+                // Charger les données du sondage
                 const { data: survey, error: surveyError } = await supabaseClient
                     .from('surveys')
                     .select('*')
@@ -799,16 +860,13 @@
 
                 if (surveyError) throw surveyError;
                 if (!survey) throw new Error('Sondage introuvable');
+                if (!survey.active) throw new Error('Ce sondage n\'est plus actif');
 
-                // Vérifier si le sondage est actif
-                if (!survey.active) {
-                    showError('Ce sondage n\'est pas actif actuellement.');
-                    return;
-                }
+                console.log('✓ Sondage chargé:', survey);
 
-                // Charger la traduction si langue NL
+                // Charger les messages (FR par défaut, puis NL si sélectionné)
                 let messages = {
-                    title: survey.msg_title || survey.titre,
+                    title: survey.msg_title || 'Sondage',
                     invitation: survey.msg_invitation || 'Votez pour votre choix !',
                     thankyou: survey.msg_thankyou || 'Merci pour votre vote !'
                 };
