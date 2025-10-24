@@ -15,18 +15,19 @@
         
         body {
             width: 1920px;
-            height: 1080px;
+            min-height: 1080px;
             background: transparent;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            padding: 20px;
         }
         
         .container {
             width: 1600px;
-            height: 820px;
+            min-height: 820px;
+            height: auto;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 5px solid #d4af37;
             border-radius: 25px;
@@ -53,10 +54,11 @@
             font-size: 1.6em;
         }
         
-        /* Grille des résultats - 2 colonnes, remplissage ligne par ligne */
+        /* Grille des résultats - 2 colonnes, remplissage vertical (colonne par colonne) */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
+            grid-auto-flow: column;
             gap: 15px;
             flex: 1;
         }
@@ -70,6 +72,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            min-height: auto;
+            height: auto;
         }
         
         .player-result:hover {
@@ -90,13 +94,13 @@
         .player-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
+            align-items: flex-start;
+            margin-bottom: 12px;
         }
         
         .player-name-container {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 15px;
             flex: 1;
             min-width: 0;
@@ -116,14 +120,27 @@
             flex-shrink: 0;
         }
         
+        .player-name-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+        
         .player-name {
             color: #ffffff;
             font-size: 1.6em;
             font-weight: 600;
             word-break: break-word;
-            line-height: 1.2;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+        
+        .player-name-nl {
+            color: #f4d03f;
+            font-size: 1.3em;
+            font-weight: 500;
+            word-break: break-word;
+            line-height: 1.3;
+            font-style: italic;
         }
         
         .player-stats {
@@ -134,14 +151,8 @@
         
         .percentage {
             color: #d4af37;
-            font-size: 1.6em;
+            font-size: 2.2em;
             font-weight: bold;
-        }
-
-        .votes-detail {
-            font-size: 0.8em;
-            color: #87CEEB;
-            margin-top: 2px;
         }
         
         .progress-bar-container {
@@ -150,6 +161,7 @@
             height: 25px;
             overflow: hidden;
             border: 1px solid rgba(212, 175, 55, 0.3);
+            margin-top: 8px;
         }
         
         .progress-bar {
@@ -198,86 +210,48 @@
             grid-column: 1 / -1;
         }
 
-        /* Stats box en haut */
-        .stats-row {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
+        /* Pour 3 résultats par colonne */
+        .results-grid.three-per-column {
+            grid-template-rows: repeat(3, auto);
         }
 
-        .stat-box {
-            background: rgba(26, 47, 74, 0.6);
-            border: 2px solid #d4af37;
-            border-radius: 12px;
-            padding: 15px 25px;
-            text-align: center;
+        /* Pour 2 résultats par colonne */
+        .results-grid.two-per-column {
+            grid-template-rows: repeat(2, auto);
         }
 
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #d4af37;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            color: #87CEEB;
-            margin-top: 5px;
-        }
-
-        .stat-sublabel {
-            font-size: 0.75em;
-            color: #999;
-            margin-top: 2px;
+        /* Pour 1 résultat par colonne */
+        .results-grid.one-per-column {
+            grid-template-rows: repeat(1, auto);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1 id="resultsTitle">🏆 Résultats du Vote 🏆</h1>
-            <div class="subtitle" id="resultsSubtitle">Sondage</div>
-        </div>
-
-        <!-- Stats globales -->
-        <div class="stats-row" id="statsRow">
-            <div class="stat-box">
-                <div class="stat-value" id="totalVotes">0</div>
-                <div class="stat-label">Votes totaux</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="votesFr">0</div>
-                <div class="stat-label">Votes FR</div>
-                <div class="stat-sublabel">🇫🇷</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="votesNl">0</div>
-                <div class="stat-label">Votes NL</div>
-                <div class="stat-sublabel">🇳🇱</div>
-            </div>
+            <h1 id="resultsTitle">🏆 Résultats du Sondage 🏆</h1>
+            <p class="subtitle" id="resultsSubtitle">En temps réel</p>
+            <p class="refresh-notice">
+                📊 Total: <span id="totalVotes">0</span> votes 
+                (<span style="color: #ffffff;">🇫🇷 <span id="votesFr">0</span></span> | 
+                <span style="color: #f4d03f;">🇳🇱 <span id="votesNl">0</span></span>)
+            </p>
         </div>
         
         <div id="loadingMessage" class="loading">
             ⏳ Chargement des résultats...
         </div>
         
-        <div class="results-grid" id="resultsGrid" style="display: none;">
+        <div id="resultsGrid" class="results-grid" style="display: none;">
             <!-- Les résultats seront insérés ici -->
         </div>
-        
-        <p class="refresh-notice" id="refreshNotice">
-            🔄 Les résultats se mettent à jour automatiquement toutes les 5 secondes
-        </p>
     </div>
 
     <script>
-        // ============================================
-        // VARIABLES GLOBALES
-        // ============================================
         let supabaseClient = null;
         let currentSurveyId = null;
         let refreshInterval = null;
+        let isBilingualMode = false;
 
         // ============================================
         // GET URL PARAMETERS
@@ -309,7 +283,8 @@
                 
                 return true;
             } catch (error) {
-                showError('Erreur de connexion: ' + error.message);
+                console.error('Erreur initialisation Supabase:', error);
+                showError('Erreur lors de l\'initialisation: ' + error.message);
                 return false;
             }
         }
@@ -331,6 +306,10 @@
                 if (surveyError) throw surveyError;
                 if (!survey) throw new Error('Sondage introuvable');
 
+                // Vérifier si le mode bilingue est activé
+                isBilingualMode = survey.bilingual_mode === true;
+                console.log('🌐 Mode bilingue:', isBilingualMode);
+
                 // Mettre à jour les titres
                 document.getElementById('resultsTitle').innerHTML = '🏆 ' + (survey.msg_title || survey.titre) + ' 🏆';
                 document.getElementById('resultsSubtitle').textContent = survey.description || survey.titre;
@@ -347,18 +326,20 @@
                     throw new Error('Aucun candidat trouvé pour ce sondage');
                 }
 
-                // Charger les traductions NL des joueurs
-                const { data: translations } = await supabaseClient
-                    .from('survey_player_translations')
-                    .select('player_id, nom')
-                    .in('player_id', players.map(p => p.id))
-                    .eq('language_code', 'nl');
+                // Charger les traductions NL des joueurs SI mode bilingue
+                let translationsMap = {};
+                if (isBilingualMode) {
+                    const { data: translations } = await supabaseClient
+                        .from('survey_player_translations')
+                        .select('player_id, nom')
+                        .in('player_id', players.map(p => p.id))
+                        .eq('language_code', 'nl');
 
-                const translationsMap = {};
-                if (translations) {
-                    translations.forEach(t => {
-                        translationsMap[t.player_id] = t.nom;
-                    });
+                    if (translations) {
+                        translations.forEach(t => {
+                            translationsMap[t.player_id] = t.nom;
+                        });
+                    }
                 }
 
                 // Charger TOUS les votes pour ce sondage
@@ -419,7 +400,7 @@
                     }
                 });
 
-                // Convertir en tableau et trier par nombre de votes
+                // Convertir en tableau et trier par nombre de votes (décroissant)
                 const results = Object.values(resultsMap).sort((a, b) => {
                     if (b.total_votes !== a.total_votes) {
                         return b.total_votes - a.total_votes;
@@ -486,26 +467,50 @@
             // Limiter à 6 premiers résultats
             const topResults = results.slice(0, 6);
 
+            // Définir le nombre de lignes selon le nombre de résultats
+            const numResults = topResults.length;
+            if (numResults <= 2) {
+                grid.classList.add('one-per-column');
+            } else if (numResults <= 4) {
+                grid.classList.add('two-per-column');
+            } else {
+                grid.classList.add('three-per-column');
+            }
+
             topResults.forEach((result, index) => {
                 const votes = result.total_votes || 0;
-                const votesFr = result.votes_fr || 0;
-                const votesNl = result.votes_nl || 0;
                 const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
                 const rank = index + 1;
                 const isFirst = rank === 1;
 
+                // Nettoyer le nom FR des emojis pour le mode bilingue
+                let displayNameFr = result.player_name;
+                let displayNameNl = result.player_name_nl;
+                
+                if (isBilingualMode && displayNameNl) {
+                    // Enlever les emojis du nom NL (ils sont déjà dans le FR)
+                    displayNameNl = removeEmojis(displayNameNl);
+                }
+
                 const card = document.createElement('div');
                 card.className = 'player-result' + (isFirst ? ' first-place' : '');
+                
+                // Construction du HTML avec ou sans traduction NL
+                let nameHtml = `<div class="player-name">${escapeHtml(displayNameFr)}</div>`;
+                if (isBilingualMode && displayNameNl && displayNameNl.trim()) {
+                    nameHtml += `<div class="player-name-nl">${escapeHtml(displayNameNl)}</div>`;
+                }
+
                 card.innerHTML = `
                     <div class="player-header">
                         <div class="player-name-container">
                             <div class="rank-badge">${rank}</div>
-                            <div class="player-name">${escapeHtml(result.player_name)}</div>
+                            <div class="player-name-wrapper">
+                                ${nameHtml}
+                            </div>
                         </div>
                         <div class="player-stats">
                             <div class="percentage">${percentage}%</div>
-                            <div class="votes-detail">${votes} vote${votes > 1 ? 's' : ''}</div>
-                            ${votesFr + votesNl > 0 ? `<div class="votes-detail">🇫🇷 ${votesFr} | 🇳🇱 ${votesNl}</div>` : ''}
                         </div>
                     </div>
                     <div class="progress-bar-container">
@@ -548,6 +553,11 @@
             return div.innerHTML;
         }
 
+        function removeEmojis(text) {
+            // Regex pour enlever les emojis
+            return text.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+        }
+
         // ============================================
         // INITIALIZATION
         // ============================================
@@ -562,9 +572,13 @@
             }
         })();
 
-        // Arrêter le refresh quand on quitte la page
-        window.addEventListener('beforeunload', () => {
-            stopAutoRefresh();
+        // Arrêter le rafraîchissement quand la page est masquée
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else {
+                startAutoRefresh();
+            }
         });
     </script>
 </body>
