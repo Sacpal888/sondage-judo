@@ -937,11 +937,17 @@
                     .from('surveys')
                     .select('*')
                     .eq('id', currentSurveyId)
-                    .single();
+                    .maybeSingle();
 
                 if (surveyError) throw surveyError;
-                if (!survey) throw new Error('Sondage introuvable');
-                if (!survey.active) throw new Error('Ce sondage n\'est plus actif');
+                if (!survey) {
+                    showError(`❌ Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+                    return;
+                }
+                if (!survey.active) {
+                    showError(`⏸️ Ce sondage n'est plus actif.<br><br>Merci de votre intérêt !`);
+                    return;
+                }
 
                 console.log('✓ Sondage chargé:', survey);
 
