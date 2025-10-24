@@ -1197,7 +1197,6 @@
                     // Insérer les nouveaux candidats
                     const playersData = players.map((nom, index) => ({
                         survey_id: editingSurveyId,
-                        user_id: currentUser.id,
                         nom,
                         ordre: index + 1
                     }));
@@ -1296,7 +1295,6 @@
                     // Insérer les candidats
                     const playersData = players.map((nom, index) => ({
                         survey_id: newSurvey.id,
-                        user_id: currentUser.id,
                         nom,
                         ordre: index + 1
                     }));
