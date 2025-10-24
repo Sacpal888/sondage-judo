@@ -20,7 +20,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 40px 20px;
             position: relative;
         }
         
@@ -33,8 +33,9 @@
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: none;
+            height: auto;
+            overflow: visible;
         }
 
         .hidden {
@@ -57,8 +58,8 @@
         }
 
         .cookie-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 5rem;
+            margin-bottom: 25px;
             animation: bounce 2s infinite;
         }
 
@@ -317,8 +318,8 @@
         }
 
         .declined-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 5rem;
+            margin-bottom: 25px;
             opacity: 0.8;
         }
 
@@ -342,12 +343,12 @@
         .logo-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         
         .logo-container img {
-            max-width: 200px;
-            max-height: 100px;
+            max-width: 300px;
+            max-height: 150px;
             object-fit: contain;
         }
 
@@ -355,28 +356,28 @@
            MAIN SURVEY SECTION
         ======================================== */
         .page-title {
-            font-size: 3.5rem;
+            font-size: 5rem;
             font-weight: bold;
             text-align: center;
             color: #d4af37;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             line-height: 1.2;
         }
 
         .invitation-text {
-            font-size: 2.2rem;
+            font-size: 3.2rem;
             color: #ffffff;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
             line-height: 1.6;
         }
 
         .players-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            margin-bottom: 30px;
+            gap: 30px;
+            margin-bottom: 40px;
             width: 100%;
         }
 
@@ -384,14 +385,15 @@
             background: linear-gradient(135deg, #1a2f4a 0%, #0d2744 100%);
             border: 3px solid rgba(212, 175, 55, 0.5);
             border-radius: 15px;
-            padding: 35px 25px;
+            padding: 50px 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 200px;
+            min-height: auto;
+            height: auto;
         }
 
         .player-card:hover {
@@ -413,12 +415,14 @@
         }
 
         .player-name {
-            font-size: 2.2em;
+            font-size: 4.4em;
             font-weight: bold;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             word-wrap: break-word;
-            line-height: 1.2;
+            line-height: 1.3;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .player-card.selected .player-name {
@@ -429,12 +433,14 @@
             background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
             color: #0a1828;
             border: 2px solid #f4d03f;
-            padding: 15px 30px;
+            padding: 20px 25px;
             border-radius: 10px;
-            font-size: 1.4rem;
+            font-size: 2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            width: 50%;
+            margin: 0 auto;
         }
 
         .vote-button:hover {
@@ -454,7 +460,7 @@
         ======================================== */
         .thank-you {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 40px;
             background: rgba(26, 47, 74, 0.8);
             border: 3px solid #d4af37;
             border-radius: 20px;
@@ -469,8 +475,8 @@
         }
 
         .thank-you-icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
+            font-size: 7rem;
+            margin-bottom: 30px;
             animation: celebrate 1s ease;
         }
 
@@ -481,14 +487,14 @@
         }
 
         .thank-you-title {
-            font-size: 3rem;
+            font-size: 4.5rem;
             font-weight: bold;
             color: #d4af37;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .thank-you-text {
-            font-size: 2rem;
+            font-size: 3rem;
             color: #ffffff;
             line-height: 1.6;
         }
@@ -498,19 +504,20 @@
         ======================================== */
         .loading-message {
             text-align: center;
-            font-size: 2rem;
+            font-size: 3rem;
             color: #d4af37;
-            padding: 40px;
+            padding: 50px;
         }
 
         .error-message {
             background: rgba(220, 53, 69, 0.2);
             border: 2px solid #dc3545;
             border-radius: 10px;
-            padding: 20px;
+            padding: 30px;
             color: #ffffff;
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            line-height: 1.6;
         }
 
         /* ========================================
@@ -521,12 +528,28 @@
             .players-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .page-title {
+                font-size: 4rem;
+            }
+            
+            .invitation-text {
+                font-size: 2.5rem;
+            }
+            
+            .player-name {
+                font-size: 3.5em;
+            }
+            
+            .vote-button {
+                font-size: 1.6rem;
+            }
         }
 
         /* Mobile */
         @media (max-width: 768px) {
             .container {
-                padding: 25px;
+                padding: 30px 20px;
                 max-width: 98%;
             }
 
@@ -550,6 +573,35 @@
             }
 
             .page-title {
+                font-size: 3rem;
+            }
+
+            .invitation-text {
+                font-size: 2rem;
+            }
+
+            .players-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .player-card {
+                padding: 30px 20px;
+            }
+
+            .player-name {
+                font-size: 3em;
+            }
+
+            .vote-button {
+                font-size: 1.4rem;
+                padding: 15px 20px;
+                width: 60%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
                 font-size: 2.5rem;
             }
 
@@ -557,23 +609,13 @@
                 font-size: 1.6rem;
             }
 
-            .players-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .player-card {
-                min-height: 160px;
-                padding: 25px 15px;
-            }
-
             .player-name {
-                font-size: 1.8em;
+                font-size: 2.5em;
             }
 
             .vote-button {
-                font-size: 1.1rem;
-                padding: 12px 24px;
+                font-size: 1.2rem;
+                width: 70%;
             }
         }
     </style>
@@ -1029,15 +1071,17 @@
 
             let fontSize;
             if (maxLength <= 15) {
-                fontSize = 2.2;
+                fontSize = 4.4;
             } else if (maxLength <= 20) {
-                fontSize = 2.0;
+                fontSize = 4.0;
             } else if (maxLength <= 25) {
-                fontSize = 1.8;
+                fontSize = 3.6;
             } else if (maxLength <= 30) {
-                fontSize = 1.6;
+                fontSize = 3.2;
+            } else if (maxLength <= 40) {
+                fontSize = 2.8;
             } else {
-                fontSize = 1.4;
+                fontSize = 2.4;
             }
 
             playerNames.forEach(nameEl => {
