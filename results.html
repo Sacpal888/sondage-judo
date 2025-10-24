@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080">
-    <title>Résultats - Sondage</title>
+    <title>RÃ©sultats - Sondage</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -43,18 +43,40 @@
         }
         
         h1 {
-            color: #d4af37;
             font-size: 4rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        h1 .title-fr {
+            color: #ffffff;
+        }
+        
+        h1 .title-nl {
+            color: #f4d03f;
         }
         
         .subtitle {
-            color: #ffffff;
             font-size: 3.3rem;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
         }
         
-        /* Grille des résultats - 2 colonnes, remplissage vertical (colonne par colonne) */
+        .subtitle .subtitle-fr {
+            color: #ffffff;
+        }
+        
+        .subtitle .subtitle-nl {
+            color: #f4d03f;
+        }
+        
+        /* Grille des rÃ©sultats - 2 colonnes, remplissage vertical (colonne par colonne) */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -202,17 +224,17 @@
             grid-column: 1 / -1;
         }
 
-        /* Pour 3 résultats par colonne */
+        /* Pour 3 rÃ©sultats par colonne */
         .results-grid.three-per-column {
             grid-template-rows: repeat(3, auto);
         }
 
-        /* Pour 2 résultats par colonne */
+        /* Pour 2 rÃ©sultats par colonne */
         .results-grid.two-per-column {
             grid-template-rows: repeat(2, auto);
         }
 
-        /* Pour 1 résultat par colonne */
+        /* Pour 1 rÃ©sultat par colonne */
         .results-grid.one-per-column {
             grid-template-rows: repeat(1, auto);
         }
@@ -221,16 +243,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 id="resultsTitle">🏆 Résultats du Sondage 🏆</h1>
-            <p class="subtitle" id="resultsSubtitle">En temps réel</p>
+            <h1 id="resultsTitle"><span class="title-fr">Résultats du Sondage</span><span class="title-nl">Enquêteresultaten</span></h1>
+            <p class="subtitle" id="resultsSubtitle"><span class="subtitle-fr">En temps réel</span><span class="subtitle-nl">In real-time</span></p>
         </div>
         
         <div id="loadingMessage" class="loading">
-            ⏳ Chargement des résultats...
+            â³ Chargement des rÃ©sultats...
         </div>
         
         <div id="resultsGrid" class="results-grid" style="display: none;">
-            <!-- Les résultats seront insérés ici -->
+            <!-- Les rÃ©sultats seront insÃ©rÃ©s ici -->
         </div>
     </div>
 
@@ -266,7 +288,7 @@
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase initialisé');
+                console.log('âœ… Supabase initialisÃ©');
                 
                 return true;
             } catch (error) {
@@ -293,11 +315,11 @@
                 if (surveyError) throw surveyError;
                 if (!survey) throw new Error('Sondage introuvable');
 
-                // Vérifier si le mode bilingue est activé
+                // VÃ©rifier si le mode bilingue est activÃ©
                 isBilingualMode = survey.bilingual_mode === true;
-                console.log('🌐 Mode bilingue:', isBilingualMode);
+                console.log('ðŸŒ Mode bilingue:', isBilingualMode);
 
-                // Charger les messages (FR par défaut)
+                // Charger les messages (FR par dÃ©faut)
                 let titleFr = survey.titre || 'Sondage';
                 let invitationFr = survey.description || 'Votez pour votre choix !';
                 let titleNl = null;
@@ -319,9 +341,9 @@
                 }
 
                 // Construire le titre avec FR + NL si bilingue
-                let displayTitle = '🏆 ' + titleFr + ' 🏆';
+                let displayTitle = 'ðŸ† ' + titleFr + ' ðŸ†';
                 if (isBilingualMode && titleNl) {
-                    displayTitle = '🏆 ' + titleFr + ' <span style="color: #f4d03f;">' + titleNl + '</span> 🏆';
+                    displayTitle = 'ðŸ† ' + titleFr + ' <span style="color: #f4d03f;">' + titleNl + '</span> ðŸ†';
                 }
 
                 // Construire le sous-titre avec FR + NL si bilingue
@@ -330,7 +352,7 @@
                     displayInvitation = invitationFr + ' <span style="color: #f4d03f;">' + invitationNl + '</span>';
                 }
 
-                // Mettre à jour les titres
+                // Mettre Ã  jour les titres
                 document.getElementById('resultsTitle').innerHTML = displayTitle;
                 document.getElementById('resultsSubtitle').innerHTML = displayInvitation;
 
@@ -343,7 +365,7 @@
 
                 if (playersError) throw playersError;
                 if (!players || players.length === 0) {
-                    throw new Error('Aucun candidat trouvé pour ce sondage');
+                    throw new Error('Aucun candidat trouvÃ© pour ce sondage');
                 }
 
                 // Charger les traductions NL des joueurs SI mode bilingue
@@ -373,9 +395,9 @@
                     throw votesError;
                 }
 
-                console.log(`📊 ${votes ? votes.length : 0} votes trouvés pour le sondage #${currentSurveyId}`);
+                console.log(`ðŸ“Š ${votes ? votes.length : 0} votes trouvÃ©s pour le sondage #${currentSurveyId}`);
 
-                // Calculer les résultats par joueur
+                // Calculer les rÃ©sultats par joueur
                 const resultsMap = {};
                 let totalVotes = 0;
                 let totalVotesFr = 0;
@@ -420,7 +442,7 @@
                     }
                 });
 
-                // Convertir en tableau et trier par nombre de votes (décroissant)
+                // Convertir en tableau et trier par nombre de votes (dÃ©croissant)
                 const results = Object.values(resultsMap).sort((a, b) => {
                     if (b.total_votes !== a.total_votes) {
                         return b.total_votes - a.total_votes;
@@ -428,20 +450,20 @@
                     return a.player_name.localeCompare(b.player_name);
                 });
 
-                console.log('📊 Résultats calculés:', results);
+                console.log('ðŸ“Š RÃ©sultats calculÃ©s:', results);
 
-                // Afficher les résultats
+                // Afficher les rÃ©sultats
                 displayResults(results || [], totalVotes);
 
-                // Masquer le loading et afficher les résultats
+                // Masquer le loading et afficher les rÃ©sultats
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('resultsGrid').style.display = 'grid';
 
                 const totalPlayers = results.length;
-                console.log(`📊 Résultats mis à jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
+                console.log(`ðŸ“Š RÃ©sultats mis Ã  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
             } catch (error) {
-                console.error('❌ Erreur lors du chargement des résultats:', error);
+                console.error('âŒ Erreur lors du chargement des rÃ©sultats:', error);
                 console.error('Details:', {
                     message: error.message,
                     code: error.code,
@@ -449,7 +471,7 @@
                     details: error.details
                 });
                 
-                let errorMessage = 'Erreur lors du chargement des résultats';
+                let errorMessage = 'Erreur lors du chargement des rÃ©sultats';
                 
                 if (error.message) {
                     errorMessage += ': ' + error.message;
@@ -457,9 +479,9 @@
                 
                 // Afficher des conseils selon le type d'erreur
                 if (error.message && error.message.includes('permission denied')) {
-                    errorMessage += '\n\n⚠️ Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
+                    errorMessage += '\n\nâš ï¸ ProblÃ¨me de permissions RLS. ExÃ©cutez le fichier SQL fourni dans Supabase.';
                 } else if (error.message && error.message.includes('Aucun candidat')) {
-                    errorMessage += '\n\n⚠️ Ajoutez des candidats au sondage #' + currentSurveyId;
+                    errorMessage += '\n\nâš ï¸ Ajoutez des candidats au sondage #' + currentSurveyId;
                 }
                 
                 showError(errorMessage);
@@ -473,16 +495,16 @@
             const grid = document.getElementById('resultsGrid');
             
             if (!results || results.length === 0 || totalVotes === 0) {
-                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les résultats s\'afficheront dès les premiers votes !</div>';
+                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les rÃ©sultats s\'afficheront dÃ¨s les premiers votes !</div>';
                 return;
             }
 
             grid.innerHTML = '';
 
-            // Limiter à 6 premiers résultats
+            // Limiter Ã  6 premiers rÃ©sultats
             const topResults = results.slice(0, 6);
 
-            // Définir le nombre de lignes selon le nombre de résultats
+            // DÃ©finir le nombre de lignes selon le nombre de rÃ©sultats
             const numResults = topResults.length;
             if (numResults <= 2) {
                 grid.classList.add('one-per-column');
@@ -503,7 +525,7 @@
                 let displayNameNl = result.player_name_nl;
                 
                 if (isBilingualMode && displayNameNl) {
-                    // Enlever les emojis du nom NL (ils sont déjà dans le FR)
+                    // Enlever les emojis du nom NL (ils sont dÃ©jÃ  dans le FR)
                     displayNameNl = removeEmojis(displayNameNl);
                 }
 
@@ -587,7 +609,7 @@
             }
         })();
 
-        // Arrêter le rafraîchissement quand la page est masquée
+        // ArrÃªter le rafraÃ®chissement quand la page est masquÃ©e
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 stopAutoRefresh();
