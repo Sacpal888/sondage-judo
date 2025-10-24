@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Base de Données</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+        }
+        h2 {
+            color: #ffff00;
+        }
+        pre {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .error {
+            color: #ff0000;
+        }
+        .success {
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnostic Base de Données - Système de Vote</h1>
+    
+    <div class="section">
+        <h2>1. Test Connexion Supabase</h2>
+        <pre id="connection"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2. Structure de la table 'votes'</h2>
+        <pre id="votesStructure"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Joueurs du sondage #1</h2>
+        <pre id="players"></pre>
+    </div>
+
+    <div class="section">
+        <h2>4. Test d'insertion (simulation)</h2>
+        <pre id="insertTest"></pre>
+    </div>
+
+    <div class="section">
+        <h2>5. Vérification des clés étrangères</h2>
+        <pre id="foreignKeys"></pre>
+    </div>
+
+    <script>
+        async function runDiagnostic() {
+            const connDiv = document.getElementById('connection');
+            const votesDiv = document.getElementById('votesStructure');
+            const playersDiv = document.getElementById('players');
+            const insertDiv = document.getElementById('insertTest');
+            const fkDiv = document.getElementById('foreignKeys');
+
+            try {
+                // 1. Test connexion
+                connDiv.innerHTML = 'Connexion à Supabase...';
+                const supabase = window.supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+                connDiv.innerHTML = `<span class="success">✓ Connecté à: ${window.SUPABASE_URL}</span>`;
+
+                // 2. Récupérer un vote existant pour voir la structure
+                votesDiv.innerHTML = 'Chargement de la structure...';
+                const { data: sampleVote, error: voteError } = await supabase
+                    .from('votes')
+                    .select('*')
+                    .limit(1)
+                    .maybeSingle();
+
+                if (voteError) {
+                    votesDiv.innerHTML = `<span class="error">Erreur: ${voteError.message}</span>`;
+                } else if (sampleVote) {
+                    votesDiv.innerHTML = `<span class="success">Structure d'un vote:</span>\n${JSON.stringify(sampleVote, null, 2)}`;
+                } else {
+                    votesDiv.innerHTML = '<span>Aucun vote existant, impossible de voir la structure</span>';
+                }
+
+                // 3. Récupérer les joueurs du sondage 1
+                playersDiv.innerHTML = 'Chargement des joueurs...';
+                const { data: players, error: playersError } = await supabase
+                    .from('survey_players')
+                    .select('*')
+                    .eq('survey_id', 1)
+                    .order('ordre', { ascending: true });
+
+                if (playersError) {
+                    playersDiv.innerHTML = `<span class="error">Erreur: ${playersError.message}</span>`;
+                } else {
+                    playersDiv.innerHTML = `<span class="success">Joueurs trouvés (${players.length}):</span>\n${JSON.stringify(players, null, 2)}`;
+                }
+
+                // 4. Test d'insertion simulée
+                insertDiv.innerHTML = 'Test de structure d\'insertion...';
+                const testData = {
+                    survey_id: 1,
+                    player_id: players && players.length > 0 ? players[0].id : 999,
+                    language_code: 'fr',
+                    session_id: 'test_session_' + Date.now(),
+                    voted_at: new Date().toISOString()
+                };
+                insertDiv.innerHTML = `<span class="success">Données qui seront insérées:</span>\n${JSON.stringify(testData, null, 2)}`;
+
+                // 5. Vérifier les clés étrangères via une requête PostgreSQL
+                fkDiv.innerHTML = 'Récupération des contraintes...';
+                const { data: fkData, error: fkError } = await supabase
+                    .rpc('get_foreign_keys', { table_name: 'votes' })
+                    .maybeSingle();
+
+                if (fkError) {
+                    fkDiv.innerHTML = `<span class="error">Impossible de récupérer les contraintes FK (fonction RPC non disponible)</span>\n\n`;
+                    fkDiv.innerHTML += `<span>Ceci est normal si la fonction RPC n'existe pas.</span>\n`;
+                    fkDiv.innerHTML += `<span>Vérifiez manuellement dans Supabase:</span>\n`;
+                    fkDiv.innerHTML += `1. Allez dans 'Database' > 'Tables' > 'votes'\n`;
+                    fkDiv.innerHTML += `2. Regardez les 'Foreign Key Relationships'\n`;
+                    fkDiv.innerHTML += `3. Vérifiez que 'player_id' pointe vers 'survey_players.id' (et non 'players.id')`;
+                } else {
+                    fkDiv.innerHTML = `<span class="success">Contraintes FK:</span>\n${JSON.stringify(fkData, null, 2)}`;
+                }
+
+                // Message final
+                insertDiv.innerHTML += '\n\n<span class="success">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>\n';
+                insertDiv.innerHTML += '<span style="color: #ffff00;">🔍 DIAGNOSTIC COMPLET</span>\n\n';
+                insertDiv.innerHTML += '<span style="color: #00ffff;">Vérifiez que dans Supabase:</span>\n';
+                insertDiv.innerHTML += '1. La table "votes" a bien une colonne "player_id"\n';
+                insertDiv.innerHTML += '2. La contrainte FK "votes_player_id_fkey" pointe vers "survey_players(id)"\n';
+                insertDiv.innerHTML += '3. Les IDs des joueurs ci-dessus correspondent aux IDs dans survey_players\n\n';
+                insertDiv.innerHTML += '<span style="color: #ff00ff;">Si la FK pointe vers "players" au lieu de "survey_players":</span>\n';
+                insertDiv.innerHTML += '→ Supprimez la contrainte actuelle\n';
+                insertDiv.innerHTML += '→ Créez une nouvelle FK vers survey_players(id)';
+
+            } catch (error) {
+                console.error('Erreur diagnostic:', error);
+                document.body.innerHTML += `<div class="section"><span class="error">ERREUR FATALE: ${error.message}</span></div>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', runDiagnostic);
+    </script>
+</body>
+</html>
