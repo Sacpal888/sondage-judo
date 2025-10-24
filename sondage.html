@@ -15,24 +15,70 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            background: transparent;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            gap: 30px;
             position: relative;
         }
         
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 945px;
             background: rgba(13, 39, 68, 0.95);
             border: 3px solid #d4af37;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border-radius: 25px;
+            padding: 47px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             position: relative;
+        }
+
+        /* Container QR Code */
+        .qr-container {
+            width: 100%;
+            max-width: 662px;
+            background: rgba(13, 39, 68, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 25px;
+            padding: 47px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 31px;
+        }
+
+        .qr-title {
+            color: #d4af37;
+            font-size: 3.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .qr-code-display {
+            background: white;
+            padding: 25px;
+            border-radius: 19px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .qr-code-display img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        #qrCodeImage {
+            width: 441px;
+            height: 441px;
         }
 
         .hidden {
@@ -255,20 +301,20 @@
         ======================================== */
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             position: relative;
         }
         
         h1 {
             color: #d4af37;
-            font-size: 1.8em;
+            font-size: 2.84em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin: 0 0 15px 0;
+            margin: 0 0 23px 0;
         }
         
         .logo-container {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 19px;
             width: 100%;
             min-height: 0;
             display: flex;
@@ -279,16 +325,16 @@
         
         .logo-container img {
             max-width: 90%;
-            max-height: 150px;
+            max-height: 189px;
             width: auto;
             height: auto;
-            border-radius: 10px;
+            border-radius: 13px;
             border: 2px solid #d4af37;
             box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
             display: block;
             background: transparent;
             object-fit: contain;
-            padding: 10px;
+            padding: 13px;
             background-color: rgba(255, 255, 255, 0.05);
         }
         
@@ -301,8 +347,8 @@
         .vote-text {
             color: #ffffff;
             text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 25px;
+            font-size: 2.84em;
+            margin-bottom: 39px;
             font-weight: 500;
         }
         
@@ -312,15 +358,15 @@
             grid-template-columns: repeat(2, 1fr);
             grid-auto-flow: column;
             grid-template-rows: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 23px;
+            margin-bottom: 32px;
         }
         
         .player-card {
             background: rgba(26, 47, 74, 0.8);
             border: 2px solid #d4af37;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -369,7 +415,7 @@
         .player-name {
             color: #ffffff;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 13px;
             word-wrap: break-word;
             hyphens: auto;
             line-height: 1.2;
@@ -384,12 +430,12 @@
             background: #d4af37;
             color: #0a1828;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 13px 25px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top: 13px;
             display: none;
         }
         
@@ -413,8 +459,8 @@
             text-align: center;
             color: #ffffff;
             background: linear-gradient(135deg, rgba(26, 47, 74, 0.9), rgba(13, 39, 68, 0.9));
-            padding: 30px;
-            border-radius: 15px;
+            padding: 38px;
+            border-radius: 19px;
             border: 2px solid #d4af37;
             animation: fadeInScale 0.5s ease-in;
         }
@@ -425,12 +471,12 @@
         
         .thank-you h2 {
             color: #d4af37;
-            margin-bottom: 15px;
-            font-size: 1.5em;
+            margin-bottom: 19px;
+            font-size: 1.89em;
         }
         
         .thank-you p {
-            font-size: 1.1em;
+            font-size: 1.39em;
             line-height: 1.6;
         }
         
@@ -450,10 +496,10 @@
             text-align: center;
             color: #ffffff;
             background: linear-gradient(135deg, rgba(100, 149, 237, 0.3), rgba(70, 130, 180, 0.3));
-            padding: 30px;
-            border-radius: 15px;
+            padding: 38px;
+            border-radius: 19px;
             border: 2px solid #87CEEB;
-            margin-top: 20px;
+            margin-top: 25px;
             animation: fadeInScale 0.5s ease-in;
         }
         
@@ -463,33 +509,53 @@
 
         .votes-frozen h3 {
             color: #87CEEB;
-            margin-bottom: 15px;
-            font-size: 1.5em;
+            margin-bottom: 19px;
+            font-size: 1.89em;
         }
 
         .votes-frozen p {
-            font-size: 1.1em;
+            font-size: 1.39em;
             line-height: 1.6;
         }
         
         .loading {
             text-align: center;
             color: #d4af37;
-            font-size: 1.3em;
-            padding: 20px;
+            font-size: 1.64em;
+            padding: 25px;
         }
         
         .error-message {
             background: rgba(220, 53, 69, 0.2);
             border: 2px solid #dc3545;
             color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 19px;
+            border-radius: 13px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         /* Responsive */
+        @media (max-width: 1400px) {
+            body {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .qr-container {
+                max-width: 400px;
+            }
+            
+            #qrCodeImage {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .qr-title {
+                font-size: 2.2em;
+            }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -530,6 +596,20 @@
             .btn-consent {
                 padding: 12px 25px;
                 font-size: 1rem;
+            }
+            
+            .qr-container {
+                max-width: 300px;
+                padding: 25px;
+            }
+            
+            #qrCodeImage {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .qr-title {
+                font-size: 1.8em;
             }
         }
     </style>
@@ -663,6 +743,14 @@
         <div id="errorMessage" class="error-message" style="display: none;"></div>
     </div>
 
+    <!-- Container QR Code -->
+    <div class="qr-container" id="qrContainer">
+        <h2 class="qr-title">Votez<br>maintenant !</h2>
+        <div class="qr-code-display">
+            <img id="qrCodeImage" src="" alt="QR Code">
+        </div>
+    </div>
+
     <script>
         let supabaseClient;
         let hasVoted = false;
@@ -765,6 +853,7 @@
                 document.getElementById('mainContent').classList.remove('hidden');
                 
                 await loadMessages();
+                await loadQRCode();
                 await checkIfVotesFrozen();
                 
                 return true;
@@ -993,6 +1082,34 @@
             }
         }
 
+        async function loadQRCode() {
+            try {
+                const { data: qrData, error: qrError } = await supabaseClient
+                    .from('settings')
+                    .select('*')
+                    .eq('key', 'qr_code')
+                    .single();
+                
+                const qrImage = document.getElementById('qrCodeImage');
+                
+                if (qrError || !qrData || !qrData.value) {
+                    // Si pas de QR code en base, on peut générer un QR code avec l'URL actuelle
+                    const currentUrl = window.location.href;
+                    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=441x441&data=${encodeURIComponent(currentUrl)}`;
+                    console.log('✅ QR Code généré avec URL actuelle');
+                    return;
+                }
+                
+                qrImage.src = qrData.value;
+                console.log('✅ QR Code chargé depuis la base de données');
+            } catch (error) {
+                console.error('Erreur chargement QR code:', error);
+                // Fallback: générer un QR code avec l'URL actuelle
+                const currentUrl = window.location.href;
+                document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=441x441&data=${encodeURIComponent(currentUrl)}`;
+            }
+        }
+
         async function loadMessages() {
             try {
                 if (!supabaseClient) return;
@@ -1041,6 +1158,12 @@
         // ============================================
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Charger le QR code immédiatement, même avant le consentement
+            // Cela permet de l'afficher pendant que l'utilisateur accepte les cookies
+            const qrImage = document.getElementById('qrCodeImage');
+            const currentUrl = window.location.href;
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=441x441&data=${encodeURIComponent(currentUrl)}`;
+            
             checkCookieConsent();
         });
     </script>
