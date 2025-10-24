@@ -628,16 +628,23 @@
                     <textarea class="form-textarea" id="msgThankyouFr" placeholder="Ex: Merci pour votre vote !"></textarea>
                 </div>
 
-                <!-- Logo -->
+                <!-- Logo Upload -->
                 <div class="form-group">
-                    <label class="form-label">URL du logo</label>
-                    <input type="text" class="form-input" id="logoUrl" placeholder="https://...">
+                    <label class="form-label">Logo (PNG sur fond transparent)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button type="button" class="btn" onclick="document.getElementById('logoFile').click()">📤 Upload Logo</button>
+                        <button type="button" class="btn btn-danger" onclick="resetLogo()">🗑️ Reset Logo</button>
+                    </div>
+                    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/jpg" style="display: none;">
+                    <div id="logoPreview" style="margin-top: 10px; text-align: center; min-height: 80px; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 10px; display: none;">
+                        <img id="logoPreviewImg" style="max-width: 100%; max-height: 150px; border-radius: 8px;">
+                    </div>
                 </div>
 
-                <!-- Candidats -->
+                <!-- Candidats / Questions -->
                 <div class="form-group">
-                    <label class="form-label">Candidats *</label>
-                    <p class="info-text">Ajoutez au moins 2 candidats pour votre sondage</p>
+                    <label class="form-label">Candidats / Questions *</label>
+                    <p class="info-text">Ajoutez au moins 2 candidats/questions pour votre sondage. Si NL est activé, vous pourrez les traduire ci-dessous.</p>
                     <div id="playersEditor" class="players-editor"></div>
                     <button type="button" class="btn" onclick="addPlayerField()">➕ Ajouter un candidat</button>
                 </div>
@@ -670,6 +677,13 @@
                         <label class="form-label">Message remerciement (NL)</label>
                         <textarea class="form-textarea" id="msgThankyouNl" placeholder="Ex: Bedankt voor je stem!"></textarea>
                     </div>
+
+                    <!-- Traduction des candidats en NL -->
+                    <div class="form-group">
+                        <label class="form-label">Traduction des candidats (NL)</label>
+                        <p class="info-text">Traduisez chaque candidat/question en néerlandais. L'ordre correspond aux candidats FR ci-dessus.</p>
+                        <div id="playersEditorNL" class="players-editor"></div>
+                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -697,6 +711,7 @@
         let currentUser = null;
         let allSurveys = [];
         let editingSurveyId = null;
+        let currentLogoBase64 = null; // Logo en base64
 
         // ============================================
         // AUTHENTIFICATION
@@ -876,16 +891,99 @@
         }
 
         // ============================================
+        // GESTION DU LOGO
+        // ============================================
+        document.getElementById('logoFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Vérifier le type de fichier
+            if (!file.type.startsWith('image/')) {
+                alert('❌ Veuillez sélectionner une image');
+                return;
+            }
+
+            // Vérifier la taille (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('❌ L\'image est trop grande (max 2MB)');
+                return;
+            }
+
+            try {
+                // Convertir en base64
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    currentLogoBase64 = event.target.result;
+                    document.getElementById('logoPreviewImg').src = currentLogoBase64;
+                    document.getElementById('logoPreview').style.display = 'block';
+                    console.log('✅ Logo chargé');
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Erreur upload logo:', error);
+                alert('❌ Erreur lors du chargement du logo');
+            }
+        });
+
+        function resetLogo() {
+            currentLogoBase64 = null;
+            document.getElementById('logoFile').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('logoPreviewImg').src = '';
+            console.log('🗑️ Logo supprimé');
+        }
+
+        // ============================================
+        // SYNCHRONISATION DES CHAMPS NL
+        // ============================================
+        function syncNLFields() {
+            const playerInputsFR = document.querySelectorAll('#playersEditor .player-item input');
+            const editorNL = document.getElementById('playersEditorNL');
+            
+            // Sauvegarder les valeurs actuelles NL
+            const currentNLValues = [];
+            const currentNLInputs = editorNL.querySelectorAll('.player-item input');
+            currentNLInputs.forEach(input => {
+                currentNLValues.push(input.value);
+            });
+
+            // Reconstruire les champs NL
+            editorNL.innerHTML = '';
+            
+            playerInputsFR.forEach((inputFR, index) => {
+                const item = document.createElement('div');
+                item.className = 'player-item';
+                item.style.marginBottom = '10px';
+                
+                const valueFR = inputFR.value || `Candidat ${index + 1}`;
+                const valueNL = currentNLValues[index] || '';
+                
+                item.innerHTML = `
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.85em; color: #667eea; margin-bottom: 5px;">FR: ${escapeHtml(valueFR)}</div>
+                        <input type="text" class="form-input" placeholder="Traduction NL" value="${escapeHtml(valueNL)}" style="margin: 0;">
+                    </div>
+                `;
+                editorNL.appendChild(item);
+            });
+        }
+
+        // ============================================
         // MODAL
         // ============================================
         function openCreateModal() {
             editingSurveyId = null;
+            currentLogoBase64 = null;
+            
             document.getElementById('modalTitle').textContent = 'Créer un sondage';
             document.getElementById('surveyForm').reset();
             document.getElementById('playersEditor').innerHTML = '';
+            document.getElementById('playersEditorNL').innerHTML = '';
             document.getElementById('errorContainer').innerHTML = '';
             document.getElementById('urlPreview').style.display = 'none';
             document.getElementById('nlFieldsContainer').style.display = 'none';
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('enableNL').checked = false;
             
             // Ajouter 3 champs candidats par défaut
             for (let i = 0; i < 3; i++) addPlayerField();
@@ -895,6 +993,8 @@
 
         async function editSurvey(surveyId) {
             editingSurveyId = surveyId;
+            currentLogoBase64 = null;
+            
             const survey = allSurveys.find(s => s.id === surveyId);
             if (!survey) return;
 
@@ -904,9 +1004,17 @@
             document.getElementById('msgTitleFr').value = survey.msg_title || '';
             document.getElementById('msgInvitationFr').value = survey.msg_invitation || '';
             document.getElementById('msgThankyouFr').value = survey.msg_thankyou || '';
-            document.getElementById('logoUrl').value = survey.logo_url || '';
             document.getElementById('errorContainer').innerHTML = '';
             document.getElementById('urlPreview').style.display = 'none';
+
+            // Charger le logo
+            if (survey.logo_base64) {
+                currentLogoBase64 = survey.logo_base64;
+                document.getElementById('logoPreviewImg').src = currentLogoBase64;
+                document.getElementById('logoPreview').style.display = 'block';
+            } else {
+                document.getElementById('logoPreview').style.display = 'none';
+            }
 
             // Charger les candidats
             const { data: players } = await supabaseClient
@@ -937,6 +1045,31 @@
                 document.getElementById('msgTitleNl').value = translations.msg_title || '';
                 document.getElementById('msgInvitationNl').value = translations.msg_invitation || '';
                 document.getElementById('msgThankyouNl').value = translations.msg_thankyou || '';
+                
+                // Charger les traductions des candidats
+                const { data: playerTranslations } = await supabaseClient
+                    .from('survey_player_translations')
+                    .select('player_id, nom')
+                    .in('player_id', players.map(p => p.id))
+                    .eq('language_code', 'nl');
+                
+                // Créer un map des traductions
+                const translationMap = {};
+                if (playerTranslations) {
+                    playerTranslations.forEach(pt => {
+                        translationMap[pt.player_id] = pt.nom;
+                    });
+                }
+                
+                // Remplir les champs NL
+                syncNLFields();
+                const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
+                players.forEach((player, index) => {
+                    if (nlInputs[index] && translationMap[player.id]) {
+                        nlInputs[index].value = translationMap[player.id];
+                    }
+                });
+                
             } else {
                 document.getElementById('enableNL').checked = false;
                 document.getElementById('nlFieldsContainer').style.display = 'none';
@@ -954,10 +1087,31 @@
             const item = document.createElement('div');
             item.className = 'player-item';
             item.innerHTML = `
-                <input type="text" class="form-input" placeholder="Nom du candidat" value="${escapeHtml(value)}" required>
-                <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+                <input type="text" class="form-input" placeholder="Nom du candidat/question" value="${escapeHtml(value)}" required>
+                <button type="button" class="btn-remove" onclick="removePlayerField(this)">✕</button>
             `;
             editor.appendChild(item);
+            
+            // Ajouter un listener pour synchroniser les champs NL
+            const input = item.querySelector('input');
+            input.addEventListener('input', () => {
+                if (document.getElementById('enableNL').checked) {
+                    syncNLFields();
+                }
+            });
+            
+            // Synchroniser si NL est activé
+            if (document.getElementById('enableNL').checked) {
+                syncNLFields();
+            }
+        }
+
+        function removePlayerField(button) {
+            button.parentElement.remove();
+            // Synchroniser les champs NL
+            if (document.getElementById('enableNL').checked) {
+                syncNLFields();
+            }
         }
 
         // Toggle NL fields
@@ -965,7 +1119,13 @@
             const enableNLCheckbox = document.getElementById('enableNL');
             if (enableNLCheckbox) {
                 enableNLCheckbox.addEventListener('change', (e) => {
-                    document.getElementById('nlFieldsContainer').style.display = e.target.checked ? 'block' : 'none';
+                    const isChecked = e.target.checked;
+                    document.getElementById('nlFieldsContainer').style.display = isChecked ? 'block' : 'none';
+                    
+                    // Synchroniser les champs des candidats quand on active NL
+                    if (isChecked) {
+                        syncNLFields();
+                    }
                 });
             }
         });
@@ -982,10 +1142,9 @@
             const msgTitleFr = document.getElementById('msgTitleFr').value.trim();
             const msgInvitationFr = document.getElementById('msgInvitationFr').value.trim();
             const msgThankyouFr = document.getElementById('msgThankyouFr').value.trim();
-            const logoUrl = document.getElementById('logoUrl').value.trim();
             const enableNL = document.getElementById('enableNL').checked;
 
-            const playerInputs = document.querySelectorAll('.player-item input');
+            const playerInputs = document.querySelectorAll('#playersEditor .player-item input');
             const players = Array.from(playerInputs).map(input => input.value.trim()).filter(v => v);
 
             if (!titre) {
@@ -998,9 +1157,16 @@
                 return;
             }
 
+            // Récupérer les traductions NL des candidats si activées
+            let playersNL = [];
+            if (enableNL) {
+                const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
+                playersNL = Array.from(nlInputs).map(input => input.value.trim());
+            }
+
             try {
                 if (editingSurveyId) {
-                    // UPDATE
+                    // ===== UPDATE =====
                     const { error: updateError } = await supabaseClient
                         .from('surveys')
                         .update({
@@ -1009,7 +1175,7 @@
                             msg_title: msgTitleFr,
                             msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
-                            logo_url: logoUrl,
+                            logo_base64: currentLogoBase64,
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', editingSurveyId);
@@ -1029,9 +1195,10 @@
                         ordre: index + 1
                     }));
                     
-                    const { error: playersError } = await supabaseClient
+                    const { data: insertedPlayers, error: playersError } = await supabaseClient
                         .from('survey_players')
-                        .insert(playersData);
+                        .insert(playersData)
+                        .select();
 
                     if (playersError) throw playersError;
 
@@ -1050,6 +1217,30 @@
                         await supabaseClient
                             .from('survey_translations')
                             .upsert(nlData, { onConflict: 'survey_id,language_code' });
+                        
+                        // Supprimer les anciennes traductions des candidats
+                        await supabaseClient
+                            .from('survey_player_translations')
+                            .delete()
+                            .in('player_id', insertedPlayers.map(p => p.id));
+                        
+                        // Insérer les nouvelles traductions des candidats
+                        const playerTranslations = [];
+                        insertedPlayers.forEach((player, index) => {
+                            if (playersNL[index] && playersNL[index].trim()) {
+                                playerTranslations.push({
+                                    player_id: player.id,
+                                    language_code: 'nl',
+                                    nom: playersNL[index].trim()
+                                });
+                            }
+                        });
+                        
+                        if (playerTranslations.length > 0) {
+                            await supabaseClient
+                                .from('survey_player_translations')
+                                .insert(playerTranslations);
+                        }
                     } else {
                         // Désactiver ou supprimer la traduction NL
                         await supabaseClient
@@ -1057,12 +1248,25 @@
                             .delete()
                             .eq('survey_id', editingSurveyId)
                             .eq('language_code', 'nl');
+                        
+                        // Supprimer les traductions des candidats
+                        const { data: oldPlayers } = await supabaseClient
+                            .from('survey_players')
+                            .select('id')
+                            .eq('survey_id', editingSurveyId);
+                        
+                        if (oldPlayers && oldPlayers.length > 0) {
+                            await supabaseClient
+                                .from('survey_player_translations')
+                                .delete()
+                                .in('player_id', oldPlayers.map(p => p.id));
+                        }
                     }
 
                     alert('✅ Sondage mis à jour !');
 
                 } else {
-                    // CREATE
+                    // ===== CREATE =====
                     const { data: newSurvey, error: createError } = await supabaseClient
                         .from('surveys')
                         .insert({
@@ -1071,7 +1275,7 @@
                             msg_title: msgTitleFr,
                             msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
-                            logo_url: logoUrl,
+                            logo_base64: currentLogoBase64,
                             active: false,
                             ordre: allSurveys.length + 1
                         })
@@ -1088,9 +1292,10 @@
                         ordre: index + 1
                     }));
                     
-                    const { error: playersError } = await supabaseClient
+                    const { data: insertedPlayers, error: playersError } = await supabaseClient
                         .from('survey_players')
-                        .insert(playersData);
+                        .insert(playersData)
+                        .select();
 
                     if (playersError) throw playersError;
 
@@ -1109,6 +1314,24 @@
                         await supabaseClient
                             .from('survey_translations')
                             .insert(nlData);
+                        
+                        // Insérer les traductions des candidats
+                        const playerTranslations = [];
+                        insertedPlayers.forEach((player, index) => {
+                            if (playersNL[index] && playersNL[index].trim()) {
+                                playerTranslations.push({
+                                    player_id: player.id,
+                                    language_code: 'nl',
+                                    nom: playersNL[index].trim()
+                                });
+                            }
+                        });
+                        
+                        if (playerTranslations.length > 0) {
+                            await supabaseClient
+                                .from('survey_player_translations')
+                                .insert(playerTranslations);
+                        }
                     }
 
                     // Afficher les URLs
@@ -1117,6 +1340,7 @@
                     alert('✅ Sondage créé !');
                 }
 
+                closeModal();
                 await loadSurveys();
 
             } catch (error) {
