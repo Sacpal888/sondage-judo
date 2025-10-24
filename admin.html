@@ -508,6 +508,9 @@
                 <label for="msgAlreadyVoted">Message si déjà voté :</label>
                 <textarea id="msgAlreadyVoted" placeholder="Merci, votre vote a déjà été enregistré !" rows="3"></textarea>
                 
+                <label for="msgQR">Message du QR Code (utilisez \n pour les sauts de ligne) :</label>
+                <textarea id="msgQR" placeholder="Votez\nmaintenant !" rows="2"></textarea>
+                
                 <button onclick="saveMessages()">💾 Enregistrer les messages</button>
                 <button onclick="resetMessagesToDefault()" style="background: #6c757d;">🔄 Réinitialiser</button>
                 <div id="messagesStatus" class="status-message"></div>
@@ -1069,7 +1072,8 @@
             title: 'Coupe virtuelle du public',
             invitation: 'Votez pour votre joueur(euse) favori(te) !',
             thankYou: 'Merci d\'avoir voté !',
-            alreadyVoted: 'Merci, votre vote a déjà été enregistré !'
+            alreadyVoted: 'Merci, votre vote a déjà été enregistré !',
+            qr: 'Votez\nmaintenant !'
         };
 
         async function loadCustomMessages() {
@@ -1077,7 +1081,7 @@
                 const { data, error } = await supabaseClient
                     .from('settings')
                     .select('*')
-                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted']);
+                    .in('key', ['msg_title', 'msg_invitation', 'msg_thankyou', 'msg_alreadyvoted', 'msg_qr']);
                 
                 if (error) throw error;
                 
@@ -1090,6 +1094,7 @@
                 document.getElementById('msgInvitation').value = messages.msg_invitation || DEFAULT_MESSAGES.invitation;
                 document.getElementById('msgThankYou').value = messages.msg_thankyou || DEFAULT_MESSAGES.thankYou;
                 document.getElementById('msgAlreadyVoted').value = messages.msg_alreadyvoted || DEFAULT_MESSAGES.alreadyVoted;
+                document.getElementById('msgQR').value = messages.msg_qr || DEFAULT_MESSAGES.qr;
             } catch (error) {
                 console.error('Erreur chargement messages:', error);
             }
@@ -1105,7 +1110,8 @@
                     { key: 'msg_title', value: document.getElementById('msgTitle').value || DEFAULT_MESSAGES.title },
                     { key: 'msg_invitation', value: document.getElementById('msgInvitation').value || DEFAULT_MESSAGES.invitation },
                     { key: 'msg_thankyou', value: document.getElementById('msgThankYou').value || DEFAULT_MESSAGES.thankYou },
-                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted }
+                    { key: 'msg_alreadyvoted', value: document.getElementById('msgAlreadyVoted').value || DEFAULT_MESSAGES.alreadyVoted },
+                    { key: 'msg_qr', value: document.getElementById('msgQR').value || DEFAULT_MESSAGES.qr }
                 ];
                 
                 for (const msg of messages) {
@@ -1138,6 +1144,7 @@
             document.getElementById('msgInvitation').value = DEFAULT_MESSAGES.invitation;
             document.getElementById('msgThankYou').value = DEFAULT_MESSAGES.thankYou;
             document.getElementById('msgAlreadyVoted').value = DEFAULT_MESSAGES.alreadyVoted;
+            document.getElementById('msgQR').value = DEFAULT_MESSAGES.qr;
             await saveMessages();
         }
 
