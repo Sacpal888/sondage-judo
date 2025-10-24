@@ -184,14 +184,6 @@
             grid-column: 1 / -1;
         }
         
-        .refresh-notice {
-            text-align: center;
-            color: #f0d46f;
-            margin-top: 10px;
-            padding: 0;
-            font-size: 1em;
-        }
-        
         .loading {
             text-align: center;
             color: #d4af37;
@@ -231,11 +223,6 @@
         <div class="header">
             <h1 id="resultsTitle">🏆 Résultats du Sondage 🏆</h1>
             <p class="subtitle" id="resultsSubtitle">En temps réel</p>
-            <p class="refresh-notice">
-                📊 Total: <span id="totalVotes">0</span> votes 
-                (<span style="color: #ffffff;">🇫🇷 <span id="votesFr">0</span></span> | 
-                <span style="color: #f4d03f;">🇳🇱 <span id="votesNl">0</span></span>)
-            </p>
         </div>
         
         <div id="loadingMessage" class="loading">
@@ -410,11 +397,6 @@
 
                 console.log('📊 Résultats calculés:', results);
 
-                // Afficher les stats
-                document.getElementById('totalVotes').textContent = totalVotes;
-                document.getElementById('votesFr').textContent = totalVotesFr;
-                document.getElementById('votesNl').textContent = totalVotesNl;
-
                 // Afficher les résultats
                 displayResults(results || [], totalVotes);
 
@@ -525,10 +507,10 @@
         // AUTO REFRESH
         // ============================================
         function startAutoRefresh() {
-            // Actualiser toutes les 5 secondes
+            // Actualiser toutes les 2 secondes
             refreshInterval = setInterval(() => {
                 loadResults();
-            }, 5000);
+            }, 2000);
         }
 
         function stopAutoRefresh() {
