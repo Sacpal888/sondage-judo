@@ -297,9 +297,42 @@
                 isBilingualMode = survey.bilingual_mode === true;
                 console.log('🌐 Mode bilingue:', isBilingualMode);
 
+                // Charger les messages (FR par défaut)
+                let titleFr = survey.msg_title || 'Sondage';
+                let invitationFr = survey.msg_invitation || 'Votez pour votre choix !';
+                let titleNl = null;
+                let invitationNl = null;
+
+                // Si mode bilingue, charger aussi les traductions NL
+                if (isBilingualMode) {
+                    const { data: surveyTranslation } = await supabaseClient
+                        .from('survey_translations')
+                        .select('*')
+                        .eq('survey_id', currentSurveyId)
+                        .eq('language_code', 'nl')
+                        .maybeSingle();
+
+                    if (surveyTranslation && surveyTranslation.active) {
+                        titleNl = surveyTranslation.msg_title;
+                        invitationNl = surveyTranslation.msg_invitation;
+                    }
+                }
+
+                // Construire le titre avec FR + NL si bilingue
+                let displayTitle = '🏆 ' + titleFr + ' 🏆';
+                if (isBilingualMode && titleNl) {
+                    displayTitle = '🏆 ' + titleFr + ' <span style="color: #f4d03f;">' + titleNl + '</span> 🏆';
+                }
+
+                // Construire le sous-titre avec FR + NL si bilingue
+                let displayInvitation = invitationFr;
+                if (isBilingualMode && invitationNl) {
+                    displayInvitation = invitationFr + ' <span style="color: #f4d03f;">' + invitationNl + '</span>';
+                }
+
                 // Mettre à jour les titres
-                document.getElementById('resultsTitle').innerHTML = '🏆 ' + (survey.msg_title || survey.titre) + ' 🏆';
-                document.getElementById('resultsSubtitle').textContent = survey.description || survey.titre;
+                document.getElementById('resultsTitle').innerHTML = displayTitle;
+                document.getElementById('resultsSubtitle').innerHTML = displayInvitation;
 
                 // Charger les joueurs du sondage
                 const { data: players, error: playersError } = await supabaseClient
