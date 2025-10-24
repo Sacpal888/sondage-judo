@@ -298,8 +298,8 @@
                 console.log('🌐 Mode bilingue:', isBilingualMode);
 
                 // Charger les messages (FR par défaut)
-                let titleFr = survey.msg_title || 'Sondage';
-                let invitationFr = survey.msg_invitation || 'Votez pour votre choix !';
+                let titleFr = survey.titre || 'Sondage';
+                let invitationFr = survey.description || 'Votez pour votre choix !';
                 let titleNl = null;
                 let invitationNl = null;
 
@@ -313,8 +313,8 @@
                         .maybeSingle();
 
                     if (surveyTranslation && surveyTranslation.active) {
-                        titleNl = surveyTranslation.msg_title;
-                        invitationNl = surveyTranslation.msg_invitation;
+                        titleNl = surveyTranslation.titre;
+                        invitationNl = surveyTranslation.description;
                     }
                 }
 
