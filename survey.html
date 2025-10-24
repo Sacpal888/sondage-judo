@@ -374,7 +374,7 @@
 
         .players-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 25px;
             margin-bottom: 30px;
             width: 100%;
@@ -426,9 +426,9 @@
         }
 
         .vote-button {
-            background: #28a745;
-            color: #ffffff;
-            border: 2px solid #ffffff;
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            color: #0a1828;
+            border: 2px solid #f4d03f;
             padding: 15px 30px;
             border-radius: 10px;
             font-size: 1.4rem;
@@ -438,14 +438,15 @@
         }
 
         .vote-button:hover {
-            background: #218838;
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
             transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
         }
 
         .player-card.selected .vote-button {
             background: #0a1828;
-            color: #d4af37;
-            border-color: #0a1828;
+            color: #f4d03f;
+            border-color: #f4d03f;
         }
 
         /* ========================================
@@ -515,6 +516,14 @@
         /* ========================================
            RESPONSIVE
         ======================================== */
+        /* Tablettes */
+        @media (max-width: 1024px) {
+            .players-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Mobile */
         @media (max-width: 768px) {
             .container {
                 padding: 25px;
@@ -549,7 +558,7 @@
             }
 
             .players-grid {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                grid-template-columns: 1fr;
                 gap: 15px;
             }
 
@@ -945,6 +954,10 @@
                     showError('Aucun candidat disponible pour ce sondage.');
                     return;
                 }
+
+                console.log('📋 Joueurs chargés:', players);
+                console.log('📋 Premier joueur:', players[0]);
+                console.log('📋 Structure d\'un joueur:', Object.keys(players[0]));
 
                 // Si langue NL, charger les traductions des candidats
                 let playerTranslationsMap = {};
