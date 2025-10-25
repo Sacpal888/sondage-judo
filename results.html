@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080">
-    <title>RÃ©sultats - Sondage</title>
+    <title>Résultats - Sondage</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -251,7 +251,7 @@
         </div>
         
         <div id="loadingMessage" class="loading">
-            Ã¢ÂÂ³ Chargement des rÃ©sultats...
+            Ã¢ÂÂ³ Chargement des résultats...
         </div>
         
         <div id="resultsGrid" class="results-grid" style="display: none;">
@@ -323,7 +323,7 @@
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('âœ… Supabase initialisÃ©');
+                console.log('âœ… Supabase initialisée');
                 
                 return true;
             } catch (error) {
@@ -350,7 +350,7 @@
                 if (surveyError) throw surveyError;
                 if (!survey) throw new Error('Sondage introuvable');
 
-                // VÃ©rifier si le mode bilingue est activÃ©
+                // Vérifier si le mode bilingue est activÃ©
                 isBilingualMode = survey.bilingual_mode === true;
                 console.log('Ã°Å¸Å’Â Mode bilingue:', isBilingualMode);
 
