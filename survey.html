@@ -809,6 +809,9 @@
         let hasVoted = false;
         let selectedPlayerId = null;
         let sessionId = generateSessionId();
+        let isAutoDetected = false; // Indique si le sondage a été détecté automatiquement
+        let activeCheckInterval = null; // Intervalle pour vérifier les changements
+        let isBilingualMode = false; // Indique si le mode bilingue est activé
 
         // ============================================
         // SESSION ID GENERATION
@@ -840,31 +843,147 @@
         // ============================================
         // URL PARAMETERS
         // ============================================
-        function getUrlParams() {
+        async function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
             
-            if (!id) {
-                showError('ID de sondage manquant dans l\'URL.');
+            try {
+                // Initialiser Supabase si pas encore fait
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        throw new Error('Configuration Supabase manquante');
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+                
+                let surveyId;
+                let autoDetected = false;
+                
+                if (id) {
+                    // ID spécifique fourni dans l'URL
+                    surveyId = parseInt(id);
+                } else {
+                    // Pas d'ID fourni → détecter automatiquement le sondage actif
+                    console.log('🔍 Aucun ID fourni, recherche du sondage actif...');
+                    
+                    const { data: activeSurvey, error } = await supabaseClient
+                        .from('surveys')
+                        .select('id')
+                        .eq('active', true)
+                        .maybeSingle();
+                    
+                    if (error) throw error;
+                    
+                    if (!activeSurvey) {
+                        showError('❌ Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.');
+                        return null;
+                    }
+                    
+                    surveyId = activeSurvey.id;
+                    autoDetected = true;
+                    console.log('✅ Sondage actif détecté : ID', surveyId);
+                }
+                
+                // Charger les informations du sondage pour récupérer le bilingual_mode
+                const { data: survey, error: surveyError } = await supabaseClient
+                    .from('surveys')
+                    .select('id, bilingual_mode')
+                    .eq('id', surveyId)
+                    .maybeSingle();
+                
+                if (surveyError) throw surveyError;
+                
+                if (!survey) {
+                    showError(`❌ Sondage #${surveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+                    return null;
+                }
+                
+                currentSurveyId = surveyId;
+                
+                return { 
+                    id: surveyId, 
+                    autoDetected: autoDetected,
+                    bilingualMode: survey.bilingual_mode === true
+                };
+                
+            } catch (error) {
+                console.error('Erreur lors de la récupération des paramètres:', error);
+                showError('Erreur: ' + error.message);
                 return null;
             }
-            
-            currentSurveyId = parseInt(id);
-            
-            return { id: currentSurveyId };
         }
 
         // ============================================
         // CONSENT MANAGEMENT
         // ============================================
+        function adaptCookieScreenToBilingualMode() {
+            console.log(`🌐 Adaptation de l'écran de cookies - Mode bilingue: ${isBilingualMode}`);
+            
+            if (!isBilingualMode) {
+                // Mode monolingue (FR seulement)
+                // Cacher les titres NL
+                const titleNl = document.querySelector('.consent-title-nl');
+                if (titleNl) titleNl.style.display = 'none';
+                
+                // Cacher les textes NL
+                const textNl = document.querySelector('.consent-text-nl');
+                if (textNl) textNl.style.display = 'none';
+                
+                // Cacher le bouton NL
+                const btnNl = document.querySelector('.btn-accept-nl');
+                if (btnNl) btnNl.style.display = 'none';
+                
+                // Ajuster le bouton FR pour prendre toute la largeur
+                const btnFr = document.querySelector('.btn-accept-fr');
+                if (btnFr) {
+                    btnFr.style.flex = '1';
+                    btnFr.innerHTML = '<span class="lang-flag">🇫🇷</span>J\'accepte';
+                }
+                
+                // Ajuster le bouton de refus
+                const btnDecline = document.querySelector('.btn-decline');
+                if (btnDecline) {
+                    btnDecline.textContent = '❌ Je refuse';
+                }
+                
+                // Simplifier les messages dans les autres écrans
+                const declinedTitle = document.querySelector('.declined-title');
+                if (declinedTitle) {
+                    declinedTitle.textContent = 'Participation Impossible';
+                }
+                
+                const declinedTexts = document.querySelectorAll('.declined-text');
+                if (declinedTexts.length > 0) {
+                    declinedTexts[0].innerHTML = '<strong>Français :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l\'intégrité du sondage. Vous ne pouvez pas participer.';
+                    if (declinedTexts[1]) declinedTexts[1].style.display = 'none';
+                }
+                
+                const btnBack = document.querySelectorAll('.btn-back');
+                btnBack.forEach(btn => {
+                    if (btn.textContent.includes('/')) {
+                        btn.textContent = '← Retour';
+                    }
+                });
+            }
+            // Si bilingue, laisser tout tel quel (déjà en FR+NL)
+        }
+        
         function checkCookieConsent() {
             const consent = getCookie(COOKIE_CONSENT_NAME);
+            
+            // Adapter l'écran de cookies selon le mode bilingue
+            adaptCookieScreenToBilingualMode();
             
             if (consent === 'accepted') {
                 // Vérifier la langue préférée sauvegardée
                 const savedLang = getCookie(COOKIE_LANG_NAME);
-                if (savedLang) {
+                if (savedLang && isBilingualMode) {
                     currentLanguage = savedLang;
+                } else {
+                    currentLanguage = 'fr'; // Par défaut FR si mode monolingue
                 }
                 
                 // Charger le sondage directement
@@ -872,7 +991,7 @@
                 document.getElementById('surveySection').classList.remove('hidden');
                 initializeSurvey();
             } else {
-                // Afficher l'écran de consentement bilingue
+                // Afficher l'écran de consentement
                 document.getElementById('cookieConsent').classList.remove('hidden');
                 document.getElementById('surveySection').classList.add('hidden');
             }
@@ -880,6 +999,12 @@
 
         function acceptConsent(language) {
             console.log(`✓ Consentement accepté avec langue: ${language}`);
+            
+            // Si mode monolingue et langue NL demandée, forcer FR
+            if (!isBilingualMode && language === 'nl') {
+                console.log('⚠️ Mode monolingue, langue forcée à FR');
+                language = 'fr';
+            }
             
             // Sauvegarder le consentement
             setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
@@ -1063,6 +1188,9 @@
 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('voteSection').style.display = 'block';
+                
+                // Démarrer la vérification automatique si le sondage a été auto-détecté
+                startActiveCheck();
 
             } catch (error) {
                 console.error('Erreur chargement sondage:', error);
@@ -1202,6 +1330,50 @@
         }
 
         // ============================================
+        // AUTO-REFRESH ACTIVE SURVEY CHECK
+        // ============================================
+        async function checkActiveSurveyChange() {
+            if (!isAutoDetected || !supabaseClient || !currentSurveyId) return;
+            
+            try {
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('active', true)
+                    .maybeSingle();
+                
+                if (error) {
+                    console.error('Erreur vérification sondage actif:', error);
+                    return;
+                }
+                
+                // Si aucun sondage actif, ou si l'ID actif est différent
+                if (!activeSurvey || activeSurvey.id !== currentSurveyId) {
+                    console.log('🔄 Changement de sondage actif détecté, rechargement...');
+                    stopActiveCheck();
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Erreur lors de la vérification:', error);
+            }
+        }
+        
+        function startActiveCheck() {
+            if (isAutoDetected && !activeCheckInterval) {
+                console.log('▶️ Démarrage de la vérification automatique (toutes les 30s)');
+                activeCheckInterval = setInterval(checkActiveSurveyChange, 30000); // Vérifier toutes les 30 secondes
+            }
+        }
+        
+        function stopActiveCheck() {
+            if (activeCheckInterval) {
+                console.log('⏹️ Arrêt de la vérification automatique');
+                clearInterval(activeCheckInterval);
+                activeCheckInterval = null;
+            }
+        }
+
+        // ============================================
         // UTILITIES
         // ============================================
         function showError(message) {
@@ -1220,9 +1392,12 @@
         // ============================================
         // INITIALIZATION
         // ============================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = getUrlParams();
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = await getUrlParams();
             if (urlParams) {
+                isAutoDetected = urlParams.autoDetected;
+                isBilingualMode = urlParams.bilingualMode;
+                console.log(`📋 Sondage #${currentSurveyId} - Bilingue: ${isBilingualMode}, Auto-détecté: ${isAutoDetected}`);
                 checkCookieConsent();
             }
         });
