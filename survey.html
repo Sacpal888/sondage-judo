@@ -637,7 +637,7 @@
         ======================================== -->
         <div id="cookieConsent" class="cookie-consent hidden">
             <div class="consent-content">
-                <div class="cookie-icon">🍪</div>
+                <div class="cookie-icon">ðŸª</div>
                 
                 <div class="consent-title-bilingual">
                     <div class="consent-title-fr">🇫🇷 Cookies et Confidentialité</div>
@@ -649,14 +649,14 @@
                         <strong>Français :</strong> Nous utilisons des cookies essentiels pour enregistrer votre vote et garantir l'intégrité de ce sondage. 
                         En cliquant sur le bouton de votre langue, vous acceptez notre utilisation des cookies et accédez au sondage dans votre langue préférée.
                         <br><br>
-                        <a class="privacy-link" onclick="showPrivacyPolicy()">📄 Politique de confidentialité complète</a>
+                        <a class="privacy-link" onclick="showPrivacyPolicy()">ðŸ“„ Politique de confidentialité complète</a>
                     </div>
 
                     <div class="consent-text-nl">
-                        <strong>Nederlands :</strong> We gebruiken essentiële cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
+                        <strong>Nederlands :</strong> We gebruiken essentiÃ«le cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
                         Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquête in uw voorkeurtaal.
                         <br><br>
-                        <a class="privacy-link" onclick="showPrivacyPolicy()">📄 Volledig privacybeleid</a>
+                        <a class="privacy-link" onclick="showPrivacyPolicy()">ðŸ“„ Volledig privacybeleid</a>
                     </div>
                 </div>
 
@@ -672,7 +672,7 @@
                         </button>
                     </div>
                     <button class="btn-decline" onclick="declineConsent()">
-                        ❌ Je refuse / Ik weiger
+                        âŒ Je refuse / Ik weiger
                     </button>
                 </div>
             </div>
@@ -683,7 +683,7 @@
         ======================================== -->
         <div id="privacyPolicy" class="privacy-policy hidden">
             <div class="privacy-content">
-                <div class="policy-icon">🔒</div>
+                <div class="policy-icon">ðŸ”’</div>
                 <h2 class="privacy-title">Politique de Confidentialité / Privacybeleid</h2>
 
                 <div class="privacy-section">
@@ -745,7 +745,7 @@
                 </div>
 
                 <div class="privacy-buttons">
-                    <button class="btn-back" onclick="backToConsent()">← Retour / Terug</button>
+                    <button class="btn-back" onclick="backToConsent()">â† Retour / Terug</button>
                 </div>
             </div>
         </div>
@@ -755,16 +755,16 @@
         ======================================== -->
         <div id="consentDeclined" class="consent-declined hidden">
             <div class="declined-content">
-                <div class="declined-icon">😔</div>
+                <div class="declined-icon">ðŸ˜”</div>
                 <h2 class="declined-title">Participation Impossible / Deelname Onmogelijk</h2>
                 <p class="declined-text">
                     <strong>🇫🇷 Français :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l'intégrité du sondage. Vous ne pouvez pas participer.
                 </p>
                 <p class="declined-text">
-                    <strong>🇳🇱 Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentiële cookies de integriteit van de enquête niet garanderen. U kunt niet deelnemen.
+                    <strong>🇳🇱 Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentiÃ«le cookies de integriteit van de enquête niet garanderen. U kunt niet deelnemen.
                 </p>
                 <div style="margin-top: 25px;">
-                    <button class="btn-back" onclick="backToConsent()">← Reconsidérer / Heroverwegen</button>
+                    <button class="btn-back" onclick="backToConsent()">â† Reconsidérer / Heroverwegen</button>
                 </div>
             </div>
         </div>
@@ -776,7 +776,7 @@
             <div id="logoContainer" class="logo-container" style="display: none;"></div>
             
             <div id="loadingMessage" class="loading-message">
-                ⏳ Chargement du sondage...
+                â³ Chargement du sondage...
             </div>
 
             <div id="voteSection" style="display: none;">
@@ -786,7 +786,7 @@
             </div>
 
             <div id="thankYou" class="thank-you">
-                <div class="thank-you-icon">🎉</div>
+                <div class="thank-you-icon">ðŸŽ‰</div>
                 <h2 class="thank-you-title">Merci !</h2>
                 <p id="thankYouText" class="thank-you-text">Votre vote a été enregistré avec succès.</p>
             </div>
@@ -866,8 +866,8 @@
                     // ID spécifique fourni dans l'URL
                     surveyId = parseInt(id);
                 } else {
-                    // Pas d'ID fourni → détecter automatiquement le sondage actif
-                    console.log('🔍 Aucun ID fourni, recherche du sondage actif...');
+                    // Pas d'ID fourni â†’ détecter automatiquement le sondage actif
+                    console.log('ðŸ” Aucun ID fourni, recherche du sondage actif...');
                     
                     const { data: activeSurvey, error } = await supabaseClient
                         .from('surveys')
@@ -878,7 +878,7 @@
                     if (error) throw error;
                     
                     if (!activeSurvey) {
-                        showError('❌ Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.');
+                        showError('âŒ Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.');
                         return null;
                     }
                     
@@ -897,7 +897,7 @@
                 if (surveyError) throw surveyError;
                 
                 if (!survey) {
-                    showError(`❌ Sondage #${surveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+                    showError(`âŒ Sondage #${surveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
                     return null;
                 }
                 
@@ -920,7 +920,7 @@
         // CONSENT MANAGEMENT
         // ============================================
         function adaptCookieScreenToBilingualMode() {
-            console.log(`🌐 Adaptation de l'écran de cookies - Mode bilingue: ${isBilingualMode}`);
+            console.log(`ðŸŒ Adaptation de l'écran de cookies - Mode bilingue: ${isBilingualMode}`);
             
             if (!isBilingualMode) {
                 // Mode monolingue (FR seulement)
@@ -946,7 +946,7 @@
                 // Ajuster le bouton de refus
                 const btnDecline = document.querySelector('.btn-decline');
                 if (btnDecline) {
-                    btnDecline.textContent = '❌ Je refuse';
+                    btnDecline.textContent = 'âŒ Je refuse';
                 }
                 
                 // Simplifier les messages dans les autres écrans
@@ -964,11 +964,11 @@
                 const btnBack = document.querySelectorAll('.btn-back');
                 btnBack.forEach(btn => {
                     if (btn.textContent.includes('/')) {
-                        btn.textContent = '← Retour';
+                        btn.textContent = 'â† Retour';
                     }
                 });
             }
-            // Si bilingue, laisser tout tel quel (déjà en FR+NL)
+            // Si bilingue, laisser tout tel quel (déjÃ  en FR+NL)
         }
         
         function checkCookieConsent() {
@@ -998,11 +998,11 @@
         }
 
         function acceptConsent(language) {
-            console.log(`✓ Consentement accepté avec langue: ${language}`);
+            console.log(`âœ“ Consentement accepté avec langue: ${language}`);
             
             // Si mode monolingue et langue NL demandée, forcer FR
             if (!isBilingualMode && language === 'nl') {
-                console.log('⚠️ Mode monolingue, langue forcée à FR');
+                console.log('âš ï¸ Mode monolingue, langue forcée Ã  FR');
                 language = 'fr';
             }
             
@@ -1022,7 +1022,7 @@
         }
 
         function declineConsent() {
-            console.log('✗ Consentement refusé');
+            console.log('âœ— Consentement refusé');
             setCookie(COOKIE_CONSENT_NAME, 'declined', 1);
             
             document.getElementById('cookieConsent').classList.add('hidden');
@@ -1044,7 +1044,7 @@
         // SURVEY INITIALIZATION
         // ============================================
         async function initializeSurvey() {
-            console.log(`🚀 Initialisation du sondage #${currentSurveyId} en ${currentLanguage}`);
+            console.log(`ðŸš€ Initialisation du sondage #${currentSurveyId} en ${currentLanguage}`);
             
             try {
                 // Initialiser Supabase
@@ -1066,15 +1066,15 @@
 
                 if (surveyError) throw surveyError;
                 if (!survey) {
-                    showError(`❌ Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+                    showError(`âŒ Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
                     return;
                 }
                 if (!survey.active) {
-                    showError(`⏸️ Ce sondage n'est plus actif.<br><br>Merci de votre intérêt !`);
+                    showError(`â¸ï¸ Ce sondage n'est plus actif.<br><br>Merci de votre intérêt !`);
                     return;
                 }
 
-                console.log('✓ Sondage chargé:', survey);
+                console.log('âœ“ Sondage chargé:', survey);
 
                 // Charger les messages (FR par défaut, puis NL si sélectionné)
                 let messages = {
@@ -1115,14 +1115,14 @@
                     document.getElementById('logoContainer').style.display = 'none';
                 }
 
-                // Vérifier si l'utilisateur a déjà voté
+                // Vérifier si l'utilisateur a déjÃ  voté
                 const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
                 if (votedCookie === 'true') {
-                    console.log('✓ Utilisateur a déjà voté');
+                    console.log('âœ“ Utilisateur a déjÃ  voté');
                     document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('thankYou').classList.add('show');
                     
-                    // ⚡ IMPORTANT : Démarrer la vérification automatique même si l'utilisateur a déjà voté
+                    // âš¡ IMPORTANT : Démarrer la vérification automatique même si l'utilisateur a déjÃ  voté
                     // pour qu'il puisse voir le nouveau sondage automatiquement
                     startActiveCheck();
                     return;
@@ -1142,9 +1142,9 @@
                     return;
                 }
 
-                console.log('📋 Joueurs chargés:', players);
-                console.log('📋 Premier joueur:', players[0]);
-                console.log('📋 Structure d\'un joueur:', Object.keys(players[0]));
+                console.log('ðŸ“‹ Joueurs chargés:', players);
+                console.log('ðŸ“‹ Premier joueur:', players[0]);
+                console.log('ðŸ“‹ Structure d\'un joueur:', Object.keys(players[0]));
 
                 // Si langue NL, charger les traductions des candidats
                 let playerTranslationsMap = {};
@@ -1175,7 +1175,7 @@
                     card.dataset.playerId = player.id;
                     card.innerHTML = `
                         <div class="player-name">${escapeHtml(playerName)}</div>
-                        <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
+                        <button class="vote-button" onclick="confirmVote(${player.id})">âœ“ Voter</button>
                     `;
                     
                     card.addEventListener('click', (e) => {
@@ -1236,7 +1236,7 @@
                 nameEl.style.fontSize = fontSize + 'rem';
             });
 
-            console.log(`🔍 Taille de police ajustée à ${fontSize}rem pour max length: ${maxLength}`);
+            console.log(`ðŸ” Taille de police ajustée Ã  ${fontSize}rem pour max length: ${maxLength}`);
         }
 
         // ============================================
@@ -1272,7 +1272,7 @@
             if (!supabaseClient) return;
             
             try {
-                console.log('📝 Tentative de vote:', {
+                console.log('ðŸ“ Tentative de vote:', {
                     survey_id: currentSurveyId,
                     player_id: playerId,
                     language_code: currentLanguage,
@@ -1292,7 +1292,7 @@
                     .select();
                 
                 if (insertError) {
-                    console.error('❌ Erreur Supabase détaillée:', insertError);
+                    console.error('âŒ Erreur Supabase détaillée:', insertError);
                     console.error('Code:', insertError.code);
                     console.error('Message:', insertError.message);
                     console.error('Details:', insertError.details);
@@ -1313,7 +1313,7 @@
                 }, 800);
                 
             } catch (error) {
-                console.error('❌ Erreur lors du vote:', error);
+                console.error('âŒ Erreur lors du vote:', error);
                 
                 // Message d'erreur plus détaillé
                 let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
@@ -1353,7 +1353,7 @@
                 
                 // Si aucun sondage actif, ou si l'ID actif est différent
                 if (!activeSurvey || activeSurvey.id !== currentSurveyId) {
-                    console.log('🔄 Changement de sondage actif détecté, rechargement...');
+                    console.log('ðŸ”„ Changement de sondage actif détecté, rechargement...');
                     stopActiveCheck();
                     window.location.reload();
                 }
@@ -1364,14 +1364,14 @@
         
         function startActiveCheck() {
             if (isAutoDetected && !activeCheckInterval) {
-                console.log('▶️ Démarrage de la vérification automatique (toutes les 2s)');
+                console.log('â–¶ï¸ Démarrage de la vérification automatique (toutes les 2s)');
                 activeCheckInterval = setInterval(checkActiveSurveyChange, 2000); // Vérifier toutes les 2 secondes
             }
         }
         
         function stopActiveCheck() {
             if (activeCheckInterval) {
-                console.log('⏹️ Arrêt de la vérification automatique');
+                console.log('â¹ï¸ Arrêt de la vérification automatique');
                 clearInterval(activeCheckInterval);
                 activeCheckInterval = null;
             }
@@ -1380,11 +1380,63 @@
         // ============================================
         // UTILITIES
         // ============================================
-        function showError(message) {
+        async function showNoSurveyMessage() {
+            try {
+                // Récupérer n'importe quel sondage pour obtenir les messages par défaut
+                const { data: anySurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('msg_no_survey_fr, msg_no_survey_nl')
+                    .limit(1)
+                    .maybeSingle();
+                
+                let messageFr = '❌ Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.';
+                let messageNl = null;
+                
+                if (anySurvey) {
+                    // Utiliser les messages personnalisés s'ils existent
+                    if (anySurvey.msg_no_survey_fr) {
+                        messageFr = anySurvey.msg_no_survey_fr;
+                    }
+                    if (anySurvey.msg_no_survey_nl) {
+                        messageNl = anySurvey.msg_no_survey_nl;
+                    }
+                }
+                
+                showError(messageFr, messageNl);
+            } catch (error) {
+                console.error('Erreur lors du chargement des messages:', error);
+                showError('❌ Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.');
+            }
+        }
+
+                function showError(messageFr, messageNl = null) {
             document.getElementById('loadingMessage').style.display = 'none';
             document.getElementById('voteSection').style.display = 'none';
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorMessage').style.display = 'block';
+            
+            const errorDiv = document.getElementById('errorMessage');
+            
+            if (messageNl) {
+                // Mode bilingue - afficher les deux messages centrés
+                errorDiv.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 30px; align-items: center; justify-content: center;">
+                        <div style="color: #ffffff; font-size: 2rem; line-height: 1.6; text-align: center;">
+                            ${messageFr}
+                        </div>
+                        <div style="color: #f4d03f; font-size: 2rem; line-height: 1.6; text-align: center;">
+                            ${messageNl}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Mode unilingue - afficher seulement le message FR
+                errorDiv.innerHTML = `
+                    <div style="color: #ffffff; font-size: 2rem; line-height: 1.6; text-align: center;">
+                        ${messageFr}
+                    </div>
+                `;
+            }
+            
+            errorDiv.style.display = 'block';
         }
 
         function escapeHtml(text) {
@@ -1401,7 +1453,7 @@
             if (urlParams) {
                 isAutoDetected = urlParams.autoDetected;
                 isBilingualMode = urlParams.bilingualMode;
-                console.log(`📋 Sondage #${currentSurveyId} - Bilingue: ${isBilingualMode}, Auto-détecté: ${isAutoDetected}`);
+                console.log(`ðŸ“‹ Sondage #${currentSurveyId} - Bilingue: ${isBilingualMode}, Auto-détecté: ${isAutoDetected}`);
                 checkCookieConsent();
             }
         });
