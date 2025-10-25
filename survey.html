@@ -1382,30 +1382,30 @@
         // ============================================
         async function showNoSurveyMessage() {
             try {
-                // Récupérer n'importe quel sondage pour obtenir les messages par défaut
-                const { data: anySurvey, error } = await supabaseClient
-                    .from('surveys')
+                // Récupérer les messages depuis app_settings
+                const { data, error } = await supabaseClient
+                    .from('app_settings')
                     .select('msg_no_survey_fr, msg_no_survey_nl')
-                    .limit(1)
+                    .eq('id', 1)
                     .maybeSingle();
                 
-                let messageFr = 'âŒ Aucun sondage actif pour le moment.<br><br>Veuillez rÃ©essayer plus tard.';
+                let messageFr = 'Aucun sondage actif pour le moment.<br><br>Veuillez reessayer plus tard.';
                 let messageNl = null;
                 
-                if (anySurvey) {
+                if (data) {
                     // Utiliser les messages personnalisés s'ils existent
-                    if (anySurvey.msg_no_survey_fr) {
-                        messageFr = anySurvey.msg_no_survey_fr;
+                    if (data.msg_no_survey_fr) {
+                        messageFr = data.msg_no_survey_fr;
                     }
-                    if (anySurvey.msg_no_survey_nl) {
-                        messageNl = anySurvey.msg_no_survey_nl;
+                    if (data.msg_no_survey_nl) {
+                        messageNl = data.msg_no_survey_nl;
                     }
                 }
                 
                 showError(messageFr, messageNl);
             } catch (error) {
                 console.error('Erreur lors du chargement des messages:', error);
-                showError('âŒ Aucun sondage actif pour le moment.<br><br>Veuillez rÃ©essayer plus tard.');
+                showError('Aucun sondage actif pour le moment.<br><br>Veuillez reessayer plus tard.');
             }
         }
 
