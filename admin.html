@@ -1200,25 +1200,76 @@
 
                     if (updateError) throw updateError;
 
-                    // Supprimer les anciens candidats
-                    await supabaseClient
+                    // ⚡ NOUVELLE LOGIQUE : Mise à jour intelligente des candidats pour préserver les votes
+                    // Récupérer les candidats existants
+                    const { data: existingPlayers, error: fetchError } = await supabaseClient
                         .from('survey_players')
-                        .delete()
-                        .eq('survey_id', editingSurveyId);
+                        .select('*')
+                        .eq('survey_id', editingSurveyId)
+                        .order('ordre', { ascending: true });
 
-                    // Insérer les nouveaux candidats
-                    const playersData = players.map((nom, index) => ({
-                        survey_id: editingSurveyId,
-                        nom,
-                        ordre: index + 1
-                    }));
+                    if (fetchError) throw fetchError;
+
+                    const existingCount = existingPlayers ? existingPlayers.length : 0;
+                    const newCount = players.length;
                     
-                    const { data: insertedPlayers, error: playersError } = await supabaseClient
-                        .from('survey_players')
-                        .insert(playersData)
-                        .select();
+                    let insertedPlayers = [];
 
-                    if (playersError) throw playersError;
+                    // Mettre à jour ou créer les candidats
+                    for (let i = 0; i < newCount; i++) {
+                        if (i < existingCount) {
+                            // Mettre à jour le candidat existant
+                            const { error: updatePlayerError } = await supabaseClient
+                                .from('survey_players')
+                                .update({
+                                    nom: players[i],
+                                    ordre: i + 1
+                                })
+                                .eq('id', existingPlayers[i].id);
+                            
+                            if (updatePlayerError) throw updatePlayerError;
+                            
+                            // Ajouter à la liste pour les traductions
+                            insertedPlayers.push(existingPlayers[i]);
+                        } else {
+                            // Insérer un nouveau candidat
+                            const { data: newPlayer, error: insertPlayerError } = await supabaseClient
+                                .from('survey_players')
+                                .insert({
+                                    survey_id: editingSurveyId,
+                                    nom: players[i],
+                                    ordre: i + 1
+                                })
+                                .select()
+                                .single();
+                            
+                            if (insertPlayerError) throw insertPlayerError;
+                            insertedPlayers.push(newPlayer);
+                        }
+                    }
+
+                    // Supprimer les candidats en trop (si on a réduit le nombre)
+                    if (newCount < existingCount) {
+                        const playersToDelete = existingPlayers.slice(newCount).map(p => p.id);
+                        
+                        // Supprimer d'abord les traductions de ces candidats
+                        await supabaseClient
+                            .from('survey_player_translations')
+                            .delete()
+                            .in('player_id', playersToDelete);
+                        
+                        // Supprimer les votes de ces candidats
+                        await supabaseClient
+                            .from('votes')
+                            .delete()
+                            .in('player_id', playersToDelete);
+                        
+                        // Supprimer les candidats
+                        await supabaseClient
+                            .from('survey_players')
+                            .delete()
+                            .in('id', playersToDelete);
+                    }
 
                     // Gérer la traduction NL
                     if (enableNL) {
@@ -1237,31 +1288,56 @@
                             .from('survey_translations')
                             .upsert(nlData, { onConflict: 'survey_id,language_code' });
                         
-                        // Supprimer les anciennes traductions des candidats
-                        await supabaseClient
+                        // ⚡ NOUVELLE LOGIQUE : Mise à jour intelligente des traductions des candidats
+                        // Récupérer les traductions existantes
+                        const { data: existingTranslations } = await supabaseClient
                             .from('survey_player_translations')
-                            .delete()
-                            .in('player_id', insertedPlayers.map(p => p.id));
+                            .select('*')
+                            .in('player_id', insertedPlayers.map(p => p.id))
+                            .eq('language_code', 'nl');
                         
-                        // Insérer les nouvelles traductions des candidats
-                        const playerTranslations = [];
-                        insertedPlayers.forEach((player, index) => {
-                            if (playersNL[index] && playersNL[index].trim()) {
-                                playerTranslations.push({
-                                    player_id: player.id,
-                                    language_code: 'nl',
-                                    nom: playersNL[index].trim()
-                                });
+                        const translationsMap = {};
+                        if (existingTranslations) {
+                            existingTranslations.forEach(t => {
+                                translationsMap[t.player_id] = t;
+                            });
+                        }
+                        
+                        // Mettre à jour ou créer les traductions
+                        for (let i = 0; i < insertedPlayers.length; i++) {
+                            const playerId = insertedPlayers[i].id;
+                            const nlName = playersNL[i] ? playersNL[i].trim() : '';
+                            
+                            if (nlName) {
+                                // Il y a une traduction NL
+                                if (translationsMap[playerId]) {
+                                    // Mettre à jour la traduction existante
+                                    await supabaseClient
+                                        .from('survey_player_translations')
+                                        .update({ nom: nlName })
+                                        .eq('player_id', playerId)
+                                        .eq('language_code', 'nl');
+                                } else {
+                                    // Créer une nouvelle traduction
+                                    await supabaseClient
+                                        .from('survey_player_translations')
+                                        .insert({
+                                            player_id: playerId,
+                                            language_code: 'nl',
+                                            nom: nlName
+                                        });
+                                }
+                            } else if (translationsMap[playerId]) {
+                                // Pas de traduction NL mais il y en avait une → supprimer
+                                await supabaseClient
+                                    .from('survey_player_translations')
+                                    .delete()
+                                    .eq('player_id', playerId)
+                                    .eq('language_code', 'nl');
                             }
-                        });
-                        
-                        if (playerTranslations.length > 0) {
-                            await supabaseClient
-                                .from('survey_player_translations')
-                                .insert(playerTranslations);
                         }
                     } else {
-                        // Désactiver ou supprimer la traduction NL
+                        // Désactiver la traduction NL (ne supprime PAS les votes)
                         await supabaseClient
                             .from('survey_translations')
                             .delete()
@@ -1269,17 +1345,11 @@
                             .eq('language_code', 'nl');
                         
                         // Supprimer les traductions des candidats
-                        const { data: oldPlayers } = await supabaseClient
-                            .from('survey_players')
-                            .select('id')
-                            .eq('survey_id', editingSurveyId);
-                        
-                        if (oldPlayers && oldPlayers.length > 0) {
-                            await supabaseClient
-                                .from('survey_player_translations')
-                                .delete()
-                                .in('player_id', oldPlayers.map(p => p.id));
-                        }
+                        await supabaseClient
+                            .from('survey_player_translations')
+                            .delete()
+                            .in('player_id', insertedPlayers.map(p => p.id))
+                            .eq('language_code', 'nl');
                     }
 
                     alert('✅ Sondage mis à jour !');
