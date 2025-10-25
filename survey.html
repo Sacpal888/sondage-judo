@@ -806,6 +806,7 @@
         let supabaseClient = null;
         let currentSurveyId = null;
         let currentLanguage = 'fr'; // Default
+        let isBilingualMode = true; // Default (sera charge depuis la DB)
         let hasVoted = false;
         let selectedPlayerId = null;
         let sessionId = generateSessionId();
@@ -847,6 +848,7 @@
             // Si un ID est fourni dans l'URL, l'utiliser
             if (id) {
                 currentSurveyId = parseInt(id);
+                await loadSurveyBilingualMode();
                 return { id: currentSurveyId };
             }
             
@@ -879,12 +881,95 @@
                 
                 currentSurveyId = activeSurvey.id;
                 console.log('Sondage actif detecte automatiquement:', currentSurveyId);
+                await loadSurveyBilingualMode();
                 return { id: currentSurveyId };
                 
             } catch (error) {
                 console.error('Erreur lors de la detection du sondage actif:', error);
                 showError('Erreur de connexion a la base de donnees.');
                 return null;
+            }
+        }
+
+        // ============================================
+        // BILINGUAL MODE
+        // ============================================
+        async function loadSurveyBilingualMode() {
+            try {
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        return;
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+
+                const { data: survey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('bilingual_mode')
+                    .eq('id', currentSurveyId)
+                    .single();
+
+                if (error) {
+                    console.error('Erreur chargement bilingual_mode:', error);
+                    return;
+                }
+
+                isBilingualMode = survey?.bilingual_mode || false;
+                console.log('Mode bilingue du sondage:', isBilingualMode);
+                
+                // Ajuster l'affichage du consent
+                adjustConsentDisplay();
+                
+            } catch (error) {
+                console.error('Erreur loadSurveyBilingualMode:', error);
+            }
+        }
+
+        function adjustConsentDisplay() {
+            if (!isBilingualMode) {
+                // En mode monolingue, forcer le francais
+                currentLanguage = 'fr';
+                
+                // Masquer tous les elements NL
+                const nlElements = document.querySelectorAll('.consent-title-nl, .consent-text-nl, .btn-accept-nl');
+                nlElements.forEach(el => el.style.display = 'none');
+                
+                // Masquer les sections NL de la politique de confidentialite
+                const privacySections = document.querySelectorAll('#privacyPolicy h3, #privacyPolicy .privacy-section');
+                privacySections.forEach(section => {
+                    if (section.textContent.includes('🇳🇱') || section.textContent.includes('Nederlands')) {
+                        section.style.display = 'none';
+                    }
+                });
+                
+                // Ajuster le bouton FR pour occuper toute la largeur
+                const btnFr = document.querySelector('.btn-accept-fr');
+                if (btnFr) {
+                    btnFr.style.width = '100%';
+                }
+                
+                // Ajuster le bouton decline pour ne garder que le texte FR
+                const declineBtn = document.querySelector('.btn-decline');
+                if (declineBtn) {
+                    declineBtn.innerHTML = 'Je refuse';
+                }
+                
+                // Ajuster le bouton back dans privacy policy
+                const backBtn = document.querySelector('.btn-back');
+                if (backBtn) {
+                    backBtn.innerHTML = 'Retour';
+                }
+                
+                // Ajuster le titre de la privacy policy
+                const privacyTitle = document.querySelector('.privacy-title');
+                if (privacyTitle) {
+                    privacyTitle.textContent = 'Politique de Confidentialite';
+                }
+                
+                console.log('Affichage ajuste : mode monolingue FR uniquement');
             }
         }
 
@@ -941,12 +1026,16 @@
         function showPrivacyPolicy() {
             document.getElementById('cookieConsent').classList.add('hidden');
             document.getElementById('privacyPolicy').classList.remove('hidden');
+            // Appliquer l'ajustement d'affichage aussi sur la privacy policy
+            adjustConsentDisplay();
         }
 
         function backToConsent() {
             document.getElementById('privacyPolicy').classList.add('hidden');
             document.getElementById('consentDeclined').classList.add('hidden');
             document.getElementById('cookieConsent').classList.remove('hidden');
+            // Reappliquer l'ajustement au cas ou
+            adjustConsentDisplay();
         }
 
         // ============================================
