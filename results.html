@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080">
-    <title>Résultats - Sondage</title>
+    <title>RÃ©sultats - Sondage</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -79,7 +79,7 @@
             color: #f4d03f;
         }
         
-        /* Grille des résultats - 2 colonnes, remplissage vertical (colonne par colonne) */
+        /* Grille des rÃ©sultats - 2 colonnes, remplissage vertical (colonne par colonne) */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -227,17 +227,17 @@
             grid-column: 1 / -1;
         }
 
-        /* Pour 3 résultats par colonne */
+        /* Pour 3 rÃ©sultats par colonne */
         .results-grid.three-per-column {
             grid-template-rows: repeat(3, auto);
         }
 
-        /* Pour 2 résultats par colonne */
+        /* Pour 2 rÃ©sultats par colonne */
         .results-grid.two-per-column {
             grid-template-rows: repeat(2, auto);
         }
 
-        /* Pour 1 résultat par colonne */
+        /* Pour 1 rÃ©sultat par colonne */
         .results-grid.one-per-column {
             grid-template-rows: repeat(1, auto);
         }
@@ -251,11 +251,11 @@
         </div>
         
         <div id="loadingMessage" class="loading">
-            â³ Chargement des résultats...
+            Ã¢ÂÂ³ Chargement des rÃ©sultats...
         </div>
         
         <div id="resultsGrid" class="results-grid" style="display: none;">
-            <!-- Les résultats seront insérés ici -->
+            <!-- Les rÃ©sultats seront insÃ©rÃ©s ici -->
         </div>
     </div>
 
@@ -268,16 +268,35 @@
         // ============================================
         // GET URL PARAMETERS
         // ============================================
-        function getUrlParams() {
+        async function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
             const surveyId = params.get('id');
             
-            if (!surveyId) {
-                showError('Erreur: ID de sondage manquant dans l\'URL');
+            // Si un ID est fourni dans l'URL, l'utiliser
+            if (surveyId) {
+                return parseInt(surveyId);
+            }
+            
+            // Sinon, charger le sondage actif depuis Supabase
+            try {
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('is_active', true)
+                    .single();
+                
+                if (error || !activeSurvey) {
+                    showError('Aucun sondage actif trouvé.');
+                    return null;
+                }
+                
+                console.log('✓ Sondage actif chargé:', activeSurvey.id);
+                return activeSurvey.id;
+            } catch (error) {
+                console.error('Erreur lors du chargement du sondage actif:', error);
+                showError('Erreur lors du chargement du sondage actif.');
                 return null;
             }
-
-            return parseInt(surveyId);
         }
 
         // ============================================
@@ -291,7 +310,7 @@
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase initialisé');
+                console.log('âœ… Supabase initialisÃ©');
                 
                 return true;
             } catch (error) {
@@ -318,11 +337,11 @@
                 if (surveyError) throw surveyError;
                 if (!survey) throw new Error('Sondage introuvable');
 
-                // Vérifier si le mode bilingue est activé
+                // VÃ©rifier si le mode bilingue est activÃ©
                 isBilingualMode = survey.bilingual_mode === true;
-                console.log('ðŸŒ Mode bilingue:', isBilingualMode);
+                console.log('Ã°Å¸Å’Â Mode bilingue:', isBilingualMode);
 
-                // Charger les messages (FR par défaut)
+                // Charger les messages (FR par dÃ©faut)
                 let titleFr = survey.titre || 'Sondage';
                 let invitationFr = survey.description || 'Votez pour votre choix !';
                 let titleNl = null;
@@ -355,7 +374,7 @@
                     displayInvitation += '<span class="subtitle-nl">' + invitationNl + '</span>';
                 }
 
-                // Mettre Ã  jour les titres
+                // Mettre ÃƒÂ  jour les titres
                 document.getElementById('resultsTitle').innerHTML = displayTitle;
                 document.getElementById('resultsSubtitle').innerHTML = displayInvitation;
 
@@ -368,7 +387,7 @@
 
                 if (playersError) throw playersError;
                 if (!players || players.length === 0) {
-                    throw new Error('Aucun candidat trouvé pour ce sondage');
+                    throw new Error('Aucun candidat trouvÃ© pour ce sondage');
                 }
 
                 // Charger les traductions NL des joueurs SI mode bilingue
@@ -398,9 +417,9 @@
                     throw votesError;
                 }
 
-                console.log(`ðŸ“Š ${votes ? votes.length : 0} votes trouvés pour le sondage #${currentSurveyId}`);
+                console.log(`Ã°Å¸â€œÅ  ${votes ? votes.length : 0} votes trouvÃ©s pour le sondage #${currentSurveyId}`);
 
-                // Calculer les résultats par joueur
+                // Calculer les rÃ©sultats par joueur
                 const resultsMap = {};
                 let totalVotes = 0;
                 let totalVotesFr = 0;
@@ -445,7 +464,7 @@
                     }
                 });
 
-                // Convertir en tableau et trier par nombre de votes (décroissant)
+                // Convertir en tableau et trier par nombre de votes (dÃ©croissant)
                 const results = Object.values(resultsMap).sort((a, b) => {
                     if (b.total_votes !== a.total_votes) {
                         return b.total_votes - a.total_votes;
@@ -453,20 +472,20 @@
                     return a.player_name.localeCompare(b.player_name);
                 });
 
-                console.log('ðŸ“Š Résultats calculés:', results);
+                console.log('Ã°Å¸â€œÅ  RÃ©sultats calculÃ©s:', results);
 
-                // Afficher les résultats
+                // Afficher les rÃ©sultats
                 displayResults(results || [], totalVotes);
 
-                // Masquer le loading et afficher les résultats
+                // Masquer le loading et afficher les rÃ©sultats
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('resultsGrid').style.display = 'grid';
 
                 const totalPlayers = results.length;
-                console.log(`ðŸ“Š Résultats mis Ã  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
+                console.log(`Ã°Å¸â€œÅ  RÃ©sultats mis ÃƒÂ  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
             } catch (error) {
-                console.error('âŒ Erreur lors du chargement des résultats:', error);
+                console.error('Ã¢ÂÅ’ Erreur lors du chargement des rÃ©sultats:', error);
                 console.error('Details:', {
                     message: error.message,
                     code: error.code,
@@ -474,7 +493,7 @@
                     details: error.details
                 });
                 
-                let errorMessage = 'Erreur lors du chargement des résultats';
+                let errorMessage = 'Erreur lors du chargement des rÃ©sultats';
                 
                 if (error.message) {
                     errorMessage += ': ' + error.message;
@@ -482,9 +501,9 @@
                 
                 // Afficher des conseils selon le type d'erreur
                 if (error.message && error.message.includes('permission denied')) {
-                    errorMessage += '\n\nâš ï¸ Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
+                    errorMessage += '\n\nÃ¢Å¡Â Ã¯Â¸Â ProblÃ¨me de permissions RLS. ExÃ©cutez le fichier SQL fourni dans Supabase.';
                 } else if (error.message && error.message.includes('Aucun candidat')) {
-                    errorMessage += '\n\nâš ï¸ Ajoutez des candidats au sondage #' + currentSurveyId;
+                    errorMessage += '\n\nÃ¢Å¡Â Ã¯Â¸Â Ajoutez des candidats au sondage #' + currentSurveyId;
                 }
                 
                 showError(errorMessage);
@@ -498,16 +517,16 @@
             const grid = document.getElementById('resultsGrid');
             
             if (!results || results.length === 0 || totalVotes === 0) {
-                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les résultats s\'afficheront dès les premiers votes !</div>';
+                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les rÃ©sultats s\'afficheront dÃ¨s les premiers votes !</div>';
                 return;
             }
 
             grid.innerHTML = '';
 
-            // Limiter Ã  6 premiers résultats
+            // Limiter ÃƒÂ  6 premiers rÃ©sultats
             const topResults = results.slice(0, 6);
 
-            // Définir le nombre de lignes selon le nombre de résultats
+            // DÃ©finir le nombre de lignes selon le nombre de rÃ©sultats
             const numResults = topResults.length;
             if (numResults <= 2) {
                 grid.classList.add('one-per-column');
@@ -528,7 +547,7 @@
                 let displayNameNl = result.player_name_nl;
                 
                 if (isBilingualMode && displayNameNl) {
-                    // Enlever les emojis du nom NL (ils sont déjÃ  dans le FR)
+                    // Enlever les emojis du nom NL (ils sont dÃ©jÃƒÂ  dans le FR)
                     displayNameNl = removeEmojis(displayNameNl);
                 }
 
@@ -599,16 +618,54 @@
         }
 
         // ============================================
+        // AUTO-REFRESH POUR NOUVEAU SONDAGE
+        // ============================================
+        let surveyCheckInterval = null;
+        
+        async function checkForNewSurvey() {
+            try {
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('is_active', true)
+                    .single();
+                
+                // Si un nouveau sondage actif est détecté (différent de l'actuel)
+                if (activeSurvey && activeSurvey.id !== currentSurveyId) {
+                    console.log('🔄 Nouveau sondage actif détecté:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
+                    // Recharger la page pour afficher le nouveau sondage
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Erreur lors de la vérification du sondage actif:', error);
+            }
+        }
+        
+        function startSurveyCheck() {
+            // Vérifier toutes les 2 secondes si un nouveau sondage est actif
+            surveyCheckInterval = setInterval(checkForNewSurvey, 2000);
+        }
+        
+        function stopSurveyCheck() {
+            if (surveyCheckInterval) {
+                clearInterval(surveyCheckInterval);
+                surveyCheckInterval = null;
+            }
+        }
+
+        // ============================================
         // INITIALIZATION
         // ============================================
         (async function init() {
-            currentSurveyId = getUrlParams();
+            currentSurveyId = await getUrlParams();
             if (!currentSurveyId) return;
 
             const initialized = await initSupabase();
             if (initialized) {
                 await loadResults();
                 startAutoRefresh();
+                // Démarrer aussi la vérification du sondage actif
+                startSurveyCheck();
             }
         })();
 
@@ -616,8 +673,10 @@
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 stopAutoRefresh();
+                stopSurveyCheck();
             } else {
                 startAutoRefresh();
+                startSurveyCheck();
             }
         });
     </script>
