@@ -557,7 +557,7 @@
         <div class="container">
             <!-- Header -->
             <div class="header">
-                <h1>🎯 Administration Multi-Sondages</h1>
+                <h1>ðŸŽ¯ Administration Multi-Sondages</h1>
                 <div class="user-info-container">
                     <span class="user-email" id="userEmail">Chargement...</span>
                     <button class="logout-btn" onclick="handleLogout()">🚪 Déconnexion</button>
@@ -566,7 +566,7 @@
 
             <!-- Statistiques globales -->
             <div class="section">
-                <h2>📊 Statistiques Globales</h2>
+                <h2>ðŸ“Š Statistiques Globales</h2>
                 <div class="stats-card">
                     <div class="stat-value" id="totalSurveysCount">0</div>
                     <div class="stat-label">Sondages créés</div>
@@ -577,13 +577,13 @@
             <div class="section">
                 <div class="controls">
                     <button class="btn btn-success" onclick="openCreateModal()">➕ Créer un sondage</button>
-                    <button class="btn" onclick="loadSurveys()">🔄 Actualiser</button>
+                    <button class="btn" onclick="loadSurveys()">ðŸ”„ Actualiser</button>
                 </div>
             </div>
 
             <!-- Liste des sondages -->
             <div class="section">
-                <h2>📋 Mes Sondages</h2>
+                <h2>ðŸ“‹ Mes Sondages</h2>
                 <div class="surveys-grid" id="surveysGrid">
                     <!-- Les cartes de sondages seront insérées ici -->
                 </div>
@@ -628,12 +628,38 @@
                     <textarea class="form-textarea" id="msgThankyouFr" placeholder="Ex: Merci pour votre vote !"></textarea>
                 </div>
 
+                
+                <!-- Messages "Aucun sondage actif" -->
+                <div class="form-group" style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 10px; border: 2px dashed #ffc107;">
+                    <label class="form-label" style="color: #f39c12; font-size: 1.1rem; margin-bottom: 15px;">
+                        📭 Messages "Aucun sondage actif" (optionnel)
+                    </label>
+                    <p class="info-text" style="margin-bottom: 15px;">
+                        Ces messages s'affichent sur la page survey.html lorsqu'aucun sondage n'est sélectionné/actif. 
+                        Laissez vide pour utiliser les messages par défaut.
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label" style="color: white;">💬 Message FR (blanc)</label>
+                        <textarea class="form-textarea" id="msgNoSurveyFr" 
+                                  placeholder="Ex: Aucun sondage actif pour le moment. Veuillez réessayer plus tard."
+                                  style="background: #fff; color: #333;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="color: #f4d03f;">💬 Message NL (jaune)</label>
+                        <textarea class="form-textarea" id="msgNoSurveyNl" 
+                                  placeholder="Ex: Geen actieve enquête op dit moment. Probeer het later opnieuw."
+                                  style="background: #1a2f4a; color: #f4d03f; border-color: #f4d03f;"></textarea>
+                    </div>
+                </div>
+
                 <!-- Logo Upload -->
                 <div class="form-group">
                     <label class="form-label">Logo (PNG sur fond transparent)</label>
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <button type="button" class="btn" onclick="document.getElementById('logoFile').click()">📤 Upload Logo</button>
-                        <button type="button" class="btn btn-danger" onclick="resetLogo()">🗑️ Reset Logo</button>
+                        <button type="button" class="btn" onclick="document.getElementById('logoFile').click()">ðŸ“¤ Upload Logo</button>
+                        <button type="button" class="btn btn-danger" onclick="resetLogo()">ðŸ—‘ï¸ Reset Logo</button>
                     </div>
                     <input type="file" id="logoFile" accept="image/png,image/jpeg,image/jpg" style="display: none;">
                     <div id="logoPreview" style="margin-top: 10px; text-align: center; min-height: 80px; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 10px; display: none;">
@@ -693,8 +719,8 @@
 
                 <!-- Actions -->
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-danger" onclick="closeModal()">❌ Annuler</button>
-                    <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">âŒ Annuler</button>
+                    <button type="submit" class="btn btn-success">ðŸ’¾ Enregistrer</button>
                 </div>
 
                 <!-- URLs Preview -->
@@ -747,7 +773,7 @@
         }
 
         async function handleLogout() {
-            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            if (confirm('Êtes-vous sÃ»r de vouloir vous déconnecter ?')) {
                 await supabaseClient.auth.signOut();
                 window.location.href = 'login.html';
             }
@@ -786,12 +812,12 @@
                 // Afficher les sondages
                 displaySurveys(allSurveys, statsMap);
                 
-                // Mettre à jour les stats globales
+                // Mettre Ã  jour les stats globales
                 document.getElementById('totalSurveysCount').textContent = allSurveys.length;
 
             } catch (error) {
                 console.error('Erreur chargement sondages:', error);
-                alert('❌ Erreur: ' + error.message);
+                alert('âŒ Erreur: ' + error.message);
             }
         }
 
@@ -818,7 +844,7 @@
                     <div class="survey-header">
                         <div class="survey-title">${escapeHtml(survey.titre)}</div>
                         <span class="${survey.active ? 'active-badge' : 'inactive-badge'}">
-                            ${survey.active ? '🟢 Actif' : '⚪ Inactif'}
+                            ${survey.active ? 'ðŸŸ¢ Actif' : 'âšª Inactif'}
                         </span>
                     </div>
 
@@ -827,7 +853,7 @@
                     <div class="language-badges">
                         <span class="lang-badge fr">🇫🇷 Français</span>
                         <span class="lang-badge nl ${nlActive ? '' : 'inactive'}">
-                            🇳🇱 Nederlands ${nlActive ? '✓' : '✗'}
+                            🇳🇱 Nederlands ${nlActive ? 'âœ“' : 'âœ—'}
                         </span>
                     </div>
 
@@ -853,12 +879,12 @@
                     <div class="survey-actions">
                         <button class="btn ${survey.active ? 'btn-warning' : 'btn-success'}" 
                                 onclick="toggleActive(${survey.id}, ${survey.active})">
-                            ${survey.active ? '⏸️ Désactiver' : '▶️ Activer'}
+                            ${survey.active ? 'â¸ï¸ Désactiver' : 'â–¶ï¸ Activer'}
                         </button>
-                        <button class="btn btn-info" onclick="editSurvey(${survey.id})">✏️ Modifier</button>
-                        <button class="btn" onclick="viewUrls(${survey.id})">🔗 URLs</button>
-                        <button class="btn btn-warning" onclick="resetVotes(${survey.id})">🔄 Reset votes</button>
-                        <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})">🗑️ Supprimer</button>
+                        <button class="btn btn-info" onclick="editSurvey(${survey.id})">âœï¸ Modifier</button>
+                        <button class="btn" onclick="viewUrls(${survey.id})">ðŸ”— URLs</button>
+                        <button class="btn btn-warning" onclick="resetVotes(${survey.id})">ðŸ”„ Reset votes</button>
+                        <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})">ðŸ—‘ï¸ Supprimer</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -872,7 +898,7 @@
             try {
                 if (!currentActive) {
                     // Désactiver tous les autres sondages de l'utilisateur
-                    console.log('🔄 Désactivation des autres sondages...');
+                    console.log('ðŸ”„ Désactivation des autres sondages...');
                     const { error: deactivateError } = await supabaseClient
                         .from('surveys')
                         .update({ active: false })
@@ -885,7 +911,7 @@
                 }
 
                 // Activer/désactiver le sondage actuel
-                console.log('🔄 Mise à jour du sondage #' + surveyId);
+                console.log('ðŸ”„ Mise Ã  jour du sondage #' + surveyId);
                 const { error } = await supabaseClient
                     .from('surveys')
                     .update({ active: !currentActive })
@@ -894,12 +920,12 @@
 
                 if (error) throw error;
 
-                alert(currentActive ? '⏸️ Sondage désactivé' : '✅ Sondage activé (vos autres sondages ont été désactivés)');
+                alert(currentActive ? 'â¸ï¸ Sondage désactivé' : '✅ Sondage activé (vos autres sondages ont été désactivés)');
                 await loadSurveys();
 
             } catch (error) {
-                console.error('❌ Erreur toggleActive:', error);
-                alert('❌ Erreur: ' + error.message);
+                console.error('âŒ Erreur toggleActive:', error);
+                alert('âŒ Erreur: ' + error.message);
             }
         }
 
@@ -912,13 +938,13 @@
 
             // Vérifier le type de fichier
             if (!file.type.startsWith('image/')) {
-                alert('❌ Veuillez sélectionner une image');
+                alert('âŒ Veuillez sélectionner une image');
                 return;
             }
 
             // Vérifier la taille (max 2MB)
             if (file.size > 2 * 1024 * 1024) {
-                alert('❌ L\'image est trop grande (max 2MB)');
+                alert('âŒ L\'image est trop grande (max 2MB)');
                 return;
             }
 
@@ -934,7 +960,7 @@
                 reader.readAsDataURL(file);
             } catch (error) {
                 console.error('Erreur upload logo:', error);
-                alert('❌ Erreur lors du chargement du logo');
+                alert('âŒ Erreur lors du chargement du logo');
             }
         });
 
@@ -943,7 +969,7 @@
             document.getElementById('logoFile').value = '';
             document.getElementById('logoPreview').style.display = 'none';
             document.getElementById('logoPreviewImg').src = '';
-            console.log('🗑️ Logo supprimé');
+            console.log('ðŸ—‘ï¸ Logo supprimé');
         }
 
         // ============================================
@@ -1017,6 +1043,8 @@
             document.getElementById('msgTitleFr').value = survey.msg_title || '';
             document.getElementById('msgInvitationFr').value = survey.msg_invitation || '';
             document.getElementById('msgThankyouFr').value = survey.msg_thankyou || '';
+            document.getElementById('msgNoSurveyFr').value = survey.msg_no_survey_fr || '';
+            document.getElementById('msgNoSurveyNl').value = survey.msg_no_survey_nl || '';
             document.getElementById('errorContainer').innerHTML = '';
             document.getElementById('urlPreview').style.display = 'none';
 
@@ -1159,6 +1187,8 @@
             const msgTitleFr = document.getElementById('msgTitleFr').value.trim();
             const msgInvitationFr = document.getElementById('msgInvitationFr').value.trim();
             const msgThankyouFr = document.getElementById('msgThankyouFr').value.trim();
+            const msgNoSurveyFr = document.getElementById('msgNoSurveyFr').value.trim();
+            const msgNoSurveyNl = document.getElementById('msgNoSurveyNl').value.trim();
             const enableNL = document.getElementById('enableNL').checked;
 
             const playerInputs = document.querySelectorAll('#playersEditor .player-item input');
@@ -1192,6 +1222,8 @@
                             msg_title: msgTitleFr,
                             msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
+                            msg_no_survey_fr: msgNoSurveyFr || null,
+                            msg_no_survey_nl: msgNoSurveyNl || null,
                             logo_base64: currentLogoBase64,
                             bilingual_mode: enableNL,
                             updated_at: new Date().toISOString()
@@ -1200,7 +1232,7 @@
 
                     if (updateError) throw updateError;
 
-                    // ⚡ NOUVELLE LOGIQUE : Mise à jour intelligente des candidats pour préserver les votes
+                    // âš¡ NOUVELLE LOGIQUE : Mise Ã  jour intelligente des candidats pour préserver les votes
                     // Récupérer les candidats existants
                     const { data: existingPlayers, error: fetchError } = await supabaseClient
                         .from('survey_players')
@@ -1215,10 +1247,10 @@
                     
                     let insertedPlayers = [];
 
-                    // Mettre à jour ou créer les candidats
+                    // Mettre Ã  jour ou créer les candidats
                     for (let i = 0; i < newCount; i++) {
                         if (i < existingCount) {
-                            // Mettre à jour le candidat existant
+                            // Mettre Ã  jour le candidat existant
                             const { error: updatePlayerError } = await supabaseClient
                                 .from('survey_players')
                                 .update({
@@ -1229,7 +1261,7 @@
                             
                             if (updatePlayerError) throw updatePlayerError;
                             
-                            // Ajouter à la liste pour les traductions
+                            // Ajouter Ã  la liste pour les traductions
                             insertedPlayers.push(existingPlayers[i]);
                         } else {
                             // Insérer un nouveau candidat
@@ -1288,7 +1320,7 @@
                             .from('survey_translations')
                             .upsert(nlData, { onConflict: 'survey_id,language_code' });
                         
-                        // ⚡ NOUVELLE LOGIQUE : Mise à jour intelligente des traductions des candidats
+                        // âš¡ NOUVELLE LOGIQUE : Mise Ã  jour intelligente des traductions des candidats
                         // Récupérer les traductions existantes
                         const { data: existingTranslations } = await supabaseClient
                             .from('survey_player_translations')
@@ -1303,7 +1335,7 @@
                             });
                         }
                         
-                        // Mettre à jour ou créer les traductions
+                        // Mettre Ã  jour ou créer les traductions
                         for (let i = 0; i < insertedPlayers.length; i++) {
                             const playerId = insertedPlayers[i].id;
                             const nlName = playersNL[i] ? playersNL[i].trim() : '';
@@ -1311,7 +1343,7 @@
                             if (nlName) {
                                 // Il y a une traduction NL
                                 if (translationsMap[playerId]) {
-                                    // Mettre à jour la traduction existante
+                                    // Mettre Ã  jour la traduction existante
                                     await supabaseClient
                                         .from('survey_player_translations')
                                         .update({ nom: nlName })
@@ -1328,7 +1360,7 @@
                                         });
                                 }
                             } else if (translationsMap[playerId]) {
-                                // Pas de traduction NL mais il y en avait une → supprimer
+                                // Pas de traduction NL mais il y en avait une â†’ supprimer
                                 await supabaseClient
                                     .from('survey_player_translations')
                                     .delete()
@@ -1352,7 +1384,7 @@
                             .eq('language_code', 'nl');
                     }
 
-                    alert('✅ Sondage mis à jour !');
+                    alert('✅ Sondage mis Ã  jour !');
 
                 } else {
                     // ===== CREATE =====
@@ -1364,6 +1396,8 @@
                             msg_title: msgTitleFr,
                             msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
+                            msg_no_survey_fr: msgNoSurveyFr || null,
+                            msg_no_survey_nl: msgNoSurveyNl || null,
                             logo_base64: currentLogoBase64,
                             bilingual_mode: enableNL,
                             active: false,
@@ -1442,7 +1476,7 @@
         });
 
         function showError(message) {
-            document.getElementById('errorContainer').innerHTML = `<div class="error-message">⚠️ ${message}</div>`;
+            document.getElementById('errorContainer').innerHTML = `<div class="error-message">âš ï¸ ${message}</div>`;
         }
 
         function showUrls(surveyId) {
@@ -1461,13 +1495,13 @@
             const urls = `
 URLs du sondage #${surveyId} :
 
-📋 Sondage FR :
+ðŸ“‹ Sondage FR :
 ${baseUrl}survey.html?id=${surveyId}
 
-📋 Sondage NL :
+ðŸ“‹ Sondage NL :
 ${baseUrl}survey.html?id=${surveyId}&lang=nl
 
-📊 Résultats :
+ðŸ“Š Résultats :
 ${baseUrl}results.html?id=${surveyId}
             `;
             alert(urls);
@@ -1495,7 +1529,7 @@ ${baseUrl}results.html?id=${surveyId}
 
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('❌ Erreur: ' + error.message);
+                alert('âŒ Erreur: ' + error.message);
             }
         }
 
@@ -1528,7 +1562,7 @@ ${baseUrl}results.html?id=${surveyId}
 
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('❌ Erreur: ' + error.message);
+                alert('âŒ Erreur: ' + error.message);
             }
         }
 
