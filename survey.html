@@ -447,8 +447,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: auto;
-            height: auto;
+            min-height: 280px;
+            height: 100%;
         }
 
         .player-card:hover {
@@ -470,8 +470,7 @@
         }
 
         .player-name {
-            font-size: 3.5rem;
-            max-font-size: 3.5rem; /* Ne jamais depasser la taille du sous-titre */
+            font-size: 3.2rem;
             font-weight: bold;
             color: #ffffff;
             margin-bottom: 20px;
@@ -479,6 +478,10 @@
             line-height: 1.3;
             overflow-wrap: break-word;
             hyphens: auto;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .player-card.selected .player-name {
@@ -496,7 +499,11 @@
             cursor: pointer;
             transition: all 0.3s ease;
             width: 50%;
+            min-height: 70px;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .vote-button:hover {
@@ -606,6 +613,10 @@
                 grid-column: 1 / -1;
                 max-width: 50%;
             }
+
+            .player-card {
+                min-height: 260px;
+            }
             
             .page-title {
                 font-size: 4rem;
@@ -616,11 +627,12 @@
             }
             
             .player-name {
-                font-size: 3rem;
+                font-size: 2.8rem;
             }
             
             .vote-button {
                 font-size: 1.6rem;
+                min-height: 60px;
             }
         }
 
@@ -677,15 +689,17 @@
 
             .player-card {
                 padding: 30px 20px;
+                min-height: 240px;
             }
 
             .player-name {
-                font-size: 2.5rem;
+                font-size: 2.3rem;
             }
 
             .vote-button {
                 font-size: 1.4rem;
                 padding: 15px 20px;
+                min-height: 55px;
                 width: 60%;
             }
         }
@@ -699,13 +713,18 @@
                 font-size: 2rem;
             }
 
+            .player-card {
+                min-height: 220px;
+            }
+
             .player-name {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
             .vote-button {
                 font-size: 1.2rem;
                 width: 70%;
+                min-height: 50px;
             }
         }
     </style>
@@ -1310,6 +1329,28 @@
             const playerNames = document.querySelectorAll('.player-name');
             if (playerNames.length === 0) return;
 
+            // Detecter le breakpoint actuel
+            const width = window.innerWidth;
+            let maxFontSize, minFontSize;
+            
+            if (width <= 480) {
+                // Tres petit mobile : invitation-text = 2rem, donc max = 1.8rem
+                maxFontSize = 1.8;
+                minFontSize = 1.2;
+            } else if (width <= 768) {
+                // Mobile : invitation-text = 2.5rem, donc max = 2.3rem
+                maxFontSize = 2.3;
+                minFontSize = 1.4;
+            } else if (width <= 1024) {
+                // Tablette : invitation-text = 3rem, donc max = 2.8rem
+                maxFontSize = 2.8;
+                minFontSize = 1.8;
+            } else {
+                // Desktop : invitation-text = 3.3rem, donc max = 3.2rem
+                maxFontSize = 3.2;
+                minFontSize = 2.0;
+            }
+
             let maxLength = 0;
             playerNames.forEach(nameEl => {
                 const length = nameEl.textContent.length;
@@ -1320,24 +1361,24 @@
 
             let fontSize;
             if (maxLength <= 15) {
-                fontSize = 3.5; // Max 3.5rem (taille du sous-titre)
+                fontSize = maxFontSize;
             } else if (maxLength <= 20) {
-                fontSize = 3.2;
+                fontSize = Math.max(maxFontSize - 0.3, minFontSize);
             } else if (maxLength <= 25) {
-                fontSize = 2.8;
+                fontSize = Math.max(maxFontSize - 0.6, minFontSize);
             } else if (maxLength <= 30) {
-                fontSize = 2.4;
+                fontSize = Math.max(maxFontSize - 0.9, minFontSize);
             } else if (maxLength <= 40) {
-                fontSize = 2.0;
+                fontSize = Math.max(maxFontSize - 1.2, minFontSize);
             } else {
-                fontSize = 1.6;
+                fontSize = minFontSize;
             }
 
             playerNames.forEach(nameEl => {
                 nameEl.style.fontSize = fontSize + 'rem';
             });
 
-            console.log(`🔍 Taille de police ajustee a ${fontSize}rem pour max length: ${maxLength}`);
+            console.log(`Taille de police ajustee a ${fontSize}rem (max: ${maxFontSize}rem, breakpoint: ${width}px) pour max length: ${maxLength}`);
         }
 
         // ============================================
@@ -1578,6 +1619,15 @@
             } else {
                 startSurveyCheck();
             }
+        });
+
+        // Reajuster la taille de police lors du redimensionnement
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                adjustFontSize();
+            }, 250);
         });
     </script>
 </body>
