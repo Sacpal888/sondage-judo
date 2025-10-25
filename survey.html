@@ -1121,6 +1121,10 @@
                     console.log('✓ Utilisateur a déjà voté');
                     document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('thankYou').classList.add('show');
+                    
+                    // ⚡ IMPORTANT : Démarrer la vérification automatique même si l'utilisateur a déjà voté
+                    // pour qu'il puisse voir le nouveau sondage automatiquement
+                    startActiveCheck();
                     return;
                 }
 
@@ -1360,8 +1364,8 @@
         
         function startActiveCheck() {
             if (isAutoDetected && !activeCheckInterval) {
-                console.log('▶️ Démarrage de la vérification automatique (toutes les 30s)');
-                activeCheckInterval = setInterval(checkActiveSurveyChange, 30000); // Vérifier toutes les 30 secondes
+                console.log('▶️ Démarrage de la vérification automatique (toutes les 2s)');
+                activeCheckInterval = setInterval(checkActiveSurveyChange, 2000); // Vérifier toutes les 2 secondes
             }
         }
         
