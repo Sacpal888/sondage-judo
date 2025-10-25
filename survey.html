@@ -807,7 +807,7 @@
             <div id="logoContainer" class="logo-container" style="display: none;"></div>
             
             <div id="loadingMessage" class="loading-message">
-                â³ Chargement du sondage...
+                â³ Chargement du sondage...
             </div>
 
             <div id="voteSection" style="display: none;">
@@ -1034,11 +1034,11 @@
         }
 
         function acceptConsent(language) {
-            console.log(`âœ“ Consentement accepté avec langue: ${language}`);
+            console.log(`✓ Consentement accepté avec langue: ${language}`);
             
             // Si mode monolingue et langue NL demandée, forcer FR
             if (!isBilingualMode && language === 'nl') {
-                console.log('âš ï¸ Mode monolingue, langue forcée à FR');
+                console.log('âš ï¸ Mode monolingue, langue forcée à FR');
                 language = 'fr';
             }
             
@@ -1058,7 +1058,7 @@
         }
 
         function declineConsent() {
-            console.log('âœ— Consentement refusé');
+            console.log('✗ Consentement refusé');
             setCookie(COOKIE_CONSENT_NAME, 'declined', 1);
             
             document.getElementById('cookieConsent').classList.add('hidden');
@@ -1106,11 +1106,11 @@
                     return;
                 }
                 if (!survey.active) {
-                    showError(`â¸ï¸ Ce sondage n'est plus actif.<br><br>Merci de votre intérêt !`);
+                    showError(`â¸ï¸ Ce sondage n'est plus actif.<br><br>Merci de votre intérêt !`);
                     return;
                 }
 
-                console.log('âœ“ Sondage chargé:', survey);
+                console.log('✓ Sondage chargé:', survey);
 
                 // Charger les messages (FR par défaut, puis NL si sélectionné)
                 let messages = {
@@ -1154,7 +1154,7 @@
                 // Vérifier si l'utilisateur a déjà voté
                 const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
                 if (votedCookie === 'true') {
-                    console.log('âœ“ Utilisateur a déjà voté');
+                    console.log('✓ Utilisateur a déjà voté');
                     document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('thankYou').classList.add('show');
                     
@@ -1211,7 +1211,7 @@
                     card.dataset.playerId = player.id;
                     card.innerHTML = `
                         <div class="player-name">${escapeHtml(playerName)}</div>
-                        <button class="vote-button" onclick="confirmVote(${player.id})">âœ“ Voter</button>
+                        <button class="vote-button" onclick="confirmVote(${player.id})">✓ Voter</button>
                     `;
                     
                     card.addEventListener('click', (e) => {
@@ -1400,7 +1400,7 @@
         
         function startActiveCheck() {
             if (isAutoDetected && !activeCheckInterval) {
-                console.log('▶️ Démarrage de la vérification automatique (toutes les 2s)');
+                console.log('▶️ Démarrage de la vérification automatique (toutes les 2s)');
                 activeCheckInterval = setInterval(checkActiveSurveyChange, 2000); // Vérifier toutes les 2 secondes
             }
         }
