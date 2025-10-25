@@ -529,6 +529,38 @@
             font-size: 2rem;
             line-height: 1.6;
         }
+        /* ========================================
+           GLOBAL MESSAGES (NO ACTIVE SURVEY)
+        ======================================== */
+        .global-messages-container {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .global-message {
+            font-size: 2rem;
+            line-height: 1.6;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .global-message-fr {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .global-message-nl {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.05);
+            border: 2px solid rgba(244, 208, 63, 0.3);
+        }
+
+
 
         /* ========================================
            RESPONSIVE
@@ -792,6 +824,11 @@
             </div>
 
             <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <div id="globalMessagesContainer" class="global-messages-container" style="display: none;">
+                <div id="globalMessageFr" class="global-message global-message-fr" style="display: none;"></div>
+                <div id="globalMessageNl" class="global-message global-message-nl" style="display: none;"></div>
+            </div>
         </div>
     </div>
 
@@ -807,6 +844,9 @@
         let currentSurveyId = null;
         let currentLanguage = 'fr'; // Default
         let hasVoted = false;
+        let activeCheckInterval = null;
+        let isAutoDetected = false; // Indique si le sondage a été détecté automatiquement
+        let isBilingualMode = false; // Indique si le mode bilingue est activé
         let selectedPlayerId = null;
         let sessionId = generateSessionId();
 
@@ -840,14 +880,78 @@
         // ============================================
         // URL PARAMETERS
         // ============================================
-        function getUrlParams() {
+        async function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
             
-            if (!id) {
-                showError('ID de sondage manquant dans l\'URL.');
+            try {
+                // Initialiser Supabase si pas encore fait
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        throw new Error('Configuration Supabase manquante');
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+                
+                let surveyId;
+                let autoDetected = false;
+                
+                if (id) {
+                    // ID spécifique fourni dans l'URL
+                    surveyId = parseInt(id);
+                } else {
+                    // Pas d'ID fourni → détecter automatiquement le sondage actif
+                    console.log('🔄 Aucun ID fourni, recherche du sondage actif...');
+                    
+                    const { data: activeSurvey, error } = await supabaseClient
+                        .from('surveys')
+                        .select('id')
+                        .eq('active', true)
+                        .maybeSingle();
+                    
+                    if (error) throw error;
+                    
+                    if (!activeSurvey) {
+                        await showGlobalMessages();
+                        return null;
+                    }
+                    
+                    surveyId = activeSurvey.id;
+                    autoDetected = true;
+                    console.log('✅ Sondage actif détecté : ID', surveyId);
+                }
+                
+                // Charger les informations du sondage pour récupérer le bilingual_mode
+                const { data: survey, error: surveyError } = await supabaseClient
+                    .from('surveys')
+                    .select('id, bilingual_mode')
+                    .eq('id', surveyId)
+                    .maybeSingle();
+                
+                if (surveyError) throw surveyError;
+                
+                if (!survey) {
+                    showError(`❌ Sondage #${surveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+                    return null;
+                }
+                
+                currentSurveyId = surveyId;
+                
+                return { 
+                    id: surveyId, 
+                    autoDetected: autoDetected,
+                    bilingualMode: survey.bilingual_mode === true
+                };
+                
+            } catch (error) {
+                console.error('Erreur lors de la récupération des paramètres:', error);
+                showError('Erreur: ' + error.message);
                 return null;
             }
+        }
             
             currentSurveyId = parseInt(id);
             
@@ -857,6 +961,59 @@
         // ============================================
         // CONSENT MANAGEMENT
         // ============================================
+        function adaptCookieScreenToBilingualMode() {
+            console.log(`🌍 Adaptation de l'écran de cookies - Mode bilingue: ${isBilingualMode}`);
+            
+            if (!isBilingualMode) {
+                // Mode monolingue (FR seulement)
+                // Cacher les titres NL
+                const titleNl = document.querySelector('.consent-title-nl');
+                if (titleNl) titleNl.style.display = 'none';
+                
+                // Cacher les textes NL
+                const textNl = document.querySelector('.consent-text-nl');
+                if (textNl) textNl.style.display = 'none';
+                
+                // Cacher le bouton NL
+                const btnNl = document.querySelector('.btn-accept-nl');
+                if (btnNl) btnNl.style.display = 'none';
+                
+                // Ajuster le bouton FR pour prendre toute la largeur
+                const btnFr = document.querySelector('.btn-accept-fr');
+                if (btnFr) {
+                    btnFr.style.flex = '1';
+                    btnFr.innerHTML = '<span class="lang-flag">🇫🇷</span>J\'accepte';
+                }
+                
+                // Ajuster le bouton de refus
+                const btnDecline = document.querySelector('.btn-decline');
+                if (btnDecline) {
+                    btnDecline.textContent = '❌ Je refuse';
+                }
+                
+                // Simplifier les messages dans les autres écrans
+                const declinedTitle = document.querySelector('.declined-title');
+                if (declinedTitle) {
+                    declinedTitle.textContent = 'Participation Impossible';
+                }
+                
+                const declinedTexts = document.querySelectorAll('.declined-text');
+                if (declinedTexts.length > 0) {
+                    declinedTexts[0].innerHTML = '<strong>Français :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l\'intégrité du sondage. Vous ne pouvez pas participer.';
+                    if (declinedTexts[1]) declinedTexts[1].style.display = 'none';
+                }
+                
+                const btnBack = document.querySelectorAll('.btn-back');
+                btnBack.forEach(btn => {
+                    if (btn.textContent.includes('/')) {
+                        btn.textContent = '← Retour';
+                    }
+                });
+            }
+            // Si bilingue, laisser tout tel quel (déjà en FR+NL)
+        }
+        
+
         function checkCookieConsent() {
             const consent = getCookie(COOKIE_CONSENT_NAME);
             
@@ -1064,6 +1221,9 @@
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('voteSection').style.display = 'block';
 
+                // Démarrer la vérification automatique du sondage actif
+                startActiveCheck();
+
             } catch (error) {
                 console.error('Erreur chargement sondage:', error);
                 showError('Erreur de chargement: ' + error.message);
@@ -1202,6 +1362,118 @@
         }
 
         // ============================================
+        // AUTO-REFRESH ACTIVE SURVEY CHECK
+        // ============================================
+        async function checkActiveSurveyChange() {
+            if (!isAutoDetected || !supabaseClient || !currentSurveyId) return;
+            
+            try {
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('active', true)
+                    .maybeSingle();
+                
+                if (error) {
+                    console.error('Erreur vérification sondage actif:', error);
+                    return;
+                }
+                
+                // Si aucun sondage actif, ou si l'ID actif est différent
+                if (!activeSurvey || activeSurvey.id !== currentSurveyId) {
+                    console.log('🔄 Changement de sondage actif détecté, rechargement...');
+                    stopActiveCheck();
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Erreur lors de la vérification:', error);
+            }
+        }
+        
+        function startActiveCheck() {
+            if (isAutoDetected && !activeCheckInterval) {
+                console.log('▶️ Démarrage de la vérification automatique (toutes les 2s)');
+                activeCheckInterval = setInterval(checkActiveSurveyChange, 2000); // Vérifier toutes les 2 secondes
+            }
+        }
+        
+        function stopActiveCheck() {
+            if (activeCheckInterval) {
+                console.log('⏹️ Arrêt de la vérification automatique');
+                clearInterval(activeCheckInterval);
+                activeCheckInterval = null;
+            }
+        }
+
+        // ============================================
+        // GLOBAL MESSAGES (NO ACTIVE SURVEY)
+        // ============================================
+        async function showGlobalMessages() {
+            try {
+                // Charger les messages globaux depuis Supabase
+                const { data, error } = await supabaseClient
+                    .from('global_messages')
+                    .select('*')
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Erreur chargement messages globaux:', error);
+                    showError('Aucun sondage actif pour le moment.');
+                    return;
+                }
+
+                // Masquer les sections de chargement et vote
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('voteSection').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+
+                const containerGlobal = document.getElementById('globalMessagesContainer');
+                const messageFrEl = document.getElementById('globalMessageFr');
+                const messageNlEl = document.getElementById('globalMessageNl');
+
+                // Afficher les messages s'ils existent
+                if (data) {
+                    let hasMessage = false;
+
+                    if (data.message_fr && data.message_fr.trim()) {
+                        messageFrEl.textContent = data.message_fr.trim();
+                        messageFrEl.style.display = 'block';
+                        hasMessage = true;
+                    } else {
+                        messageFrEl.style.display = 'none';
+                    }
+
+                    if (data.message_nl && data.message_nl.trim()) {
+                        messageNlEl.textContent = data.message_nl.trim();
+                        messageNlEl.style.display = 'block';
+                        hasMessage = true;
+                    } else {
+                        messageNlEl.style.display = 'none';
+                    }
+
+                    if (hasMessage) {
+                        containerGlobal.style.display = 'block';
+                    } else {
+                        // Aucun message configuré -> message par défaut
+                        showError('Aucun sondage actif pour le moment.');
+                    }
+                } else {
+                    // Aucun message configuré -> message par défaut
+                    showError('Aucun sondage actif pour le moment.');
+                }
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError('Aucun sondage actif pour le moment.');
+            }
+        }
+
+
+
+
+
+        // ============================================
         // UTILITIES
         // ============================================
         function showError(message) {
@@ -1220,9 +1492,13 @@
         // ============================================
         // INITIALIZATION
         // ============================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = getUrlParams();
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = await getUrlParams();
             if (urlParams) {
+                isAutoDetected = urlParams.autoDetected;
+                isBilingualMode = urlParams.bilingualMode;
+                console.log(`📋 Sondage #${currentSurveyId} - Bilingue: ${isBilingualMode}, Auto-détecté: ${isAutoDetected}`);
+                adaptCookieScreenToBilingualMode();
                 checkCookieConsent();
             }
         });
