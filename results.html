@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080">
-    <title>Résultats - Sondage</title>
+    <title>RÃ©sultats - Sondage</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -25,8 +25,8 @@
         }
         
         .container {
-            width: 1600px;
-            min-height: 820px;
+            max-width: 1600px;
+            width: auto;
             height: auto;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 5px solid #d4af37;
@@ -83,7 +83,7 @@
         .results-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
             flex: 1;
             justify-content: center;
             align-items: start;
@@ -92,66 +92,74 @@
         /* Layout pour 2 candidats : cote a cote centres */
         .results-grid.layout-2 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(400px, 650px));
             grid-auto-flow: row;
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
             align-items: start;
+            width: fit-content;
         }
 
         /* Layout pour 3 candidats : cote a cote centres */
         .results-grid.layout-3 {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(350px, 500px));
             grid-auto-flow: row;
-            max-width: 1600px;
+            max-width: 100%;
             margin: 0 auto;
             align-items: start;
+            width: fit-content;
         }
 
         /* Layout pour 4 candidats : 2 colonnes de 2 (ordre: 1,2 puis 3,4) */
         .results-grid.layout-4 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(400px, 650px));
             grid-auto-flow: row;
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
             align-items: start;
+            width: fit-content;
         }
 
         /* Layout pour 5 candidats : 2 colonnes de 2 + 1 centre en bas */
         .results-grid.layout-5 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(400px, 650px));
             grid-auto-flow: row;
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
             align-items: start;
+            width: fit-content;
         }
 
         .results-grid.layout-5 .player-result:nth-child(5) {
             grid-column: 1 / -1;
-            max-width: 700px;
+            max-width: 650px;
             margin: 0 auto;
             width: 100%;
+            justify-self: center;
         }
 
         /* Layout pour 6 candidats : 2 colonnes de 3 (ordre: 1,2 puis 3,4 puis 5,6) */
         .results-grid.layout-6 {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(400px, 650px));
             grid-auto-flow: row;
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
             align-items: start;
+            width: fit-content;
         }
 
         /* Pour plus de 6 candidats : grille standard 2 colonnes */
         .results-grid.layout-default {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(400px, 650px));
             grid-auto-flow: row;
             align-items: start;
+            width: fit-content;
+            margin: 0 auto;
         }
         
         .player-result {
@@ -163,7 +171,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 180px;
+            min-height: 140px;
         }
         
         .player-result:hover {
