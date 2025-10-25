@@ -539,6 +539,13 @@
             font-size: 16px;
             opacity: 0.9;
         }
+
+        .global-messages-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -570,6 +577,30 @@
                 <div class="stats-card">
                     <div class="stat-value" id="totalSurveysCount">0</div>
                     <div class="stat-label">Sondages créés</div>
+                </div>
+            </div>
+
+            <!-- Messages globaux -->
+            <div class="section">
+                <h2>🔒 Messages Globaux (aucun sondage actif)</h2>
+                <div class="global-messages-card">
+                    <p style="color: #666; margin-bottom: 20px; font-size: 0.95rem;">
+                        Ces messages s'affichent quand aucun sondage n'est actif. Configurez-les une seule fois pour tous les sondages.
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message Français</label>
+                        <textarea class="form-input" id="globalMessageFr" rows="3" placeholder="Le sondage est actuellement ferme. Revenez bientot !"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message Neerlandais</label>
+                        <textarea class="form-input" id="globalMessageNl" rows="3" placeholder="De enquete is momenteel gesloten. Kom snel terug!"></textarea>
+                    </div>
+
+                    <button class="btn btn-success" onclick="saveGlobalMessages()" style="margin-top: 10px;">
+                        💾 Enregistrer les messages
+                    </button>
                 </div>
             </div>
 
@@ -1578,10 +1609,83 @@ ${baseUrl}results.html?id=${surveyId}
         // ============================================
         // INITIALISATION
         // ============================================
+        // ============================================
+        // GLOBAL MESSAGES MANAGEMENT
+        // ============================================
+        async function loadGlobalMessages() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('config_messages')
+                    .select('end_message_fr, end_message_nl')
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Erreur chargement messages globaux:', error);
+                    return;
+                }
+                
+                if (data) {
+                    document.getElementById('globalMessageFr').value = data.end_message_fr || '';
+                    document.getElementById('globalMessageNl').value = data.end_message_nl || '';
+                }
+            } catch (error) {
+                console.error('Erreur chargement messages globaux:', error);
+            }
+        }
+
+        async function saveGlobalMessages() {
+            const messageFr = document.getElementById('globalMessageFr').value.trim();
+            const messageNl = document.getElementById('globalMessageNl').value.trim();
+
+            if (!messageFr || !messageNl) {
+                alert('Veuillez remplir les deux messages.');
+                return;
+            }
+
+            try {
+                // Verifier si une ligne existe deja
+                const { data: existing, error: selectError } = await supabaseClient
+                    .from('config_messages')
+                    .select('id')
+                    .single();
+
+                let result;
+                if (existing) {
+                    // Update
+                    result = await supabaseClient
+                        .from('config_messages')
+                        .update({
+                            end_message_fr: messageFr,
+                            end_message_nl: messageNl
+                        })
+                        .eq('id', existing.id);
+                } else {
+                    // Insert
+                    result = await supabaseClient
+                        .from('config_messages')
+                        .insert({
+                            end_message_fr: messageFr,
+                            end_message_nl: messageNl
+                        });
+                }
+
+                if (result.error) throw result.error;
+
+                alert('Messages globaux enregistres avec succes !');
+            } catch (error) {
+                console.error('Erreur sauvegarde messages globaux:', error);
+                alert('Erreur lors de l\'enregistrement: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         (async function init() {
             const isAuthenticated = await checkAuthentication();
             if (isAuthenticated) {
                 await loadSurveys();
+                await loadGlobalMessages();
             }
         })();
     </script>
