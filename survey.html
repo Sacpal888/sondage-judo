@@ -867,8 +867,8 @@
                 const { data: activeSurvey, error } = await supabaseClient
                     .from('surveys')
                     .select('id')
-                    .eq('is_active', true)
-                    .single();
+                    .eq('active', true)
+                    .maybeSingle();
                 
                 if (error || !activeSurvey) {
                     // Aucun sondage actif, afficher le message de fin
@@ -1326,8 +1326,8 @@
                 const { data: activeSurvey, error } = await supabaseClient
                     .from('surveys')
                     .select('id')
-                    .eq('is_active', true)
-                    .single();
+                    .eq('active', true)
+                    .maybeSingle();
                 
                 // Si un nouveau sondage actif est detecte
                 if (activeSurvey) {
