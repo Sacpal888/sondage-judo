@@ -840,18 +840,52 @@
         // ============================================
         // URL PARAMETERS
         // ============================================
-        function getUrlParams() {
+        async function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
             
-            if (!id) {
-                showError('ID de sondage manquant dans l\'URL.');
-                return null;
+            // Si un ID est fourni dans l'URL, l'utiliser
+            if (id) {
+                currentSurveyId = parseInt(id);
+                return { id: currentSurveyId };
             }
             
-            currentSurveyId = parseInt(id);
-            
-            return { id: currentSurveyId };
+            // Sinon, detecter automatiquement le sondage actif
+            try {
+                // Initialiser Supabase si ce n'est pas deja fait
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        throw new Error('Configuration Supabase manquante');
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+                
+                // Chercher le sondage actif
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('is_active', true)
+                    .single();
+                
+                if (error || !activeSurvey) {
+                    // Aucun sondage actif, afficher le message de fin
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    await showEndMessage();
+                    return null;
+                }
+                
+                currentSurveyId = activeSurvey.id;
+                console.log('Sondage actif detecte automatiquement:', currentSurveyId);
+                return { id: currentSurveyId };
+                
+            } catch (error) {
+                console.error('Erreur lors de la detection du sondage actif:', error);
+                showError('Erreur de connexion a la base de donnees.');
+                return null;
+            }
         }
 
         // ============================================
@@ -1204,6 +1238,60 @@
         // ============================================
         // UTILITIES
         // ============================================
+        // ============================================
+        // END MESSAGE
+        // ============================================
+        async function showEndMessage() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('config_messages')
+                    .select('end_message_fr, end_message_nl')
+                    .single();
+                
+                let messageFr = 'Le sondage est actuellement ferme. Revenez bientot !';
+                let messageNl = 'De enquete is momenteel gesloten. Kom snel terug!';
+                
+                if (data && !error) {
+                    if (data.end_message_fr) messageFr = data.end_message_fr;
+                    if (data.end_message_nl) messageNl = data.end_message_nl;
+                }
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('voteSection').style.display = 'none';
+                document.getElementById('thankYou').classList.remove('show');
+                document.getElementById('errorMessage').style.display = 'none';
+                
+                // Creer et afficher le message de fin
+                const endMessageDiv = document.createElement('div');
+                endMessageDiv.id = 'endMessageDisplay';
+                endMessageDiv.style.cssText = `
+                    text-align: center;
+                    padding: 60px 30px;
+                    background: rgba(13, 39, 68, 0.95);
+                    border-radius: 20px;
+                    margin: 20px auto;
+                    max-width: 800px;
+                `;
+                
+                endMessageDiv.innerHTML = `
+                    <div style="font-size: 4rem; margin-bottom: 30px;">&#128274;</div>
+                    <div style="color: #ffffff; font-size: 2rem; font-weight: bold; margin-bottom: 20px; line-height: 1.4;">
+                        ${escapeHtml(messageFr)}
+                    </div>
+                    <div style="color: #f4d03f; font-size: 2rem; font-weight: bold; line-height: 1.4;">
+                        ${escapeHtml(messageNl)}
+                    </div>
+                `;
+                
+                const container = document.querySelector('.container');
+                container.appendChild(endMessageDiv);
+                
+            } catch (error) {
+                console.error('Erreur chargement message de fin:', error);
+                showError('Aucun sondage actif pour le moment.');
+            }
+        }
+
         function showError(message) {
             document.getElementById('loadingMessage').style.display = 'none';
             document.getElementById('voteSection').style.display = 'none';
@@ -1218,12 +1306,78 @@
         }
 
         // ============================================
+        // AUTO-REFRESH POUR NOUVEAU SONDAGE
+        // ============================================
+        let surveyCheckInterval = null;
+        
+        async function checkForNewSurvey() {
+            try {
+                // Initialiser Supabase si ce n'est pas deja fait
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        return; // Pas de config, on ne peut pas verifier
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+                
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('is_active', true)
+                    .single();
+                
+                // Si un nouveau sondage actif est detecte
+                if (activeSurvey) {
+                    // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
+                    if (!currentSurveyId) {
+                        console.log('Nouveau sondage actif detecte:', activeSurvey.id);
+                        window.location.reload();
+                    }
+                    // Cas 2: Un autre sondage est maintenant actif
+                    else if (activeSurvey.id !== currentSurveyId) {
+                        console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
+                        window.location.reload();
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors de la verification du sondage actif:', error);
+            }
+        }
+        
+        function startSurveyCheck() {
+            // Verifier toutes les 2 secondes si un nouveau sondage est actif
+            surveyCheckInterval = setInterval(checkForNewSurvey, 2000);
+        }
+        
+        function stopSurveyCheck() {
+            if (surveyCheckInterval) {
+                clearInterval(surveyCheckInterval);
+                surveyCheckInterval = null;
+            }
+        }
+
+        // ============================================
         // INITIALIZATION
         // ============================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = getUrlParams();
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = await getUrlParams();
             if (urlParams) {
                 checkCookieConsent();
+            }
+            // Demarrer la verification periodique du sondage actif dans tous les cas
+            // (meme si aucun sondage n'est actif, pour detecter quand un nouveau devient actif)
+            startSurveyCheck();
+        });
+        
+        // Arreter la verification quand la page est masquee
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopSurveyCheck();
+            } else {
+                startSurveyCheck();
             }
         });
     </script>
