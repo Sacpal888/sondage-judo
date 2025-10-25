@@ -374,11 +374,66 @@
         }
 
         .players-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
             margin-bottom: 0;
             width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Layout pour 2 candidats : cote a cote centres */
+        .players-grid.layout-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 3 candidats : cote a cote centres */
+        .players-grid.layout-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 4 candidats : 2 colonnes de 2 */
+        .players-grid.layout-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 5 candidats : 2 colonnes de 2 + 1 centre en bas */
+        .players-grid.layout-5 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .players-grid.layout-5 .player-card:nth-child(5) {
+            grid-column: 1 / -1;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Layout pour 6 candidats : 2 colonnes de 3 */
+        .players-grid.layout-6 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Pour plus de 6 candidats : grille standard 3 colonnes */
+        .players-grid.layout-default {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
         }
 
         .player-card {
@@ -415,7 +470,8 @@
         }
 
         .player-name {
-            font-size: 3.8rem;
+            font-size: 3.5rem;
+            max-font-size: 3.5rem; /* Ne jamais depasser la taille du sous-titre */
             font-weight: bold;
             color: #ffffff;
             margin-bottom: 20px;
@@ -535,8 +591,20 @@
         ======================================== */
         /* Tablettes */
         @media (max-width: 1024px) {
-            .players-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .players-grid,
+            .players-grid.layout-2,
+            .players-grid.layout-3,
+            .players-grid.layout-4,
+            .players-grid.layout-5,
+            .players-grid.layout-6,
+            .players-grid.layout-default {
+                grid-template-columns: repeat(2, 1fr) !important;
+                max-width: 100%;
+            }
+
+            .players-grid.layout-5 .player-card:nth-child(5) {
+                grid-column: 1 / -1;
+                max-width: 50%;
             }
             
             .page-title {
@@ -590,9 +658,21 @@
                 font-size: 2.5rem;
             }
 
-            .players-grid {
-                grid-template-columns: 1fr;
+            .players-grid,
+            .players-grid.layout-2,
+            .players-grid.layout-3,
+            .players-grid.layout-4,
+            .players-grid.layout-5,
+            .players-grid.layout-6,
+            .players-grid.layout-default {
+                grid-template-columns: 1fr !important;
                 gap: 15px;
+                max-width: 100%;
+            }
+
+            .players-grid.layout-5 .player-card:nth-child(5) {
+                grid-column: 1;
+                max-width: 100%;
             }
 
             .player-card {
@@ -1181,6 +1261,9 @@
                     grid.appendChild(card);
                 });
 
+                // Appliquer le layout adapte au nombre de candidats
+                applyGridLayout(players.length);
+
                 // Ajuster la taille de police
                 adjustFontSize();
 
@@ -1191,6 +1274,33 @@
                 console.error('Erreur chargement sondage:', error);
                 showError('Erreur de chargement: ' + error.message);
             }
+        }
+
+        // ============================================
+        // GRID LAYOUT ADAPTATION
+        // ============================================
+        function applyGridLayout(count) {
+            const grid = document.getElementById('playersGrid');
+            
+            // Retirer toutes les classes de layout existantes
+            grid.classList.remove('layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-default');
+            
+            // Appliquer le layout selon le nombre de candidats
+            if (count === 2) {
+                grid.classList.add('layout-2');
+            } else if (count === 3) {
+                grid.classList.add('layout-3');
+            } else if (count === 4) {
+                grid.classList.add('layout-4');
+            } else if (count === 5) {
+                grid.classList.add('layout-5');
+            } else if (count === 6) {
+                grid.classList.add('layout-6');
+            } else {
+                grid.classList.add('layout-default');
+            }
+            
+            console.log(`📐 Layout applique pour ${count} candidats`);
         }
 
         // ============================================
@@ -1210,24 +1320,24 @@
 
             let fontSize;
             if (maxLength <= 15) {
-                fontSize = 3.8;
+                fontSize = 3.5; // Max 3.5rem (taille du sous-titre)
             } else if (maxLength <= 20) {
-                fontSize = 3.4;
+                fontSize = 3.2;
             } else if (maxLength <= 25) {
-                fontSize = 3.0;
+                fontSize = 2.8;
             } else if (maxLength <= 30) {
-                fontSize = 2.6;
+                fontSize = 2.4;
             } else if (maxLength <= 40) {
-                fontSize = 2.2;
+                fontSize = 2.0;
             } else {
-                fontSize = 1.8;
+                fontSize = 1.6;
             }
 
             playerNames.forEach(nameEl => {
                 nameEl.style.fontSize = fontSize + 'rem';
             });
 
-            console.log(`🔍 Taille de police ajustée à ${fontSize}rem pour max length: ${maxLength}`);
+            console.log(`🔍 Taille de police ajustee a ${fontSize}rem pour max length: ${maxLength}`);
         }
 
         // ============================================
