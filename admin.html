@@ -367,6 +367,23 @@
             background: #138496;
         }
 
+        .btn-done {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-done:hover {
+            background: #5a6268;
+        }
+
+        .btn-done.active {
+            background: #28a745;
+        }
+
+        .btn-done.active:hover {
+            background: #218838;
+        }
+
         /* ========================================
            MODAL
         ======================================== */
@@ -922,21 +939,23 @@
                     </div>
 
                     <div class="survey-actions">
-                        <div style="display: flex; gap: 8px; align-items: center;">
+                        <div style="display: flex; gap: 8px; width: 100%;">
                             <button class="btn ${survey.active ? 'btn-warning' : 'btn-success'}" 
-                                    onclick="toggleActive(${survey.id}, ${survey.active})">
+                                    onclick="toggleActive(${survey.id}, ${survey.active})"
+                                    style="flex: 1;">
                                 ${survey.active ? '⏸️ Désactiver' : '▶️ Activer'}
                             </button>
-                            <span class="${survey.ever_activated ? 'ever-activated-badge' : 'ever-activated-badge-inactive'}" 
-                                  title="${survey.ever_activated ? 'Ce sondage a déjà été activé' : 'Ce sondage n\'a jamais été activé'}">
-                                ✅ Déjà fait
-                            </span>
+                            <button class="btn btn-done ${survey.ever_activated ? 'active' : ''}" 
+                                    onclick="toggleEverActivated(${survey.id}, ${survey.ever_activated})"
+                                    style="flex: 1;">
+                                ${survey.ever_activated ? '✅ Déjà fait' : '⬜ Déjà fait'}
+                            </button>
                         </div>
-                        <button class="btn btn-info" onclick="editSurvey(${survey.id})">✏️ Modifier</button>
-                        <button class="btn" onclick="viewUrls(${survey.id})">🔗 URLs</button>
-                        <button class="btn btn-warning" onclick="resetVotes(${survey.id})">🔄 Reset votes</button>
-                        ${survey.ever_activated ? `<button class="btn" onclick="resetEverActivated(${survey.id})" title="Décocher le statut 'Déjà fait'">❌ Reset "Déjà fait"</button>` : ''}
-                        <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})">🗑️ Supprimer</button>
+                        <div style="display: flex; gap: 8px; width: 100%;">
+                            <button class="btn btn-info" onclick="editSurvey(${survey.id})" style="flex: 1;">✏️ Modifier</button>
+                            <button class="btn btn-warning" onclick="resetVotes(${survey.id})" style="flex: 1;">🔄 Reset votes</button>
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})" style="width: 100%;">🗑️ Supprimer</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -1500,6 +1519,7 @@
         // ============================================
         // AFFICHER LES URLs
         // ============================================
+        /* FONCTION DÉSACTIVÉE - Bouton URLs supprimé
         function viewUrls(surveyId) {
             const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
             const urls = `
@@ -1516,6 +1536,7 @@ ${baseUrl}results.html?id=${surveyId}
             `;
             alert(urls);
         }
+        */
 
         // ============================================
         // RESET VOTES
@@ -1579,22 +1600,25 @@ ${baseUrl}results.html?id=${surveyId}
         // ============================================
         // RESET "DÉJÀ ACTIVÉ"
         // ============================================
-        async function resetEverActivated(surveyId) {
+        async function toggleEverActivated(surveyId, currentValue) {
             const survey = allSurveys.find(s => s.id === surveyId);
-            if (!confirm(`Décocher le statut "Déjà fait" pour "${survey.titre}" ?`)) {
+            const newValue = !currentValue;
+            const action = newValue ? 'cocher' : 'décocher';
+            
+            if (!confirm(`${action === 'cocher' ? 'Cocher' : 'Décocher'} le statut "Déjà fait" pour "${survey.titre}" ?`)) {
                 return;
             }
 
             try {
                 const { error } = await supabaseClient
                     .from('surveys')
-                    .update({ ever_activated: false })
+                    .update({ ever_activated: newValue })
                     .eq('id', surveyId)
                     .eq('user_id', currentUser.id);
 
                 if (error) throw error;
 
-                alert('✅ Statut "Déjà fait" décoche');
+                alert(`✅ Statut "Déjà fait" ${newValue ? 'coché' : 'décoché'}`);
                 await loadSurveys();
 
             } catch (error) {
