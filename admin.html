@@ -223,6 +223,18 @@
             cursor: help;
         }
 
+        .ever-activated-badge-inactive {
+            background: #ccc;
+            color: #999;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: help;
+            opacity: 0.6;
+        }
+
         .survey-description {
             color: #666;
             font-size: 0.9rem;
@@ -500,6 +512,35 @@
             gap: 15px;
             flex-wrap: wrap;
             margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .bilingual-toggle {
+            margin-left: auto;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .toggle-text {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1rem;
         }
 
         .info-text {
@@ -620,6 +661,12 @@
                 <div class="controls">
                     <button class="btn btn-success" onclick="openCreateModal()">➕ Créer un sondage</button>
                     <button class="btn" onclick="loadSurveys()">🔄 Actualiser</button>
+                    <div class="bilingual-toggle">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="globalBilingualMode" onchange="toggleGlobalBilingualMode()">
+                            <span class="toggle-text">🌐 Mode bilingue (FR/NL)</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -682,15 +729,13 @@
                     <button type="button" class="btn" onclick="addPlayerField()">➕ Ajouter un candidat</button>
                 </div>
 
-                <!-- Traduction NL -->
-                <div class="form-group">
-                    <div class="form-checkbox">
-                        <input type="checkbox" id="enableNL">
-                        <label for="enableNL" class="form-label" style="margin: 0;">Activer la version néerlandaise (NL)</label>
-                    </div>
-                </div>
-
-                <div id="nlFieldsContainer" style="display: none;">
+                <!-- Traduction NL - Toujours visible -->
+                <div style="background: rgba(244, 208, 63, 0.1); padding: 20px; border-radius: 10px; border: 2px solid rgba(244, 208, 63, 0.3); margin-top: 20px;">
+                    <h3 style="color: #f4d03f; margin-bottom: 15px;">🇳🇱 Traduction néerlandaise</h3>
+                    <p class="info-text" style="margin-bottom: 15px;">
+                        Remplissez les champs NL pour préparer la version néerlandaise. L'activation se fait via le mode bilingue global.
+                    </p>
+                
                     <div class="form-group">
                         <label class="form-label">Titre (NL)</label>
                         <input type="text" class="form-input" id="surveyTitleNl" placeholder="Nederlandse titel">
@@ -735,11 +780,14 @@
         // ============================================
         // VARIABLES GLOBALES
         // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
         let supabaseClient = null;
         let currentUser = null;
         let allSurveys = [];
         let editingSurveyId = null;
         let currentLogoBase64 = null; // Logo en base64
+        let globalBilingualMode = false; // Mode bilingue global
 
         // ============================================
         // AUTHENTIFICATION
@@ -840,12 +888,9 @@
                     
                     <div class="survey-header">
                         <div class="survey-title">${escapeHtml(survey.titre)}</div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <span class="${survey.active ? 'active-badge' : 'inactive-badge'}">
-                                ${survey.active ? '🟢 Actif' : '⚪ Inactif'}
-                            </span>
-                            ${survey.ever_activated ? '<span class="ever-activated-badge" title="Ce sondage a déjà été activé">✅ Déjà fait</span>' : ''}
-                        </div>
+                        <span class="${survey.active ? 'active-badge' : 'inactive-badge'}">
+                            ${survey.active ? '🟢 Actif' : '⚪ Inactif'}
+                        </span>
                     </div>
 
                     ${survey.description ? `<div class="survey-description">${escapeHtml(survey.description)}</div>` : ''}
@@ -877,14 +922,20 @@
                     </div>
 
                     <div class="survey-actions">
-                        <button class="btn ${survey.active ? 'btn-warning' : 'btn-success'}" 
-                                onclick="toggleActive(${survey.id}, ${survey.active})">
-                            ${survey.active ? '⏸️ Désactiver' : '▶️ Activer'}
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="btn ${survey.active ? 'btn-warning' : 'btn-success'}" 
+                                    onclick="toggleActive(${survey.id}, ${survey.active})">
+                                ${survey.active ? '⏸️ Désactiver' : '▶️ Activer'}
+                            </button>
+                            <span class="${survey.ever_activated ? 'ever-activated-badge' : 'ever-activated-badge-inactive'}" 
+                                  title="${survey.ever_activated ? 'Ce sondage a déjà été activé' : 'Ce sondage n\'a jamais été activé'}">
+                                ✅ Déjà fait
+                            </span>
+                        </div>
                         <button class="btn btn-info" onclick="editSurvey(${survey.id})">✏️ Modifier</button>
                         <button class="btn" onclick="viewUrls(${survey.id})">🔗 URLs</button>
                         <button class="btn btn-warning" onclick="resetVotes(${survey.id})">🔄 Reset votes</button>
-                        ${survey.ever_activated ? `<button class="btn" onclick="resetEverActivated(${survey.id})" title="Décocher le statut 'Déjà fait'">❌ Déjà fait</button>` : ''}
+                        ${survey.ever_activated ? `<button class="btn" onclick="resetEverActivated(${survey.id})" title="Décocher le statut 'Déjà fait'">❌ Reset "Déjà fait"</button>` : ''}
                         <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})">🗑️ Supprimer</button>
                     </div>
                 `;
@@ -1028,9 +1079,7 @@
             document.getElementById('playersEditorNL').innerHTML = '';
             document.getElementById('errorContainer').innerHTML = '';
             document.getElementById('urlPreview').style.display = 'none';
-            document.getElementById('nlFieldsContainer').style.display = 'none';
             document.getElementById('logoPreview').style.display = 'none';
-            document.getElementById('enableNL').checked = false;
             
             // Ajouter 3 champs candidats par défaut
             for (let i = 0; i < 3; i++) addPlayerField();
@@ -1083,12 +1132,8 @@
                 .eq('language_code', 'nl')
                 .maybeSingle();
 
-            // Vérifier le mode bilingue (priorité au champ bilingual_mode de la table surveys)
-            const isBilingual = survey.bilingual_mode === true || translations;
-            
-            if (isBilingual) {
-                document.getElementById('enableNL').checked = true;
-                document.getElementById('nlFieldsContainer').style.display = 'block';
+            // Charger les traductions NL si elles existent
+            if (translations) {
                 document.getElementById('surveyTitleNl').value = translations.titre || '';
                 document.getElementById('surveyDescriptionNl').value = translations.description || '';
                 document.getElementById('msgThankyouNl').value = translations.msg_thankyou || '';
@@ -1116,10 +1161,6 @@
                         nlInputs[index].value = translationMap[player.id];
                     }
                 });
-                
-            } else {
-                document.getElementById('enableNL').checked = false;
-                document.getElementById('nlFieldsContainer').style.display = 'none';
             }
 
             document.getElementById('surveyModal').classList.add('active');
@@ -1142,40 +1183,18 @@
             // Ajouter un listener pour synchroniser les champs NL
             const input = item.querySelector('input');
             input.addEventListener('input', () => {
-                if (document.getElementById('enableNL').checked) {
-                    syncNLFields();
-                }
+                syncNLFields();
             });
             
-            // Synchroniser si NL est activé
-            if (document.getElementById('enableNL').checked) {
-                syncNLFields();
-            }
+            // Toujours synchroniser les champs NL
+            syncNLFields();
         }
 
         function removePlayerField(button) {
             button.parentElement.remove();
-            // Synchroniser les champs NL
-            if (document.getElementById('enableNL').checked) {
-                syncNLFields();
-            }
+            // Toujours synchroniser les champs NL
+            syncNLFields();
         }
-
-        // Toggle NL fields
-        document.addEventListener('DOMContentLoaded', () => {
-            const enableNLCheckbox = document.getElementById('enableNL');
-            if (enableNLCheckbox) {
-                enableNLCheckbox.addEventListener('change', (e) => {
-                    const isChecked = e.target.checked;
-                    document.getElementById('nlFieldsContainer').style.display = isChecked ? 'block' : 'none';
-                    
-                    // Synchroniser les champs des candidats quand on active NL
-                    if (isChecked) {
-                        syncNLFields();
-                    }
-                });
-            }
-        });
 
         // ============================================
         // SAUVEGARDER SONDAGE
@@ -1187,7 +1206,6 @@
             const titre = document.getElementById('surveyTitle').value.trim();
             const description = document.getElementById('surveyDescription').value.trim();
             const msgThankyouFr = document.getElementById('msgThankyouFr').value.trim();
-            const enableNL = document.getElementById('enableNL').checked;
 
             const playerInputs = document.querySelectorAll('#playersEditor .player-item input');
             const players = Array.from(playerInputs).map(input => input.value.trim()).filter(v => v);
@@ -1202,12 +1220,9 @@
                 return;
             }
 
-            // Récupérer les traductions NL des candidats si activées
-            let playersNL = [];
-            if (enableNL) {
-                const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
-                playersNL = Array.from(nlInputs).map(input => input.value.trim());
-            }
+            // Toujours récupérer les traductions NL des candidats (les champs sont toujours visibles)
+            const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
+            const playersNL = Array.from(nlInputs).map(input => input.value.trim());
 
             try {
                 if (editingSurveyId) {
@@ -1219,7 +1234,6 @@
                             description,
                             msg_thankyou: msgThankyouFr,
                             logo_base64: currentLogoBase64,
-                            bilingual_mode: enableNL,
                             updated_at: new Date().toISOString()
                         })
                         .eq('id', editingSurveyId);
@@ -1308,7 +1322,7 @@
                         const nlData = {
                             survey_id: editingSurveyId,
                             language_code: 'nl',
-                            active: enableNL, // Active seulement si la case est cochée
+                            active: globalBilingualMode, // Active selon le mode bilingue global
                             titre: nlTitle,
                             description: nlDescription,
                             msg_thankyou: nlThankyou
@@ -1366,13 +1380,6 @@
                                     .eq('language_code', 'nl');
                             }
                         }
-                    } else if (!enableNL) {
-                        // Si on désactive NL et qu'il n'y a pas de données, mettre active à false
-                        await supabaseClient
-                            .from('survey_translations')
-                            .update({ active: false })
-                            .eq('survey_id', editingSurveyId)
-                            .eq('language_code', 'nl');
                     } else {
                         // Désactiver la traduction NL (ne supprime PAS les votes)
                         await supabaseClient
@@ -1400,7 +1407,6 @@
                             description,
                             msg_thankyou: msgThankyouFr,
                             logo_base64: currentLogoBase64,
-                            bilingual_mode: enableNL,
                             active: false,
                             ordre: allSurveys.length + 1,
                             user_id: currentUser.id
@@ -1435,7 +1441,7 @@
                         const nlData = {
                             survey_id: newSurvey.id,
                             language_code: 'nl',
-                            active: enableNL, // Active seulement si la case est cochée
+                            active: globalBilingualMode, // Active selon le mode bilingue global
                             titre: nlTitle,
                             description: nlDescription,
                             msg_thankyou: nlThankyou
@@ -1681,9 +1687,85 @@ ${baseUrl}results.html?id=${surveyId}
         // ============================================
         // INITIALIZATION
         // ============================================
+        // ============================================
+        // MODE BILINGUE GLOBAL
+        // ============================================
+        async function loadGlobalBilingualMode() {
+            try {
+                // Charger l'état du mode bilingue depuis config_messages
+                const { data, error } = await supabaseClient
+                    .from('config_messages')
+                    .select('bilingual_mode')
+                    .maybeSingle();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Erreur chargement mode bilingue:', error);
+                    return;
+                }
+                
+                globalBilingualMode = data?.bilingual_mode || false;
+                document.getElementById('globalBilingualMode').checked = globalBilingualMode;
+                
+            } catch (error) {
+                console.error('Erreur chargement mode bilingue:', error);
+            }
+        }
+
+        async function toggleGlobalBilingualMode() {
+            const isEnabled = document.getElementById('globalBilingualMode').checked;
+            globalBilingualMode = isEnabled;
+            
+            try {
+                // Vérifier si une ligne existe déjà
+                const { data: existing, error: selectError } = await supabaseClient
+                    .from('config_messages')
+                    .select('id')
+                    .maybeSingle();
+
+                let result;
+                if (existing) {
+                    // Update
+                    result = await supabaseClient
+                        .from('config_messages')
+                        .update({ bilingual_mode: isEnabled })
+                        .eq('id', existing.id);
+                } else {
+                    // Insert
+                    result = await supabaseClient
+                        .from('config_messages')
+                        .insert({ bilingual_mode: isEnabled });
+                }
+
+                if (result.error) throw result.error;
+
+                // Mettre à jour toutes les traductions NL existantes
+                await supabaseClient
+                    .from('survey_translations')
+                    .update({ active: isEnabled })
+                    .eq('language_code', 'nl');
+
+                alert(isEnabled ? 
+                    '✅ Mode bilingue activé ! Toutes les traductions NL sont maintenant actives.' : 
+                    '⏸️ Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
+                
+                await loadSurveys(); // Rafraîchir l'affichage
+                
+            } catch (error) {
+                console.error('Erreur toggle mode bilingue:', error);
+                alert('❌ Erreur: ' + error.message);
+                // Revenir à l'état précédent
+                document.getElementById('globalBilingualMode').checked = !isEnabled;
+                globalBilingualMode = !isEnabled;
+            }
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         (async function init() {
             const isAuthenticated = await checkAuthentication();
             if (isAuthenticated) {
+                await loadGlobalBilingualMode();
                 await loadSurveys();
                 await loadGlobalMessages();
             }
