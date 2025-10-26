@@ -15,7 +15,7 @@
         
         body {
             width: 1920px;
-            height: 100vh;
+            min-height: 1080px;
             background: transparent;
             display: flex;
             justify-content: center;
@@ -25,8 +25,8 @@
         }
         
         .container {
-            max-width: 1600px;
-            width: auto;
+            width: 1600px;
+            min-height: 820px;
             height: auto;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 5px solid #d4af37;
@@ -79,79 +79,13 @@
             color: #f4d03f;
         }
         
-        /* Grille des resultats - ordre de lecture gauche a droite, haut en bas */
+        /* Grille des rÃ©sultats - 2 colonnes, remplissage vertical (colonne par colonne) */
         .results-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-auto-flow: column;
+            gap: 15px;
             flex: 1;
-            justify-content: center;
-            align-items: start;
-        }
-
-        /* Layout pour 2 candidats : cote a cote centres */
-        .results-grid.layout-2 {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            grid-auto-flow: row;
-            max-width: max-content;
-            margin: 0 auto;
-            align-items: start;
-        }
-
-        /* Layout pour 3 candidats : cote a cote centres */
-        .results-grid.layout-3 {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            grid-auto-flow: row;
-            max-width: max-content;
-            margin: 0 auto;
-            align-items: start;
-        }
-
-        /* Layout pour 4 candidats : 2 colonnes de 2 (ordre: 1,2 puis 3,4) */
-        .results-grid.layout-4 {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            grid-auto-flow: row;
-            max-width: max-content;
-            margin: 0 auto;
-            align-items: start;
-        }
-
-        /* Layout pour 5 candidats : 2 colonnes de 2 + 1 centre en bas */
-        .results-grid.layout-5 {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            grid-auto-flow: row;
-            max-width: max-content;
-            margin: 0 auto;
-            align-items: start;
-        }
-
-        .results-grid.layout-5 .player-result:nth-child(5) {
-            grid-column: 1 / -1;
-            justify-self: center;
-        }
-
-        /* Layout pour 6 candidats : 2 colonnes de 3 (ordre: 1,2 puis 3,4 puis 5,6) */
-        .results-grid.layout-6 {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            grid-auto-flow: row;
-            max-width: max-content;
-            margin: 0 auto;
-            align-items: start;
-        }
-
-        /* Pour plus de 6 candidats : grille standard 2 colonnes */
-        .results-grid.layout-default {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            grid-auto-flow: row;
-            align-items: start;
-            max-width: max-content;
-            margin: 0 auto;
         }
         
         .player-result {
@@ -163,8 +97,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 140px;
-            min-width: 400px;
+            min-height: auto;
+            height: auto;
         }
         
         .player-result:hover {
@@ -218,7 +152,7 @@
         
         .player-name {
             color: #ffffff;
-            font-size: 3.2rem;
+            font-size: 1.6em;
             font-weight: 600;
             word-break: break-word;
             line-height: 1.3;
@@ -227,7 +161,7 @@
         
         .player-name-nl {
             color: #f4d03f;
-            font-size: 2.6rem;
+            font-size: 1.3em;
             font-weight: 500;
             word-break: break-word;
             line-height: 1.3;
@@ -289,6 +223,24 @@
             padding: 15px;
             border-radius: 10px;
             text-align: center;
+            margin-top: 20px;
+            grid-column: 1 / -1;
+        }
+
+        /* Pour 3 rÃ©sultats par colonne */
+        .results-grid.three-per-column {
+            grid-template-rows: repeat(3, auto);
+        }
+
+        /* Pour 2 rÃ©sultats par colonne */
+        .results-grid.two-per-column {
+            grid-template-rows: repeat(2, auto);
+        }
+
+        /* Pour 1 rÃ©sultat par colonne */
+        .results-grid.one-per-column {
+            grid-template-rows: repeat(1, auto);
+        }
     </style>
 </head>
 <body>
@@ -316,48 +268,16 @@
         // ============================================
         // GET URL PARAMETERS
         // ============================================
-        async function getUrlParams() {
+        function getUrlParams() {
             const params = new URLSearchParams(window.location.search);
             const surveyId = params.get('id');
             
-            // Si un ID est fourni dans l'URL, l'utiliser
-            if (surveyId) {
-                return parseInt(surveyId);
-            }
-
-            // Sinon, detecter automatiquement le sondage actif
-            try {
-                // Initialiser Supabase si ce n'est pas deja fait
-                if (!supabaseClient) {
-                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-                        throw new Error('Configuration Supabase manquante');
-                    }
-                    supabaseClient = supabase.createClient(
-                        window.SUPABASE_URL,
-                        window.SUPABASE_ANON_KEY
-                    );
-                }
-
-                // Chercher le sondage actif
-                const { data: activeSurvey, error } = await supabaseClient
-                    .from('surveys')
-                    .select('id')
-                    .eq('active', true)
-                    .maybeSingle();
-
-                if (error || !activeSurvey) {
-                    showError('Aucun sondage actif pour le moment.');
-                    return null;
-                }
-
-                console.log('Sondage actif detecte automatiquement:', activeSurvey.id);
-                return activeSurvey.id;
-
-            } catch (error) {
-                console.error('Erreur lors de la detection du sondage actif:', error);
-                showError('Erreur de connexion a la base de donnees.');
+            if (!surveyId) {
+                showError('Erreur: ID de sondage manquant dans l\'URL');
                 return null;
             }
+
+            return parseInt(surveyId);
         }
 
         // ============================================
@@ -398,9 +318,14 @@
                 if (surveyError) throw surveyError;
                 if (!survey) throw new Error('Sondage introuvable');
 
-                // VÃ©rifier si le mode bilingue est activÃ©
-                isBilingualMode = survey.bilingual_mode === true;
-                console.log('Ã°Å¸Å’Â Mode bilingue:', isBilingualMode);
+                // Charger le mode bilingue global depuis config_messages
+                const { data: configMessages } = await supabaseClient
+                    .from('config_messages')
+                    .select('bilingual_mode')
+                    .maybeSingle();
+                
+                isBilingualMode = configMessages?.bilingual_mode || false;
+                console.log('Mode bilingue global:', isBilingualMode);
 
                 // Charger les messages (FR par dÃ©faut)
                 let titleFr = survey.titre || 'Sondage';
@@ -587,9 +512,15 @@
             // Limiter ÃƒÂ  6 premiers rÃ©sultats
             const topResults = results.slice(0, 6);
 
-
-            // Appliquer le layout selon le nombre de resultats
-            applyGridLayout(topResults.length);
+            // DÃ©finir le nombre de lignes selon le nombre de rÃ©sultats
+            const numResults = topResults.length;
+            if (numResults <= 2) {
+                grid.classList.add('one-per-column');
+            } else if (numResults <= 4) {
+                grid.classList.add('two-per-column');
+            } else {
+                grid.classList.add('three-per-column');
+            }
 
             topResults.forEach((result, index) => {
                 const votes = result.total_votes || 0;
@@ -633,80 +564,6 @@
                 `;
                 grid.appendChild(card);
             });
-
-            // Ajuster les tailles de police
-            adjustFontSize();
-        }
-
-        // ============================================
-        // GRID LAYOUT ADAPTATION
-        // ============================================
-        function applyGridLayout(count) {
-            const grid = document.getElementById('resultsGrid');
-            
-            // Retirer toutes les classes de layout existantes
-            grid.classList.remove('layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-default');
-            
-            // Appliquer le layout selon le nombre de candidats
-            if (count === 2) {
-                grid.classList.add('layout-2');
-            } else if (count === 3) {
-                grid.classList.add('layout-3');
-            } else if (count === 4) {
-                grid.classList.add('layout-4');
-            } else if (count === 5) {
-                grid.classList.add('layout-5');
-            } else if (count === 6) {
-                grid.classList.add('layout-6');
-            } else {
-                grid.classList.add('layout-default');
-            }
-            
-            console.log(`Layout applique pour ${count} resultats`);
-        }
-
-        // ============================================
-        // FONT SIZE ADJUSTMENT
-        // ============================================
-        function adjustFontSize() {
-            const playerNames = document.querySelectorAll('.player-name');
-            if (playerNames.length === 0) return;
-
-            let maxLength = 0;
-            playerNames.forEach(nameEl => {
-                const length = nameEl.textContent.length;
-                if (length > maxLength) {
-                    maxLength = length;
-                }
-            });
-
-            // subtitle = 3.3rem, donc player-name max = 3.2rem
-            let fontSize;
-            if (maxLength <= 15) {
-                fontSize = 3.2;
-            } else if (maxLength <= 20) {
-                fontSize = 2.8;
-            } else if (maxLength <= 25) {
-                fontSize = 2.4;
-            } else if (maxLength <= 30) {
-                fontSize = 2.0;
-            } else if (maxLength <= 40) {
-                fontSize = 1.6;
-            } else {
-                fontSize = 1.3;
-            }
-
-            playerNames.forEach(nameEl => {
-                nameEl.style.fontSize = fontSize + 'rem';
-            });
-
-            // Ajuster aussi les noms NL proportionnellement
-            const playerNamesNl = document.querySelectorAll('.player-name-nl');
-            playerNamesNl.forEach(nameEl => {
-                nameEl.style.fontSize = (fontSize * 0.8) + 'rem';
-            });
-
-            console.log(`Taille de police ajustee a ${fontSize}rem pour max length: ${maxLength}`);
         }
 
         // ============================================
@@ -714,9 +571,8 @@
         // ============================================
         function startAutoRefresh() {
             // Actualiser toutes les 2 secondes
-            refreshInterval = setInterval(async () => {
-                await loadResults();
-                await checkForNewActiveSurvey();
+            refreshInterval = setInterval(() => {
+                loadResults();
             }, 2000);
         }
 
@@ -724,27 +580,6 @@
             if (refreshInterval) {
                 clearInterval(refreshInterval);
                 refreshInterval = null;
-            }
-        }
-
-        async function checkForNewActiveSurvey() {
-            if (!supabaseClient) return;
-
-            try {
-                const { data: activeSurvey, error } = await supabaseClient
-                    .from('surveys')
-                    .select('id')
-                    .eq('active', true)
-                    .maybeSingle();
-
-                // Si un nouveau sondage actif est detecte (different de l'actuel)
-                if (activeSurvey && activeSurvey.id !== currentSurveyId) {
-                    console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
-                    // Recharger la page pour afficher le nouveau sondage
-                    window.location.reload();
-                }
-            } catch (error) {
-                console.error('Erreur verification sondage actif:', error);
             }
         }
 
@@ -772,7 +607,7 @@
         // INITIALIZATION
         // ============================================
         (async function init() {
-            currentSurveyId = await getUrlParams();
+            currentSurveyId = getUrlParams();
             if (!currentSurveyId) return;
 
             const initialized = await initSupabase();
@@ -789,15 +624,6 @@
             } else {
                 startAutoRefresh();
             }
-        });
-
-        // Reajuster la taille de police lors du redimensionnement
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                adjustFontSize();
-            }, 250);
         });
     </script>
 </body>
