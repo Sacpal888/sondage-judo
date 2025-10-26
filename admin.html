@@ -212,6 +212,17 @@
             white-space: nowrap;
         }
 
+        .ever-activated-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            white-space: nowrap;
+            cursor: help;
+        }
+
         .survey-description {
             color: #666;
             font-size: 0.9rem;
@@ -829,9 +840,12 @@
                     
                     <div class="survey-header">
                         <div class="survey-title">${escapeHtml(survey.titre)}</div>
-                        <span class="${survey.active ? 'active-badge' : 'inactive-badge'}">
-                            ${survey.active ? '🟢 Actif' : '⚪ Inactif'}
-                        </span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="${survey.active ? 'active-badge' : 'inactive-badge'}">
+                                ${survey.active ? '🟢 Actif' : '⚪ Inactif'}
+                            </span>
+                            ${survey.ever_activated ? '<span class="ever-activated-badge" title="Ce sondage a déjà été activé">✅ Déjà fait</span>' : ''}
+                        </div>
                     </div>
 
                     ${survey.description ? `<div class="survey-description">${escapeHtml(survey.description)}</div>` : ''}
@@ -870,6 +884,7 @@
                         <button class="btn btn-info" onclick="editSurvey(${survey.id})">✏️ Modifier</button>
                         <button class="btn" onclick="viewUrls(${survey.id})">🔗 URLs</button>
                         <button class="btn btn-warning" onclick="resetVotes(${survey.id})">🔄 Reset votes</button>
+                        ${survey.ever_activated ? `<button class="btn" onclick="resetEverActivated(${survey.id})" title="Décocher le statut 'Déjà fait'">❌ Déjà fait</button>` : ''}
                         <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})">🗑️ Supprimer</button>
                     </div>
                 `;
@@ -898,9 +913,16 @@
 
                 // Activer/désactiver le sondage actuel
                 console.log('🔄 Mise à jour du sondage #' + surveyId);
+                const updateData = { active: !currentActive };
+                
+                // Si on active pour la première fois, marquer comme "ever_activated"
+                if (!currentActive) {
+                    updateData.ever_activated = true;
+                }
+                
                 const { error } = await supabaseClient
                     .from('surveys')
-                    .update({ active: !currentActive })
+                    .update(updateData)
                     .eq('id', surveyId)
                     .eq('user_id', currentUser.id);
 
@@ -1275,15 +1297,21 @@
                             .in('id', playersToDelete);
                     }
 
-                    // Gérer la traduction NL
-                    if (enableNL) {
+                    // Gérer la traduction NL - TOUJOURS sauvegarder les traductions si elles existent
+                    // Récupérer les valeurs NL des champs
+                    const nlTitle = document.getElementById('surveyTitleNl').value.trim();
+                    const nlDescription = document.getElementById('surveyDescriptionNl').value.trim();
+                    const nlThankyou = document.getElementById('msgThankyouNl').value.trim();
+                    
+                    // Sauvegarder si au moins un champ NL est rempli
+                    if (nlTitle || nlDescription || nlThankyou) {
                         const nlData = {
                             survey_id: editingSurveyId,
                             language_code: 'nl',
-                            active: true,
-                            titre: document.getElementById('surveyTitleNl').value.trim(),
-                            description: document.getElementById('surveyDescriptionNl').value.trim(),
-                            msg_thankyou: document.getElementById('msgThankyouNl').value.trim()
+                            active: enableNL, // Active seulement si la case est cochée
+                            titre: nlTitle,
+                            description: nlDescription,
+                            msg_thankyou: nlThankyou
                         };
 
                         await supabaseClient
@@ -1338,6 +1366,13 @@
                                     .eq('language_code', 'nl');
                             }
                         }
+                    } else if (!enableNL) {
+                        // Si on désactive NL et qu'il n'y a pas de données, mettre active à false
+                        await supabaseClient
+                            .from('survey_translations')
+                            .update({ active: false })
+                            .eq('survey_id', editingSurveyId)
+                            .eq('language_code', 'nl');
                     } else {
                         // Désactiver la traduction NL (ne supprime PAS les votes)
                         await supabaseClient
@@ -1390,15 +1425,20 @@
 
                     if (playersError) throw playersError;
 
-                    // Gérer la traduction NL
-                    if (enableNL) {
+                    // Gérer la traduction NL - TOUJOURS sauvegarder les traductions si elles existent
+                    const nlTitle = document.getElementById('surveyTitleNl').value.trim();
+                    const nlDescription = document.getElementById('surveyDescriptionNl').value.trim();
+                    const nlThankyou = document.getElementById('msgThankyouNl').value.trim();
+                    
+                    // Sauvegarder si au moins un champ NL est rempli
+                    if (nlTitle || nlDescription || nlThankyou) {
                         const nlData = {
                             survey_id: newSurvey.id,
                             language_code: 'nl',
-                            active: true,
-                            titre: document.getElementById('surveyTitleNl').value.trim(),
-                            description: document.getElementById('surveyDescriptionNl').value.trim(),
-                            msg_thankyou: document.getElementById('msgThankyouNl').value.trim()
+                            active: enableNL, // Active seulement si la case est cochée
+                            titre: nlTitle,
+                            description: nlDescription,
+                            msg_thankyou: nlThankyou
                         };
 
                         await supabaseClient
@@ -1522,6 +1562,33 @@ ${baseUrl}results.html?id=${surveyId}
                 if (error) throw error;
 
                 alert('✅ Sondage supprimé');
+                await loadSurveys();
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('❌ Erreur: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // RESET "DÉJÀ ACTIVÉ"
+        // ============================================
+        async function resetEverActivated(surveyId) {
+            const survey = allSurveys.find(s => s.id === surveyId);
+            if (!confirm(`Décocher le statut "Déjà fait" pour "${survey.titre}" ?`)) {
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('surveys')
+                    .update({ ever_activated: false })
+                    .eq('id', surveyId)
+                    .eq('user_id', currentUser.id);
+
+                if (error) throw error;
+
+                alert('✅ Statut "Déjà fait" décoche');
                 await loadSurveys();
 
             } catch (error) {
