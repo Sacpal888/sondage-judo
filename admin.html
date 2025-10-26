@@ -644,45 +644,10 @@
                 </div>
 
                 <!-- Messages personnalisés FR -->
-                <div class="form-group">
-                    <label class="form-label">Message titre (FR)</label>
-                    <input type="text" class="form-input" id="msgTitleFr" placeholder="Ex: Coupe virtuelle du public">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Message invitation (FR)</label>
-                    <textarea class="form-textarea" id="msgInvitationFr" placeholder="Ex: Votez pour votre joueur·euse favori·te !"></textarea>
-                </div>
 
                 <div class="form-group">
                     <label class="form-label">Message remerciement (FR)</label>
                     <textarea class="form-textarea" id="msgThankyouFr" placeholder="Ex: Merci pour votre vote !"></textarea>
-                </div>
-
-                
-                <!-- Messages "Aucun sondage actif" -->
-                <div class="form-group" style="background: rgba(255, 193, 7, 0.1); padding: 20px; border-radius: 10px; border: 2px dashed #ffc107;">
-                    <label class="form-label" style="color: #f39c12; font-size: 1.1rem; margin-bottom: 15px;">
-                        Messages "Aucun sondage actif" (optionnel)
-                    </label>
-                    <p class="info-text" style="margin-bottom: 15px;">
-                        Ces messages s'affichent sur la page survey.html lorsqu'aucun sondage n'est selectionne/actif. 
-                        Laissez vide pour utiliser les messages par defaut.
-                    </p>
-                    
-                    <div class="form-group">
-                        <label class="form-label" style="color: white;">Message FR (blanc)</label>
-                        <textarea class="form-textarea" id="msgNoSurveyFr" 
-                                  placeholder="Ex: Aucun sondage actif pour le moment. Veuillez reessayer plus tard."
-                                  style="background: #fff; color: #333;"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="color: #f4d03f;">Message NL (jaune)</label>
-                        <textarea class="form-textarea" id="msgNoSurveyNl" 
-                                  placeholder="Ex: Geen actieve enquete op dit moment. Probeer het later opnieuw."
-                                  style="background: #1a2f4a; color: #f4d03f; border-color: #f4d03f;"></textarea>
-                    </div>
                 </div>
 
                 <!-- Logo Upload -->
@@ -723,16 +688,6 @@
                     <div class="form-group">
                         <label class="form-label">Description (NL)</label>
                         <textarea class="form-textarea" id="surveyDescriptionNl" placeholder="Nederlandse beschrijving"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Message titre (NL)</label>
-                        <input type="text" class="form-input" id="msgTitleNl" placeholder="Ex: Virtuele publieksbeker">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Message invitation (NL)</label>
-                        <textarea class="form-textarea" id="msgInvitationNl" placeholder="Ex: Stem op je favoriete speler!"></textarea>
                     </div>
 
                     <div class="form-group">
@@ -1071,11 +1026,7 @@
             document.getElementById('modalTitle').textContent = 'Modifier le sondage';
             document.getElementById('surveyTitle').value = survey.titre;
             document.getElementById('surveyDescription').value = survey.description || '';
-            document.getElementById('msgTitleFr').value = survey.msg_title || '';
-            document.getElementById('msgInvitationFr').value = survey.msg_invitation || '';
             document.getElementById('msgThankyouFr').value = survey.msg_thankyou || '';
-            document.getElementById('msgNoSurveyFr').value = survey.msg_no_survey_fr || '';
-            document.getElementById('msgNoSurveyNl').value = survey.msg_no_survey_nl || '';
             document.getElementById('errorContainer').innerHTML = '';
             document.getElementById('urlPreview').style.display = 'none';
 
@@ -1118,8 +1069,6 @@
                 document.getElementById('nlFieldsContainer').style.display = 'block';
                 document.getElementById('surveyTitleNl').value = translations.titre || '';
                 document.getElementById('surveyDescriptionNl').value = translations.description || '';
-                document.getElementById('msgTitleNl').value = translations.msg_title || '';
-                document.getElementById('msgInvitationNl').value = translations.msg_invitation || '';
                 document.getElementById('msgThankyouNl').value = translations.msg_thankyou || '';
                 
                 // Charger les traductions des candidats
@@ -1215,11 +1164,7 @@
 
             const titre = document.getElementById('surveyTitle').value.trim();
             const description = document.getElementById('surveyDescription').value.trim();
-            const msgTitleFr = document.getElementById('msgTitleFr').value.trim();
-            const msgInvitationFr = document.getElementById('msgInvitationFr').value.trim();
             const msgThankyouFr = document.getElementById('msgThankyouFr').value.trim();
-            const msgNoSurveyFr = document.getElementById('msgNoSurveyFr').value.trim();
-            const msgNoSurveyNl = document.getElementById('msgNoSurveyNl').value.trim();
             const enableNL = document.getElementById('enableNL').checked;
 
             const playerInputs = document.querySelectorAll('#playersEditor .player-item input');
@@ -1250,11 +1195,7 @@
                         .update({
                             titre,
                             description,
-                            msg_title: msgTitleFr,
-                            msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
-                            msg_no_survey_fr: msgNoSurveyFr || null,
-                            msg_no_survey_nl: msgNoSurveyNl || null,
                             logo_base64: currentLogoBase64,
                             bilingual_mode: enableNL,
                             updated_at: new Date().toISOString()
@@ -1342,8 +1283,6 @@
                             active: true,
                             titre: document.getElementById('surveyTitleNl').value.trim(),
                             description: document.getElementById('surveyDescriptionNl').value.trim(),
-                            msg_title: document.getElementById('msgTitleNl').value.trim(),
-                            msg_invitation: document.getElementById('msgInvitationNl').value.trim(),
                             msg_thankyou: document.getElementById('msgThankyouNl').value.trim()
                         };
 
@@ -1424,11 +1363,7 @@
                         .insert({
                             titre,
                             description,
-                            msg_title: msgTitleFr,
-                            msg_invitation: msgInvitationFr,
                             msg_thankyou: msgThankyouFr,
-                            msg_no_survey_fr: msgNoSurveyFr || null,
-                            msg_no_survey_nl: msgNoSurveyNl || null,
                             logo_base64: currentLogoBase64,
                             bilingual_mode: enableNL,
                             active: false,
@@ -1463,8 +1398,6 @@
                             active: true,
                             titre: document.getElementById('surveyTitleNl').value.trim(),
                             description: document.getElementById('surveyDescriptionNl').value.trim(),
-                            msg_title: document.getElementById('msgTitleNl').value.trim(),
-                            msg_invitation: document.getElementById('msgInvitationNl').value.trim(),
                             msg_thankyou: document.getElementById('msgThankyouNl').value.trim()
                         };
 
