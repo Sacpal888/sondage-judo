@@ -1005,19 +1005,18 @@
                     );
                 }
 
-                const { data: survey, error } = await supabaseClient
-                    .from('surveys')
+                // Charger le mode bilingue global depuis config_messages
+                const { data: configMessages, error } = await supabaseClient
+                    .from('config_messages')
                     .select('bilingual_mode')
-                    .eq('id', currentSurveyId)
-                    .single();
+                    .maybeSingle();
 
-                if (error) {
+                if (error && error.code !== 'PGRST116') {
                     console.error('Erreur chargement bilingual_mode:', error);
-                    return;
                 }
 
-                isBilingualMode = survey?.bilingual_mode || false;
-                console.log('Mode bilingue du sondage:', isBilingualMode);
+                isBilingualMode = configMessages?.bilingual_mode || false;
+                console.log('Mode bilingue global:', isBilingualMode);
                 
                 // Ajuster l'affichage du consent
                 adjustConsentDisplay();
