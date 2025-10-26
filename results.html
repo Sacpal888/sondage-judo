@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1920, height=1080">
-    <title>RÃ©sultats - Sondage</title>
+    <title>Résultats - Sondage</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <style>
@@ -79,7 +79,7 @@
             color: #f4d03f;
         }
         
-        /* Grille des rÃ©sultats - 2 colonnes, remplissage vertical (colonne par colonne) */
+        /* Grille des résultats - 2 colonnes, remplissage vertical (colonne par colonne) */
         .results-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -227,17 +227,17 @@
             grid-column: 1 / -1;
         }
 
-        /* Pour 3 rÃ©sultats par colonne */
+        /* Pour 3 résultats par colonne */
         .results-grid.three-per-column {
             grid-template-rows: repeat(3, auto);
         }
 
-        /* Pour 2 rÃ©sultats par colonne */
+        /* Pour 2 résultats par colonne */
         .results-grid.two-per-column {
             grid-template-rows: repeat(2, auto);
         }
 
-        /* Pour 1 rÃ©sultat par colonne */
+        /* Pour 1 résultat par colonne */
         .results-grid.one-per-column {
             grid-template-rows: repeat(1, auto);
         }
@@ -251,11 +251,11 @@
         </div>
         
         <div id="loadingMessage" class="loading">
-            Ã¢ÂÂ³ Chargement des rÃ©sultats...
+            âÂÂ³ Chargement des résultats...
         </div>
         
         <div id="resultsGrid" class="results-grid" style="display: none;">
-            <!-- Les rÃ©sultats seront insÃ©rÃ©s ici -->
+            <!-- Les résultats seront insérés ici -->
         </div>
     </div>
 
@@ -268,16 +268,39 @@
         // ============================================
         // GET URL PARAMETERS
         // ============================================
-        function getUrlParams() {
-            const params = new URLSearchParams(window.location.search);
-            const surveyId = params.get('id');
-            
-            if (!surveyId) {
-                showError('Erreur: ID de sondage manquant dans l\'URL');
+        async function getUrlParams() {
+            // TOUJOURS detecter automatiquement le sondage actif
+            // Ne plus utiliser le parametre ?id= dans l'URL pour eviter de rester bloque sur un ancien sondage
+            try {
+                // Initialiser Supabase temporairement pour la detection
+                if (!supabaseClient) {
+                    if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                        showError('Configuration manquante. Contactez l\'administrateur.');
+                        return null;
+                    }
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                }
+                
+                // Chercher le sondage actif
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('active', true)
+                    .maybeSingle();
+                
+                if (error || !activeSurvey) {
+                    showError('Aucun sondage actif pour le moment.');
+                    return null;
+                }
+                
+                console.log('Sondage actif detecte automatiquement:', activeSurvey.id);
+                return activeSurvey.id;
+                
+            } catch (error) {
+                console.error('Erreur lors de la detection du sondage actif:', error);
+                showError('Erreur de connexion a la base de donnees.');
                 return null;
             }
-
-            return parseInt(surveyId);
         }
 
         // ============================================
@@ -291,7 +314,7 @@
                 }
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('âœ… Supabase initialisÃ©');
+                console.log('âœ… Supabase initialisé');
                 
                 return true;
             } catch (error) {
@@ -327,7 +350,7 @@
                 isBilingualMode = configMessages?.bilingual_mode || false;
                 console.log('Mode bilingue global:', isBilingualMode);
 
-                // Charger les messages (FR par dÃ©faut)
+                // Charger les messages (FR par défaut)
                 let titleFr = survey.titre || 'Sondage';
                 let invitationFr = survey.description || 'Votez pour votre choix !';
                 let titleNl = null;
@@ -373,7 +396,7 @@
 
                 if (playersError) throw playersError;
                 if (!players || players.length === 0) {
-                    throw new Error('Aucun candidat trouvÃ© pour ce sondage');
+                    throw new Error('Aucun candidat trouvé pour ce sondage');
                 }
 
                 // Charger les traductions NL des joueurs SI mode bilingue
@@ -403,9 +426,9 @@
                     throw votesError;
                 }
 
-                console.log(`Ã°Å¸â€œÅ  ${votes ? votes.length : 0} votes trouvÃ©s pour le sondage #${currentSurveyId}`);
+                console.log(`Ã°Å¸â€œÅ  ${votes ? votes.length : 0} votes trouvés pour le sondage #${currentSurveyId}`);
 
-                // Calculer les rÃ©sultats par joueur
+                // Calculer les résultats par joueur
                 const resultsMap = {};
                 let totalVotes = 0;
                 let totalVotesFr = 0;
@@ -450,7 +473,7 @@
                     }
                 });
 
-                // Convertir en tableau et trier par nombre de votes (dÃ©croissant)
+                // Convertir en tableau et trier par nombre de votes (décroissant)
                 const results = Object.values(resultsMap).sort((a, b) => {
                     if (b.total_votes !== a.total_votes) {
                         return b.total_votes - a.total_votes;
@@ -458,20 +481,20 @@
                     return a.player_name.localeCompare(b.player_name);
                 });
 
-                console.log('Ã°Å¸â€œÅ  RÃ©sultats calculÃ©s:', results);
+                console.log('Ã°Å¸â€œÅ  Résultats calculés:', results);
 
-                // Afficher les rÃ©sultats
+                // Afficher les résultats
                 displayResults(results || [], totalVotes);
 
-                // Masquer le loading et afficher les rÃ©sultats
+                // Masquer le loading et afficher les résultats
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('resultsGrid').style.display = 'grid';
 
                 const totalPlayers = results.length;
-                console.log(`Ã°Å¸â€œÅ  RÃ©sultats mis ÃƒÂ  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
+                console.log(`Ã°Å¸â€œÅ  Résultats mis ÃƒÂ  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
             } catch (error) {
-                console.error('Ã¢ÂÅ’ Erreur lors du chargement des rÃ©sultats:', error);
+                console.error('âÂÅ’ Erreur lors du chargement des résultats:', error);
                 console.error('Details:', {
                     message: error.message,
                     code: error.code,
@@ -479,7 +502,7 @@
                     details: error.details
                 });
                 
-                let errorMessage = 'Erreur lors du chargement des rÃ©sultats';
+                let errorMessage = 'Erreur lors du chargement des résultats';
                 
                 if (error.message) {
                     errorMessage += ': ' + error.message;
@@ -487,9 +510,9 @@
                 
                 // Afficher des conseils selon le type d'erreur
                 if (error.message && error.message.includes('permission denied')) {
-                    errorMessage += '\n\nÃ¢Å¡Â Ã¯Â¸Â ProblÃ¨me de permissions RLS. ExÃ©cutez le fichier SQL fourni dans Supabase.';
+                    errorMessage += '\n\nâÅ¡Â ïÂ¸Â Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
                 } else if (error.message && error.message.includes('Aucun candidat')) {
-                    errorMessage += '\n\nÃ¢Å¡Â Ã¯Â¸Â Ajoutez des candidats au sondage #' + currentSurveyId;
+                    errorMessage += '\n\nâÅ¡Â ïÂ¸Â Ajoutez des candidats au sondage #' + currentSurveyId;
                 }
                 
                 showError(errorMessage);
@@ -503,16 +526,16 @@
             const grid = document.getElementById('resultsGrid');
             
             if (!results || results.length === 0 || totalVotes === 0) {
-                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les rÃ©sultats s\'afficheront dÃ¨s les premiers votes !</div>';
+                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les résultats s\'afficheront dès les premiers votes !</div>';
                 return;
             }
 
             grid.innerHTML = '';
 
-            // Limiter ÃƒÂ  6 premiers rÃ©sultats
+            // Limiter ÃƒÂ  6 premiers résultats
             const topResults = results.slice(0, 6);
 
-            // DÃ©finir le nombre de lignes selon le nombre de rÃ©sultats
+            // Définir le nombre de lignes selon le nombre de résultats
             const numResults = topResults.length;
             if (numResults <= 2) {
                 grid.classList.add('one-per-column');
@@ -533,7 +556,7 @@
                 let displayNameNl = result.player_name_nl;
                 
                 if (isBilingualMode && displayNameNl) {
-                    // Enlever les emojis du nom NL (ils sont dÃ©jÃƒÂ  dans le FR)
+                    // Enlever les emojis du nom NL (ils sont déjÃƒÂ  dans le FR)
                     displayNameNl = removeEmojis(displayNameNl);
                 }
 
@@ -569,17 +592,46 @@
         // ============================================
         // AUTO REFRESH
         // ============================================
+        let surveyCheckInterval = null;
+        
+        async function checkForNewSurvey() {
+            try {
+                if (!supabaseClient) return;
+                
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('active', true)
+                    .maybeSingle();
+                
+                // Si un nouveau sondage actif est détecté et différent du sondage actuel
+                if (activeSurvey && activeSurvey.id !== currentSurveyId) {
+                    console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Erreur lors de la verification du sondage actif:', error);
+            }
+        }
+        
         function startAutoRefresh() {
-            // Actualiser toutes les 2 secondes
+            // Actualiser les résultats toutes les 2 secondes
             refreshInterval = setInterval(() => {
                 loadResults();
             }, 2000);
+            
+            // Vérifier si un nouveau sondage est actif toutes les 5 secondes
+            surveyCheckInterval = setInterval(checkForNewSurvey, 5000);
         }
 
         function stopAutoRefresh() {
             if (refreshInterval) {
                 clearInterval(refreshInterval);
                 refreshInterval = null;
+            }
+            if (surveyCheckInterval) {
+                clearInterval(surveyCheckInterval);
+                surveyCheckInterval = null;
             }
         }
 
@@ -607,7 +659,7 @@
         // INITIALIZATION
         // ============================================
         (async function init() {
-            currentSurveyId = getUrlParams();
+            currentSurveyId = await getUrlParams();
             if (!currentSurveyId) return;
 
             const initialized = await initSupabase();
@@ -617,7 +669,7 @@
             }
         })();
 
-        // ArrÃªter le rafraÃ®chissement quand la page est masquÃ©e
+        // Arrêter le rafraîchissement quand la page est masquée
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 stopAutoRefresh();
