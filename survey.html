@@ -941,17 +941,8 @@
         // URL PARAMETERS
         // ============================================
         async function getUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
-            
-            // Si un ID est fourni dans l'URL, l'utiliser
-            if (id) {
-                currentSurveyId = parseInt(id);
-                await loadSurveyBilingualMode();
-                return { id: currentSurveyId };
-            }
-            
-            // Sinon, detecter automatiquement le sondage actif
+            // TOUJOURS detecter automatiquement le sondage actif
+            // Ne plus utiliser le parametre ?id= dans l'URL pour eviter de rester bloque sur un ancien sondage
             try {
                 // Initialiser Supabase si ce n'est pas deja fait
                 if (!supabaseClient) {
@@ -1005,18 +996,19 @@
                     );
                 }
 
-                // Charger le mode bilingue global depuis config_messages
-                const { data: configMessages, error } = await supabaseClient
-                    .from('config_messages')
+                const { data: survey, error } = await supabaseClient
+                    .from('surveys')
                     .select('bilingual_mode')
-                    .maybeSingle();
+                    .eq('id', currentSurveyId)
+                    .single();
 
-                if (error && error.code !== 'PGRST116') {
+                if (error) {
                     console.error('Erreur chargement bilingual_mode:', error);
+                    return;
                 }
 
-                isBilingualMode = configMessages?.bilingual_mode || false;
-                console.log('Mode bilingue global:', isBilingualMode);
+                isBilingualMode = survey?.bilingual_mode || false;
+                console.log('Mode bilingue du sondage:', isBilingualMode);
                 
                 // Ajuster l'affichage du consent
                 adjustConsentDisplay();
