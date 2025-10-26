@@ -1167,7 +1167,26 @@
                     return;
                 }
                 if (!survey.active) {
-                    showError(`⏸️ Ce sondage n'est plus actif.<br><br>Merci de votre intérêt !`);
+                    // Charger le message "aucun sondage actif" depuis la config
+                    const { data: configMessages } = await supabaseClient
+                        .from('config_messages')
+                        .select('end_message_fr, end_message_nl')
+                        .maybeSingle();
+                    
+                    let noActiveMessage = '⏸️ Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.';
+                    
+                    if (configMessages) {
+                        if (currentLanguage === 'nl' && configMessages.end_message_nl) {
+                            noActiveMessage = configMessages.end_message_nl.replace(/\n/g, '<br>');
+                        } else if (configMessages.end_message_fr) {
+                            noActiveMessage = configMessages.end_message_fr.replace(/\n/g, '<br>');
+                        }
+                    }
+                    
+                    showError(noActiveMessage);
+                    
+                    // Démarrer le polling pour détecter quand un sondage devient actif
+                    startPollingForActiveSurvey(currentSurveyId);
                     return;
                 }
 
@@ -1543,6 +1562,32 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // ============================================
+        // POLLING POUR SONDAGE ACTIF
+        // ============================================
+        let pollingInterval = null;
+        
+        function startPollingForActiveSurvey(surveyId) {
+            // Vérifier toutes les 5 secondes si le sondage devient actif
+            pollingInterval = setInterval(async () => {
+                try {
+                    const { data: survey } = await supabaseClient
+                        .from('surveys')
+                        .select('active')
+                        .eq('id', surveyId)
+                        .maybeSingle();
+                    
+                    if (survey && survey.active) {
+                        // Le sondage est maintenant actif, rafraîchir la page
+                        clearInterval(pollingInterval);
+                        window.location.reload();
+                    }
+                } catch (error) {
+                    console.error('Erreur polling:', error);
+                }
+            }, 5000); // Toutes les 5 secondes
         }
 
         // ============================================
