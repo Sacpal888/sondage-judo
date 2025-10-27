@@ -346,6 +346,7 @@
         let currentSurveyId = null;
         let refreshInterval = null;
         let isBilingualMode = false;
+        let currentZoom = 1; // Mémoriser le zoom actuel
 
         // ============================================
         // URL PARAMETERS
@@ -608,9 +609,11 @@
                 if (totalHeight > maxHeight) {
                     const zoom = maxHeight / totalHeight;
                     console.log(`🔽 Réduction à ${(zoom * 100).toFixed(1)}% via CSS zoom`);
+                    currentZoom = zoom; // Sauvegarder pour le prochain refresh
                     container.style.zoom = zoom;
                 } else {
                     console.log(`✅ Contenu adapté, pas de réduction nécessaire`);
+                    currentZoom = 1; // Pas de zoom nécessaire
                 }
             }, 150);
         }
@@ -620,6 +623,12 @@
         // ============================================
         function displayResults(results, totalVotes) {
             const grid = document.getElementById('resultsGrid');
+            const container = document.querySelector('.container');
+            
+            // Appliquer immédiatement le zoom mémorisé pour éviter le clignotement
+            if (container && currentZoom !== 1) {
+                container.style.zoom = currentZoom;
+            }
             
             if (!results || results.length === 0 || totalVotes === 0) {
                 grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les résultats s\'afficheront dès les premiers votes !</div>';
