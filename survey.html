@@ -1533,7 +1533,7 @@
                 document.getElementById('thankYou').classList.remove('show');
                 document.getElementById('errorMessage').style.display = 'none';
                 
-                // Creer et afficher le message de fin
+                // Creer et afficher le message de fin avec bouton manuel
                 const endMessageDiv = document.createElement('div');
                 endMessageDiv.id = 'endMessageDisplay';
                 endMessageDiv.style.cssText = `
@@ -1546,12 +1546,52 @@
                 `;
                 
                 endMessageDiv.innerHTML = `
-                    <div style="font-size: 4rem; margin-bottom: 30px;">&#128274;</div>
+                    <div style="font-size: 4rem; margin-bottom: 30px;">⏳</div>
                     <div style="color: #ffffff; font-size: 2rem; font-weight: bold; margin-bottom: 20px; line-height: 1.4;">
                         ${escapeHtml(messageFr)}
                     </div>
-                    <div style="color: #f4d03f; font-size: 2rem; font-weight: bold; line-height: 1.4;">
+                    <div style="color: #f4d03f; font-size: 2rem; font-weight: bold; margin-bottom: 40px; line-height: 1.4;">
                         ${escapeHtml(messageNl)}
+                    </div>
+                    
+                    <!-- Instructions importantes -->
+                    <div style="background: rgba(212, 175, 55, 0.1); border: 2px solid #d4af37; border-radius: 15px; padding: 20px; margin: 30px 0;">
+                        <div style="color: #d4af37; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;">
+                            ⚠️ INSTRUCTIONS / INSTRUCTIES
+                        </div>
+                        <div style="color: #ffffff; font-size: 1.2rem; line-height: 1.6; text-align: left;">
+                            <strong>🇫🇷 Français :</strong><br>
+                            • Attendez l'annonce de l'animateur<br>
+                            • Cliquez UNIQUEMENT quand on vous le dit<br>
+                            • Ne pas actualiser sans consigne<br><br>
+                            <strong>🇳🇱 Nederlands :</strong><br>
+                            • Wacht op de aankondiging van de presentator<br>
+                            • Klik ALLEEN wanneer u dat wordt gevraagd<br>
+                            • Vernieuw niet zonder instructie
+                        </div>
+                    </div>
+                    
+                    <!-- Bouton d'actualisation -->
+                    <button id="refreshBtn" onclick="refreshWithCooldown()" style="
+                        background: linear-gradient(135deg, #d4af37, #f0d46f);
+                        color: #0a1828;
+                        border: none;
+                        padding: 20px 50px;
+                        font-size: 1.8rem;
+                        font-weight: bold;
+                        border-radius: 15px;
+                        cursor: pointer;
+                        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                        transition: all 0.3s;
+                        margin-top: 20px;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 40px rgba(212, 175, 55, 0.6)';" 
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(212, 175, 55, 0.4)';">
+                        🔄 ACTUALISER / VERNIEUWEN
+                    </button>
+                    
+                    <!-- Message de cooldown -->
+                    <div id="cooldownMsg" style="display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;">
+                        ⏱️ Veuillez patienter... / Even geduld...
                     </div>
                 `;
                 
@@ -1562,6 +1602,34 @@
                 console.error('Erreur chargement message de fin:', error);
                 showError('Aucun sondage actif pour le moment.');
             }
+        }
+        
+        // Fonction d'actualisation avec cooldown (10 secondes)
+        let lastRefreshTime = 0;
+        const COOLDOWN_MS = 10000; // 10 secondes
+
+        function refreshWithCooldown() {
+            const now = Date.now();
+            const timeSinceLastRefresh = now - lastRefreshTime;
+            const btn = document.getElementById('refreshBtn');
+            const cooldownMsg = document.getElementById('cooldownMsg');
+            
+            if (timeSinceLastRefresh < COOLDOWN_MS) {
+                // Afficher message de cooldown avec compte à rebours
+                const remaining = Math.ceil((COOLDOWN_MS - timeSinceLastRefresh) / 1000);
+                cooldownMsg.textContent = `⏱️ Veuillez patienter ${remaining} secondes... / Wacht ${remaining} seconden...`;
+                cooldownMsg.style.display = 'block';
+                
+                // Animation du bouton (disabled)
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+                
+                return;
+            }
+            
+            // Actualiser la page
+            lastRefreshTime = now;
+            window.location.reload();
         }
 
         function showError(message) {
@@ -1621,13 +1689,23 @@
                     );
                 }
                 
-                const { data: activeSurvey, error } = await supabaseClient
-                    .from('surveys')
-                    .select('id')
-                    .eq('active', true)
-                    .maybeSingle();
+                // Optimisation : faire les 2 requêtes en parallèle pour réduire le nombre d'appels
+                const [surveyResult, configResult] = await Promise.all([
+                    supabaseClient
+                        .from('surveys')
+                        .select('id')
+                        .eq('active', true)
+                        .maybeSingle(),
+                    supabaseClient
+                        .from('config_messages')
+                        .select('bilingual_mode')
+                        .maybeSingle()
+                ]);
                 
-                // Si un nouveau sondage actif est detecte
+                const activeSurvey = surveyResult.data;
+                const configData = configResult.data;
+                
+                // Vérifier changement de sondage
                 if (activeSurvey) {
                     // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
                     if (!currentSurveyId) {
@@ -1643,15 +1721,8 @@
                     }
                 }
                 
-                // Vérifier le mode bilingue
-                const { data: configData } = await supabaseClient
-                    .from('config_messages')
-                    .select('bilingual_mode')
-                    .maybeSingle();
-                
+                // Vérifier changement du mode bilingue
                 const newBilingualMode = configData?.bilingual_mode || false;
-                
-                // Si le mode bilingue a changé
                 if (newBilingualMode !== isBilingualMode) {
                     console.log('Changement du mode bilingue détecté:', isBilingualMode, '→', newBilingualMode);
                     window.location.reload();
@@ -1663,8 +1734,9 @@
         }
         
         function startSurveyCheck() {
-            // Verifier toutes les 2 secondes si un nouveau sondage est actif
-            surveyCheckInterval = setInterval(checkForNewSurvey, 2000);
+            // Verifier toutes les 5 secondes (au lieu de 2) pour réduire la charge sur Supabase
+            surveyCheckInterval = setInterval(checkForNewSurvey, 5000);
+        }
         }
         
         function stopSurveyCheck() {
@@ -1682,9 +1754,9 @@
             if (urlParams) {
                 checkCookieConsent();
             }
-            // Demarrer la verification periodique du sondage actif dans tous les cas
-            // (meme si aucun sondage n'est actif, pour detecter quand un nouveau devient actif)
-            startSurveyCheck();
+            // DÉSACTIVÉ : Polling automatique désactivé pour économiser les requêtes
+            // Les utilisateurs utilisent le bouton manuel "Actualiser" sur annonce du présentateur
+            // startSurveyCheck();
         });
         
         // Arreter la verification quand la page est masquee
@@ -1692,7 +1764,8 @@
             if (document.hidden) {
                 stopSurveyCheck();
             } else {
-                startSurveyCheck();
+                // DÉSACTIVÉ : Polling automatique désactivé
+                // startSurveyCheck();
             }
         });
 
