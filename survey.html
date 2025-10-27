@@ -997,18 +997,17 @@
                     );
                 }
 
-                const { data: survey, error } = await supabaseClient
-                    .from('surveys')
+                const { data, error } = await supabaseClient
+                    .from('config_messages')
                     .select('bilingual_mode')
-                    .eq('id', currentSurveyId)
-                    .single();
+                    .maybeSingle();
 
-                if (error) {
+                if (error && error.code !== 'PGRST116') {
                     console.error('Erreur chargement bilingual_mode:', error);
                     return;
                 }
 
-                isBilingualMode = survey?.bilingual_mode || false;
+                isBilingualMode = data?.bilingual_mode || false;
                 console.log('Mode bilingue du sondage:', isBilingualMode);
                 
                 // Ajuster l'affichage du consent
