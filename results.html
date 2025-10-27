@@ -587,33 +587,35 @@
             
             if (!container) return;
             
-            // Réinitialiser le zoom avant de mesurer
-            container.style.zoom = '1';
+            // Appliquer le zoom mémorisé d'abord
+            if (currentZoom !== 1) {
+                container.style.zoom = currentZoom;
+            }
             
-            // Attendre que le DOM soit complètement rendu
+            // Attendre que le DOM soit complètement rendu avant de vérifier si ajustement nécessaire
             setTimeout(() => {
+                // Mesurer avec le zoom actuel appliqué
+                const containerHeight = container.offsetHeight / (currentZoom || 1);
+                
                 // Hauteur maximale autorisée (ombre comprise: container + 140px d'ombre)
                 const maxHeight = 1000;
-                
-                // Mesurer la hauteur réelle du container
-                const containerHeight = container.offsetHeight;
                 
                 // Ajouter les marges de l'ombre: 60px top + 80px bottom = 140px
                 const totalHeight = containerHeight + 140;
                 
-                console.log(`📏 Hauteur container: ${containerHeight}px`);
-                console.log(`📏 Hauteur totale (ombre comprise): ${totalHeight}px`);
-                console.log(`📏 Hauteur max autorisée: ${maxHeight}px`);
-                
-                // Si le contenu dépasse, calculer le zoom nécessaire
+                // Calculer le nouveau zoom nécessaire
+                let newZoom = 1;
                 if (totalHeight > maxHeight) {
-                    const zoom = maxHeight / totalHeight;
-                    console.log(`🔽 Réduction à ${(zoom * 100).toFixed(1)}% via CSS zoom`);
-                    currentZoom = zoom; // Sauvegarder pour le prochain refresh
-                    container.style.zoom = zoom;
-                } else {
-                    console.log(`✅ Contenu adapté, pas de réduction nécessaire`);
-                    currentZoom = 1; // Pas de zoom nécessaire
+                    newZoom = maxHeight / totalHeight;
+                }
+                
+                // Appliquer seulement si le zoom a changé de manière significative (>1% de différence)
+                if (Math.abs(newZoom - currentZoom) > 0.01) {
+                    console.log(`📏 Hauteur totale (ombre comprise): ${totalHeight}px`);
+                    console.log(`📏 Hauteur max autorisée: ${maxHeight}px`);
+                    console.log(`🔄 Ajustement du zoom: ${(currentZoom * 100).toFixed(1)}% → ${(newZoom * 100).toFixed(1)}%`);
+                    currentZoom = newZoom;
+                    container.style.zoom = newZoom;
                 }
             }, 150);
         }
