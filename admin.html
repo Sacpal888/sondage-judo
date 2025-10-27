@@ -1148,7 +1148,7 @@
         }
 
         // ============================================
-        // TRADUCTION AUTOMATIQUE NL - OUVRIR DEEPL
+        // TRADUCTION AUTOMATIQUE NL - COPIER ET OUVRIR DEEPL
         // ============================================
         function translateAllToNL() {
             try {
@@ -1190,25 +1190,55 @@
                     });
                 }
 
-                // Encoder l'URL pour DeepL
-                const encodedText = encodeURIComponent(textToTranslate.trim());
-                const deeplUrl = `https://www.deepl.com/translator#fr/nl/${encodedText}`;
-
-                // Ouvrir DeepL dans un nouvel onglet
-                window.open(deeplUrl, '_blank');
-
-                // Afficher les instructions
-                alert('✅ DeepL s\'ouvre dans un nouvel onglet !\n\n' +
-                      '📋 Instructions :\n' +
-                      '1. Copiez toute la traduction dans DeepL\n' +
-                      '2. Collez-la dans un éditeur de texte\n' +
-                      '3. Récupérez chaque partie entre les ---SECTIONS---\n' +
-                      '4. Collez dans les champs NL correspondants\n\n' +
-                      '💡 Gardez les séparateurs ---TITRE---, ---CANDIDAT1--- etc. pour vous repérer !');
+                // Copier dans le presse-papiers
+                navigator.clipboard.writeText(textToTranslate.trim()).then(() => {
+                    // Ouvrir DeepL dans un nouvel onglet
+                    window.open('https://www.deepl.com/translator#fr/nl/', '_blank');
+                    
+                    // Afficher les instructions
+                    alert('✅ Texte copié dans le presse-papiers !\n\n' +
+                          '📋 Prochaines étapes :\n' +
+                          '1. DeepL s\'ouvre dans un nouvel onglet\n' +
+                          '2. Collez (Ctrl+V ou Cmd+V) dans le champ de gauche\n' +
+                          '3. Attendez la traduction automatique\n' +
+                          '4. Copiez toute la traduction à droite\n' +
+                          '5. Revenez ici et collez dans les champs NL\n\n' +
+                          '💡 Gardez les séparateurs ---TITRE---, ---CANDIDAT1--- etc. pour vous repérer !');
+                }).catch(err => {
+                    // Si le presse-papiers ne fonctionne pas, afficher le texte à copier manuellement
+                    console.error('Erreur copie presse-papiers:', err);
+                    
+                    // Créer une zone de texte temporaire pour afficher le texte
+                    const textarea = document.createElement('textarea');
+                    textarea.value = textToTranslate.trim();
+                    textarea.style.position = 'fixed';
+                    textarea.style.top = '50%';
+                    textarea.style.left = '50%';
+                    textarea.style.transform = 'translate(-50%, -50%)';
+                    textarea.style.width = '80%';
+                    textarea.style.height = '60%';
+                    textarea.style.zIndex = '10000';
+                    textarea.style.padding = '20px';
+                    textarea.style.fontSize = '14px';
+                    textarea.style.border = '3px solid #667eea';
+                    textarea.style.borderRadius = '10px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    // Ouvrir DeepL
+                    window.open('https://www.deepl.com/translator#fr/nl/', '_blank');
+                    
+                    alert('📋 Copiez le texte ci-dessous (Ctrl+C) puis collez-le dans DeepL !\n\n' +
+                          'Fermez cette zone de texte en cliquant en dehors.');
+                    
+                    // Supprimer la zone après 30 secondes ou au clic
+                    setTimeout(() => textarea.remove(), 30000);
+                    document.addEventListener('click', () => textarea.remove(), { once: true });
+                });
 
             } catch (error) {
                 console.error('❌ Erreur:', error);
-                alert('❌ Erreur lors de l\'ouverture de DeepL:\n' + error.message);
+                alert('❌ Erreur:\n' + error.message);
             }
         }
 
@@ -1728,13 +1758,7 @@ ${baseUrl}results.html?id=${surveyId}
         // RESET "DÉJÀ ACTIVÉ"
         // ============================================
         async function toggleEverActivated(surveyId, currentValue) {
-            const survey = allSurveys.find(s => s.id === surveyId);
             const newValue = !currentValue;
-            const action = newValue ? 'cocher' : 'décocher';
-            
-            if (!confirm(`${action === 'cocher' ? 'Cocher' : 'Décocher'} le statut "Déjà fait" pour "${survey.titre}" ?`)) {
-                return;
-            }
 
             try {
                 const { error } = await supabaseClient
@@ -1745,7 +1769,6 @@ ${baseUrl}results.html?id=${surveyId}
 
                 if (error) throw error;
 
-                alert(`✅ Statut "Déjà fait" ${newValue ? 'coché' : 'décoché'}`);
                 await loadSurveys();
 
             } catch (error) {
