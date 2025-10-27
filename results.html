@@ -25,8 +25,10 @@
         }
         
         .container {
-            width: 1600px;
-            min-height: 820px;
+            width: fit-content;
+            min-width: 500px;
+            max-width: 1800px;
+            min-height: auto;
             height: auto;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 3px solid #d4af37;
@@ -44,21 +46,24 @@
         
         h1 {
             font-size: 4rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
             text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             line-height: 1.2;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
         }
         
         h1 .title-fr {
             color: #ffffff;
-            display: block;
         }
         
         h1 .title-nl {
             color: #f4d03f;
-            display: block;
-            margin-top: 5px;
         }
 
         /* Masquer les éléments NL si mode bilingue désactivé */
@@ -73,14 +78,23 @@
             display: block;
         }
         
+        /* Masquer les éléments NL si mode bilingue désactivé */
+        body:not(.bilingual-mode) .title-nl,
+        body:not(.bilingual-mode) .subtitle-nl,
+        body:not(.bilingual-mode) .loading-nl {
+            display: none;
+        }
+
         .subtitle {
             font-size: 3.3rem;
             text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.4;
             display: flex;
             gap: 15px;
             justify-content: center;
             align-items: center;
-            line-height: 1.2;
+            flex-wrap: wrap;
         }
         
         .subtitle .subtitle-fr {
@@ -91,13 +105,68 @@
             color: #f4d03f;
         }
         
-        /* Grille des résultats - 2 colonnes, remplissage vertical (colonne par colonne) */
+        /* Grille des résultats - adapte selon le nombre de résultats */
         .results-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 0;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Layout pour 2 résultats : côte à côte centrés */
+        .results-grid.layout-2 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            grid-auto-flow: column;
-            gap: 20px;
-            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 3 résultats : côte à côte centrés */
+        .results-grid.layout-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 4 résultats : 2 colonnes de 2 */
+        .results-grid.layout-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 5 résultats : 2 colonnes de 2 + 1 centré en bas */
+        .results-grid.layout-5 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .results-grid.layout-5 .player-result:nth-child(5) {
+            grid-column: 1 / -1;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Layout pour 6 résultats : 2 colonnes de 3 */
+        .results-grid.layout-6 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Pour plus de 6 résultats : grille standard 3 colonnes */
+        .results-grid.layout-default {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
         }
         
         .player-result {
@@ -164,8 +233,8 @@
         
         .player-name {
             color: #ffffff;
-            font-size: 1.6em;
-            font-weight: 600;
+            font-size: 3.2rem;
+            font-weight: bold;
             word-break: break-word;
             line-height: 1.3;
             margin-bottom: 5px;
@@ -173,8 +242,8 @@
         
         .player-name-nl {
             color: #f4d03f;
-            font-size: 1.3em;
-            font-weight: 500;
+            font-size: 3.2rem;
+            font-weight: bold;
             word-break: break-word;
             line-height: 1.3;
             font-style: italic;
@@ -238,33 +307,18 @@
             margin-top: 20px;
             grid-column: 1 / -1;
         }
-
-        /* Pour 3 résultats par colonne */
-        .results-grid.three-per-column {
-            grid-template-rows: repeat(3, 1fr);
-        }
-
-        /* Pour 2 résultats par colonne */
-        .results-grid.two-per-column {
-            grid-template-rows: repeat(2, 1fr);
-        }
-
-        /* Pour 1 résultat par colonne */
-        .results-grid.one-per-column {
-            grid-template-rows: repeat(1, 1fr);
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>
-                <span class="title-fr">Résultats</span>
-                <span class="title-nl">Resultaten</span>
+                <span class="title-fr" id="surveyTitle">Résultats</span>
+                <span class="title-nl" id="surveyTitleNl"></span>
             </h1>
             <div class="subtitle">
-                <span class="subtitle-fr">Classement</span>
-                <span class="subtitle-nl">Rangschikking</span>
+                <span class="subtitle-fr" id="surveyDescription">Classement</span>
+                <span class="subtitle-nl" id="surveyDescriptionNl"></span>
             </div>
         </div>
         
@@ -386,6 +440,39 @@
                 const bilingualModeEnabled = configData?.bilingual_mode || false;
                 console.log('🌐 Mode bilingue global:', bilingualModeEnabled);
 
+                // Charger les informations du sondage (titre et description)
+                const { data: surveyData, error: surveyError } = await supabaseClient
+                    .from('surveys')
+                    .select('titre, description')
+                    .eq('id', currentSurveyId)
+                    .single();
+
+                if (surveyError) throw surveyError;
+
+                // Afficher le titre et la description FR
+                document.getElementById('surveyTitle').textContent = surveyData.titre || 'Résultats';
+                document.getElementById('surveyDescription').textContent = surveyData.description || 'Classement';
+
+                // Si mode bilingue, charger les traductions NL
+                if (bilingualModeEnabled) {
+                    const { data: translationData } = await supabaseClient
+                        .from('survey_translations')
+                        .select('titre, description')
+                        .eq('survey_id', currentSurveyId)
+                        .eq('language_code', 'nl')
+                        .eq('active', true)
+                        .maybeSingle();
+
+                    if (translationData && translationData.titre) {
+                        // Afficher les titres NL
+                        document.getElementById('surveyTitleNl').textContent = translationData.titre;
+                        
+                        if (translationData.description) {
+                            document.getElementById('surveyDescriptionNl').textContent = translationData.description;
+                        }
+                    }
+                }
+
                 // Récupérer les résultats déjà calculés depuis la vue
                 const { data: resultsData, error: resultsError } = await supabaseClient
                     .from('v_survey_results')
@@ -499,14 +586,22 @@
             // Limiter à 6 premiers résultats
             const topResults = results.slice(0, 6);
 
-            // Définir le nombre de lignes selon le nombre de résultats
+            // Appliquer le layout selon le nombre de résultats (comme dans survey)
             const numResults = topResults.length;
-            if (numResults <= 2) {
-                grid.classList.add('one-per-column');
-            } else if (numResults <= 4) {
-                grid.classList.add('two-per-column');
+            grid.classList.remove('layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-default');
+            
+            if (numResults === 2) {
+                grid.classList.add('layout-2');
+            } else if (numResults === 3) {
+                grid.classList.add('layout-3');
+            } else if (numResults === 4) {
+                grid.classList.add('layout-4');
+            } else if (numResults === 5) {
+                grid.classList.add('layout-5');
+            } else if (numResults === 6) {
+                grid.classList.add('layout-6');
             } else {
-                grid.classList.add('three-per-column');
+                grid.classList.add('layout-default');
             }
 
             topResults.forEach((result, index) => {
