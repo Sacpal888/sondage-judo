@@ -1061,6 +1061,26 @@
                 }
                 
                 console.log('Affichage ajuste : mode monolingue FR uniquement');
+            } else {
+                // En mode bilingue, afficher tous les elements NL
+                const nlElements = document.querySelectorAll('.consent-title-nl, .consent-text-nl, .btn-accept-nl');
+                nlElements.forEach(el => el.style.display = '');
+                
+                // Afficher les sections NL de la politique de confidentialite
+                const privacySections = document.querySelectorAll('#privacyPolicy h3, #privacyPolicy .privacy-section');
+                privacySections.forEach(section => {
+                    if (section.textContent.includes('🇳🇱') || section.textContent.includes('Nederlands')) {
+                        section.style.display = '';
+                    }
+                });
+                
+                // Restaurer la largeur normale du bouton FR
+                const btnFr = document.querySelector('.btn-accept-fr');
+                if (btnFr) {
+                    btnFr.style.width = '';
+                }
+                
+                console.log('Affichage ajuste : mode bilingue FR + NL');
             }
         }
 
