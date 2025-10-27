@@ -1112,6 +1112,12 @@
         }
 
         function acceptConsent(language) {
+            // Forcer le français si le mode bilingue n'est pas activé
+            if (!isBilingualMode && language === 'nl') {
+                console.warn('⚠️ Mode bilingue désactivé : forçage du français au lieu de NL');
+                language = 'fr';
+            }
+            
             console.log(`✓ Consentement accepté avec langue: ${language}`);
             
             // Sauvegarder le consentement
