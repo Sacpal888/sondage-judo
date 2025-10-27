@@ -579,6 +579,42 @@
         }
 
         // ============================================
+        // AUTO-SCALING WHEN CONTENT OVERFLOWS
+        // ============================================
+        function adjustContainerScale() {
+            const container = document.querySelector('.container');
+            const header = document.querySelector('.header');
+            const grid = document.getElementById('resultsGrid');
+            
+            if (!container || !grid) return;
+            
+            // Réinitialiser le scale avant de mesurer
+            container.style.transform = 'scale(1)';
+            container.style.transformOrigin = 'top center';
+            
+            // Attendre que le DOM soit complètement rendu
+            requestAnimationFrame(() => {
+                // Hauteur disponible dans le container
+                const maxContainerHeight = 1000; // max-height du container
+                const containerPadding = 60; // padding top + bottom (30px * 2)
+                
+                // Hauteur totale du contenu (header + grid)
+                const headerHeight = header.offsetHeight;
+                const gridHeight = grid.scrollHeight;
+                const totalContentHeight = headerHeight + gridHeight + 50; // +50 pour les marges
+                
+                // Si le contenu dépasse, calculer le ratio de réduction
+                if (totalContentHeight > maxContainerHeight) {
+                    const scale = maxContainerHeight / totalContentHeight;
+                    console.log(`📏 Contenu trop grand (${totalContentHeight}px > ${maxContainerHeight}px), réduction à ${(scale * 100).toFixed(1)}%`);
+                    container.style.transform = `scale(${scale})`;
+                } else {
+                    console.log(`✅ Contenu adapté (${totalContentHeight}px <= ${maxContainerHeight}px)`);
+                }
+            });
+        }
+
+        // ============================================
         // DISPLAY RESULTS
         // ============================================
         function displayResults(results, totalVotes) {
@@ -654,6 +690,9 @@
                 `;
                 grid.appendChild(card);
             });
+            
+            // Ajuster l'échelle du container après l'affichage
+            adjustContainerScale();
         }
 
         // ============================================
