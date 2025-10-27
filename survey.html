@@ -1633,13 +1633,30 @@
                     if (!currentSurveyId) {
                         console.log('Nouveau sondage actif detecte:', activeSurvey.id);
                         window.location.reload();
+                        return;
                     }
                     // Cas 2: Un autre sondage est maintenant actif
                     else if (activeSurvey.id !== currentSurveyId) {
                         console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
                         window.location.reload();
+                        return;
                     }
                 }
+                
+                // Vérifier le mode bilingue
+                const { data: configData } = await supabaseClient
+                    .from('config_messages')
+                    .select('bilingual_mode')
+                    .maybeSingle();
+                
+                const newBilingualMode = configData?.bilingual_mode || false;
+                
+                // Si le mode bilingue a changé
+                if (newBilingualMode !== isBilingualMode) {
+                    console.log('Changement du mode bilingue détecté:', isBilingualMode, '→', newBilingualMode);
+                    window.location.reload();
+                }
+                
             } catch (error) {
                 console.error('Erreur lors de la verification du sondage actif:', error);
             }
