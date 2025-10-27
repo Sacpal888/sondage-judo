@@ -751,7 +751,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="color: #f4d03f; margin: 0;">🇳🇱 Traduction néerlandaise</h3>
                         <button type="button" class="btn" onclick="translateAllToNL()" style="background: #f39c12; color: white;">
-                            🌐 Traduire automatiquement
+                            🌐 Ouvrir DeepL
                         </button>
                     </div>
                     <p class="info-text" style="margin-bottom: 15px;">
@@ -1148,16 +1148,10 @@
         }
 
         // ============================================
-        // TRADUCTION AUTOMATIQUE NL
+        // TRADUCTION AUTOMATIQUE NL - OUVRIR DEEPL
         // ============================================
-        async function translateAllToNL() {
+        function translateAllToNL() {
             try {
-                // Vérifier si la clé API DeepL est configurée
-                if (!window.DEEPL_API_KEY || window.DEEPL_API_KEY === 'VOTRE_CLE_DEEPL_ICI') {
-                    alert('❌ Clé API DeepL manquante.\n\nAjoutez dans config.js:\nwindow.DEEPL_API_KEY = "votre_clé_ici";\n\nObtenez une clé gratuite sur: https://www.deepl.com/pro-api');
-                    return;
-                }
-
                 // Récupérer les textes FR à traduire
                 const titleFR = document.getElementById('surveyTitle').value.trim();
                 const descriptionFR = document.getElementById('surveyDescription').value.trim();
@@ -1165,87 +1159,56 @@
                 
                 // Récupérer les candidats FR
                 const playerInputsFR = document.querySelectorAll('#playersEditor .player-item input');
-                const playersFR = Array.from(playerInputsFR).map(input => input.value.trim()).filter(v => v);
+                const playersFR = Array.from(playerInputsFR).map((input, index) => ({
+                    index: index + 1,
+                    text: input.value.trim()
+                })).filter(p => p.text);
 
                 if (!titleFR && !descriptionFR && !thankyouFR && playersFR.length === 0) {
                     alert('⚠️ Veuillez remplir au moins un champ FR à traduire.');
                     return;
                 }
 
-                // Afficher un message de chargement
-                const translateBtn = event.target;
-                const originalText = translateBtn.innerHTML;
-                translateBtn.innerHTML = '⏳ Traduction en cours...';
-                translateBtn.disabled = true;
-
-                // Préparer tous les textes à traduire en un seul appel
-                const textsToTranslate = [];
-                if (titleFR) textsToTranslate.push(titleFR);
-                if (descriptionFR) textsToTranslate.push(descriptionFR);
-                if (thankyouFR) textsToTranslate.push(thankyouFR);
-                textsToTranslate.push(...playersFR);
-
-                // Appeler l'API DeepL
-                const response = await fetch('https://api-free.deepl.com/v2/translate', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `DeepL-Auth-Key ${window.DEEPL_API_KEY}`,
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        'text': textsToTranslate,
-                        'target_lang': 'NL',
-                        'source_lang': 'FR'
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || `Erreur API: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const translations = data.translations.map(t => t.text);
-
-                // Remplir les champs NL avec les traductions
-                let index = 0;
+                // Formater le texte pour DeepL avec des séparateurs clairs
+                let textToTranslate = '';
+                
                 if (titleFR) {
-                    document.getElementById('surveyTitleNl').value = translations[index];
-                    index++;
+                    textToTranslate += '---TITRE---\n' + titleFR + '\n\n';
                 }
+                
                 if (descriptionFR) {
-                    document.getElementById('surveyDescriptionNl').value = translations[index];
-                    index++;
+                    textToTranslate += '---DESCRIPTION---\n' + descriptionFR + '\n\n';
                 }
+                
                 if (thankyouFR) {
-                    document.getElementById('msgThankyouNl').value = translations[index];
-                    index++;
+                    textToTranslate += '---REMERCIEMENT---\n' + thankyouFR + '\n\n';
+                }
+                
+                if (playersFR.length > 0) {
+                    playersFR.forEach(player => {
+                        textToTranslate += `---CANDIDAT${player.index}---\n${player.text}\n\n`;
+                    });
                 }
 
-                // Remplir les candidats NL
-                const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
-                nlInputs.forEach((input, i) => {
-                    if (index < translations.length) {
-                        input.value = translations[index];
-                        index++;
-                    }
-                });
+                // Encoder l'URL pour DeepL
+                const encodedText = encodeURIComponent(textToTranslate.trim());
+                const deeplUrl = `https://www.deepl.com/translator#fr/nl/${encodedText}`;
 
-                // Restaurer le bouton
-                translateBtn.innerHTML = originalText;
-                translateBtn.disabled = false;
+                // Ouvrir DeepL dans un nouvel onglet
+                window.open(deeplUrl, '_blank');
 
-                alert('✅ Traduction automatique terminée !');
+                // Afficher les instructions
+                alert('✅ DeepL s\'ouvre dans un nouvel onglet !\n\n' +
+                      '📋 Instructions :\n' +
+                      '1. Copiez toute la traduction dans DeepL\n' +
+                      '2. Collez-la dans un éditeur de texte\n' +
+                      '3. Récupérez chaque partie entre les ---SECTIONS---\n' +
+                      '4. Collez dans les champs NL correspondants\n\n' +
+                      '💡 Gardez les séparateurs ---TITRE---, ---CANDIDAT1--- etc. pour vous repérer !');
 
             } catch (error) {
-                console.error('❌ Erreur traduction:', error);
-                alert('❌ Erreur lors de la traduction:\n' + error.message);
-                
-                // Restaurer le bouton en cas d'erreur
-                if (event && event.target) {
-                    event.target.innerHTML = '🌐 Traduire automatiquement';
-                    event.target.disabled = false;
-                }
+                console.error('❌ Erreur:', error);
+                alert('❌ Erreur lors de l\'ouverture de DeepL:\n' + error.message);
             }
         }
 
