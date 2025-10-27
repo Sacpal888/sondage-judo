@@ -60,6 +60,18 @@
             display: block;
             margin-top: 5px;
         }
+
+        /* Masquer les éléments NL si mode bilingue désactivé */
+        body:not(.bilingual-mode) .title-nl,
+        body:not(.bilingual-mode) .subtitle-nl,
+        body:not(.bilingual-mode) .loading-nl {
+            display: none;
+        }
+
+        /* Ajuster l'affichage du sous-titre en mode unilingue */
+        body:not(.bilingual-mode) .subtitle {
+            display: block;
+        }
         
         .subtitle {
             font-size: 3.3rem;
@@ -257,8 +269,8 @@
         </div>
         
         <div id="loadingMessage" class="loading">
-            Chargement des résultats...<br>
-            Resultaten laden...
+            <span class="loading-fr">Chargement des résultats...</span>
+            <span class="loading-nl"><br>Resultaten laden...</span>
         </div>
         
         <div id="resultsGrid" class="results-grid" style="display: none;"></div>
@@ -278,11 +290,51 @@
         // ============================================
         async function getUrlParams() {
             const urlParams = new URLSearchParams(window.location.search);
-            const surveyId = urlParams.get('survey') || urlParams.get('id');
+            let surveyId = urlParams.get('survey') || urlParams.get('id');
 
+            // Si aucun ID n'est fourni dans l'URL, récupérer le sondage actif
             if (!surveyId) {
-                showError('Aucun ID de sondage spécifié dans l\'URL');
-                return null;
+                console.log('🔍 Aucun ID dans l\'URL, recherche du sondage actif...');
+                
+                try {
+                    // Initialiser Supabase si pas encore fait
+                    if (!supabaseClient) {
+                        if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                            showError('Configuration manquante. Veuillez vérifier config.js');
+                            return null;
+                        }
+                        supabaseClient = supabase.createClient(
+                            window.SUPABASE_URL,
+                            window.SUPABASE_ANON_KEY
+                        );
+                    }
+                    
+                    // Récupérer le sondage actif
+                    const { data: activeSurvey, error } = await supabaseClient
+                        .from('surveys')
+                        .select('id')
+                        .eq('active', true)
+                        .maybeSingle();
+                    
+                    if (error) {
+                        console.error('❌ Erreur récupération sondage actif:', error);
+                        showError('Erreur lors de la récupération du sondage actif');
+                        return null;
+                    }
+                    
+                    if (!activeSurvey) {
+                        showError('Aucun sondage actif pour le moment');
+                        return null;
+                    }
+                    
+                    surveyId = activeSurvey.id;
+                    console.log('✅ Sondage actif trouvé:', surveyId);
+                    
+                } catch (error) {
+                    console.error('❌ Erreur:', error);
+                    showError('Erreur lors de la récupération du sondage actif');
+                    return null;
+                }
             }
 
             console.log('📊 Survey ID:', surveyId);
@@ -325,6 +377,15 @@
 
                 console.log('🔄 Chargement des résultats pour le sondage:', currentSurveyId);
 
+                // Vérifier le mode bilingue global depuis config_messages
+                const { data: configData, error: configError } = await supabaseClient
+                    .from('config_messages')
+                    .select('bilingual_mode')
+                    .single();
+
+                const bilingualModeEnabled = configData?.bilingual_mode || false;
+                console.log('🌐 Mode bilingue global:', bilingualModeEnabled);
+
                 // Récupérer les candidats du sondage actuel
                 const { data: players, error: playersError } = await supabaseClient
                     .from('players')
@@ -340,8 +401,16 @@
 
                 console.log('👥 Candidats trouvés:', players.length);
 
-                // Vérifier si on est en mode bilingue
-                isBilingualMode = players.some(p => p.name_nl && p.name_nl.trim() !== '');
+                // Mode bilingue actif SEULEMENT si le mode global est activé ET qu'il y a des traductions NL
+                isBilingualMode = bilingualModeEnabled && players.some(p => p.name_nl && p.name_nl.trim() !== '');
+                console.log('📊 Affichage bilingue:', isBilingualMode);
+
+                // Ajouter ou retirer la classe bilingual-mode sur le body
+                if (isBilingualMode) {
+                    document.body.classList.add('bilingual-mode');
+                } else {
+                    document.body.classList.remove('bilingual-mode');
+                }
 
                 // Récupérer tous les votes du sondage actuel
                 const { data: votes, error: votesError } = await supabaseClient
