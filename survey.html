@@ -1656,36 +1656,46 @@
             }
         }
         
-        // Fonction d'actualisation avec cooldown (10 secondes)
-        let lastRefreshTime = 0;
-        const COOLDOWN_MS = 10000; // 10 secondes
+        // Fonction d'actualisation avec compte à rebours de 10 secondes
+        const COOLDOWN_SECONDS = 10;
+        let countdownInterval = null;
 
         function refreshWithCooldown() {
-            const now = Date.now();
-            const timeSinceLastRefresh = now - lastRefreshTime;
             const btn = document.getElementById('refreshBtn');
             const cooldownMsg = document.getElementById('cooldownMsg');
             
-            if (timeSinceLastRefresh < COOLDOWN_MS) {
-                // Afficher message de cooldown avec compte à rebours selon la langue
-                const remaining = Math.ceil((COOLDOWN_MS - timeSinceLastRefresh) / 1000);
-                if (currentLanguage === 'fr') {
-                    cooldownMsg.textContent = `⏱️ Veuillez patienter ${remaining} secondes...`;
-                } else {
-                    cooldownMsg.textContent = `⏱️ Wacht ${remaining} seconden...`;
-                }
-                cooldownMsg.style.display = 'block';
-                
-                // Animation du bouton (disabled)
-                btn.style.opacity = '0.5';
-                btn.style.cursor = 'not-allowed';
-                
-                return;
+            // Désactiver et cacher le bouton
+            btn.style.display = 'none';
+            
+            // Afficher le message de cooldown
+            cooldownMsg.style.display = 'block';
+            
+            let remaining = COOLDOWN_SECONDS;
+            
+            // Afficher le compte initial
+            if (currentLanguage === 'fr') {
+                cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> secondes...`;
+            } else {
+                cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconden...`;
             }
             
-            // Actualiser la page
-            lastRefreshTime = now;
-            window.location.reload();
+            // Démarrer le compte à rebours
+            countdownInterval = setInterval(() => {
+                remaining--;
+                
+                if (remaining > 0) {
+                    // Mettre à jour l'affichage
+                    if (currentLanguage === 'fr') {
+                        cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
+                    } else {
+                        cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
+                    }
+                } else {
+                    // Temps écoulé, actualiser la page
+                    clearInterval(countdownInterval);
+                    window.location.reload();
+                }
+            }, 1000);
         }
 
         function showError(message) {
