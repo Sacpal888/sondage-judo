@@ -587,37 +587,25 @@
             
             if (!container) return;
             
-            // Appliquer le zoom mémorisé d'abord
-            if (currentZoom !== 1) {
+            // Sauvegarder le zoom actuel (ou 1 si premier appel)
+            if (currentZoom === 1) {
+                // Premier appel: mesurer sans zoom
+                requestAnimationFrame(() => {
+                    const maxHeight = 1000;
+                    const containerHeight = container.offsetHeight;
+                    const totalHeight = containerHeight + 140; // avec ombre
+                    
+                    if (totalHeight > maxHeight) {
+                        currentZoom = maxHeight / totalHeight;
+                        container.style.zoom = currentZoom;
+                        console.log(`🔽 Zoom initial: ${(currentZoom * 100).toFixed(1)}%`);
+                    }
+                });
+            } else {
+                // Appels suivants: le zoom est déjà appliqué, pas besoin de recalculer
+                // (le contenu ne change pas de taille, juste les pourcentages)
                 container.style.zoom = currentZoom;
             }
-            
-            // Attendre que le DOM soit complètement rendu avant de vérifier si ajustement nécessaire
-            setTimeout(() => {
-                // Mesurer avec le zoom actuel appliqué
-                const containerHeight = container.offsetHeight / (currentZoom || 1);
-                
-                // Hauteur maximale autorisée (ombre comprise: container + 140px d'ombre)
-                const maxHeight = 1000;
-                
-                // Ajouter les marges de l'ombre: 60px top + 80px bottom = 140px
-                const totalHeight = containerHeight + 140;
-                
-                // Calculer le nouveau zoom nécessaire
-                let newZoom = 1;
-                if (totalHeight > maxHeight) {
-                    newZoom = maxHeight / totalHeight;
-                }
-                
-                // Appliquer seulement si le zoom a changé de manière significative (>1% de différence)
-                if (Math.abs(newZoom - currentZoom) > 0.01) {
-                    console.log(`📏 Hauteur totale (ombre comprise): ${totalHeight}px`);
-                    console.log(`📏 Hauteur max autorisée: ${maxHeight}px`);
-                    console.log(`🔄 Ajustement du zoom: ${(currentZoom * 100).toFixed(1)}% → ${(newZoom * 100).toFixed(1)}%`);
-                    currentZoom = newZoom;
-                    container.style.zoom = newZoom;
-                }
-            }, 150);
         }
 
         // ============================================
@@ -625,12 +613,6 @@
         // ============================================
         function displayResults(results, totalVotes) {
             const grid = document.getElementById('resultsGrid');
-            const container = document.querySelector('.container');
-            
-            // Appliquer immédiatement le zoom mémorisé pour éviter le clignotement
-            if (container && currentZoom !== 1) {
-                container.style.zoom = currentZoom;
-            }
             
             if (!results || results.length === 0 || totalVotes === 0) {
                 grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les résultats s\'afficheront dès les premiers votes !</div>';
