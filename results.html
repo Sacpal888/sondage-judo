@@ -614,8 +614,8 @@
         function displayResults(results, totalVotes) {
             const grid = document.getElementById('resultsGrid');
             
-            if (!results || results.length === 0 || totalVotes === 0) {
-                grid.innerHTML = '<div class="no-votes">Aucun vote pour le moment...<br>Les résultats s\'afficheront dès les premiers votes !</div>';
+            if (!results || results.length === 0) {
+                grid.innerHTML = '<div class="no-votes">Aucun candidat disponible</div>';
                 return;
             }
 
