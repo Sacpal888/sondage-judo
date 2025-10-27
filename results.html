@@ -386,23 +386,40 @@
                 const bilingualModeEnabled = configData?.bilingual_mode || false;
                 console.log('🌐 Mode bilingue global:', bilingualModeEnabled);
 
-                // Récupérer les candidats du sondage actuel
-                const { data: players, error: playersError } = await supabaseClient
-                    .from('players')
-                    .select('id, name, name_nl')
+                // Récupérer les résultats déjà calculés depuis la vue
+                const { data: resultsData, error: resultsError } = await supabaseClient
+                    .from('v_survey_results')
+                    .select('*')
                     .eq('survey_id', currentSurveyId)
-                    .order('name', { ascending: true });
+                    .order('rank', { ascending: true });
 
-                if (playersError) throw playersError;
+                if (resultsError) throw resultsError;
                 
-                if (!players || players.length === 0) {
+                if (!resultsData || resultsData.length === 0) {
                     throw new Error('Aucun candidat trouvé pour ce sondage');
                 }
 
-                console.log('👥 Candidats trouvés:', players.length);
+                console.log('👥 Résultats trouvés:', resultsData.length);
+
+                // Charger les traductions NL des candidats SI mode bilingue activé
+                let translationsMap = {};
+                if (bilingualModeEnabled) {
+                    const playerIds = resultsData.map(r => r.player_id);
+                    const { data: translations } = await supabaseClient
+                        .from('survey_player_translations')
+                        .select('player_id, nom')
+                        .in('player_id', playerIds)
+                        .eq('language_code', 'nl');
+
+                    if (translations) {
+                        translations.forEach(t => {
+                            translationsMap[t.player_id] = t.nom;
+                        });
+                    }
+                }
 
                 // Mode bilingue actif SEULEMENT si le mode global est activé ET qu'il y a des traductions NL
-                isBilingualMode = bilingualModeEnabled && players.some(p => p.name_nl && p.name_nl.trim() !== '');
+                isBilingualMode = bilingualModeEnabled && Object.keys(translationsMap).length > 0;
                 console.log('📊 Affichage bilingue:', isBilingualMode);
 
                 // Ajouter ou retirer la classe bilingual-mode sur le body
@@ -412,68 +429,23 @@
                     document.body.classList.remove('bilingual-mode');
                 }
 
-                // Récupérer tous les votes du sondage actuel
-                const { data: votes, error: votesError } = await supabaseClient
-                    .from('votes')
-                    .select('player_id, language_code')
-                    .eq('survey_id', currentSurveyId);
+                // Ajouter les traductions NL aux résultats
+                const results = resultsData.map(r => ({
+                    player_id: r.player_id,
+                    player_name: r.player_name,
+                    player_name_nl: translationsMap[r.player_id] || null,
+                    total_votes: r.total_votes || 0,
+                    votes_fr: r.votes_fr || 0,
+                    votes_nl: r.votes_nl || 0,
+                    percentage: 0 // Sera calculé dans displayResults
+                }));
 
-                if (votesError) throw votesError;
+                // Calculer le total des votes
+                const totalVotes = results.reduce((sum, r) => sum + r.total_votes, 0);
+                const totalVotesFr = results.reduce((sum, r) => sum + r.votes_fr, 0);
+                const totalVotesNl = results.reduce((sum, r) => sum + r.votes_nl, 0);
 
-                console.log('🗳️  Votes trouvés:', votes ? votes.length : 0);
-
-                // Créer une map des résultats
-                const resultsMap = {};
-                let totalVotes = 0;
-                let totalVotesFr = 0;
-                let totalVotesNl = 0;
-
-                players.forEach(player => {
-                    resultsMap[player.id] = {
-                        player_id: player.id,
-                        player_name: player.name,
-                        player_name_nl: player.name_nl,
-                        total_votes: 0,
-                        votes_fr: 0,
-                        votes_nl: 0,
-                        percentage: 0
-                    };
-                });
-
-                // Compter les votes
-                if (votes && votes.length > 0) {
-                    votes.forEach(vote => {
-                        if (resultsMap[vote.player_id]) {
-                            resultsMap[vote.player_id].total_votes++;
-                            totalVotes++;
-                            
-                            if (vote.language_code === 'fr') {
-                                resultsMap[vote.player_id].votes_fr++;
-                                totalVotesFr++;
-                            } else if (vote.language_code === 'nl') {
-                                resultsMap[vote.player_id].votes_nl++;
-                                totalVotesNl++;
-                            }
-                        }
-                    });
-                }
-
-                // Calculer les pourcentages
-                Object.values(resultsMap).forEach(result => {
-                    if (totalVotes > 0) {
-                        result.percentage = (result.total_votes / totalVotes) * 100;
-                    }
-                });
-
-                // Convertir en tableau et trier par nombre de votes (décroissant)
-                const results = Object.values(resultsMap).sort((a, b) => {
-                    if (b.total_votes !== a.total_votes) {
-                        return b.total_votes - a.total_votes;
-                    }
-                    return a.player_name.localeCompare(b.player_name);
-                });
-
-                console.log('📊 Résultats calculés:', results);
+                console.log('📊 Résultats préparés:', results);
 
                 // Afficher les résultats
                 displayResults(results || [], totalVotes);
