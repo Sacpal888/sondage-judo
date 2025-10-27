@@ -748,7 +748,12 @@
 
                 <!-- Traduction NL - Toujours visible -->
                 <div style="background: rgba(244, 208, 63, 0.1); padding: 20px; border-radius: 10px; border: 2px solid rgba(244, 208, 63, 0.3); margin-top: 20px;">
-                    <h3 style="color: #f4d03f; margin-bottom: 15px;">🇳🇱 Traduction néerlandaise</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #f4d03f; margin: 0;">🇳🇱 Traduction néerlandaise</h3>
+                        <button type="button" class="btn" onclick="translateAllToNL()" style="background: #f39c12; color: white;">
+                            🌐 Traduire automatiquement
+                        </button>
+                    </div>
                     <p class="info-text" style="margin-bottom: 15px;">
                         Remplissez les champs NL pour préparer la version néerlandaise. L'activation se fait via le mode bilingue global.
                     </p>
@@ -922,7 +927,7 @@
                     <div class="survey-stats">
                         <div class="survey-stat">
                             <div class="stat-value">${stats.total_players || 0}</div>
-                            <div class="stat-label">Candidats</div>
+                            <div class="stat-label">Choix</div>
                         </div>
                         <div class="survey-stat">
                             <div class="stat-value">${stats.total_votes || 0}</div>
@@ -939,10 +944,23 @@
                     </div>
 
                     <div class="survey-actions">
-                        <div style="display: flex; gap: 8px; width: 100%;">
+                        <div style="display: flex; gap: 8px; width: 100%; align-items: center;">
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <button class="btn" onclick="moveSurvey(${survey.id}, 'up')" 
+                                        style="padding: 5px 10px; font-size: 0.8rem; min-width: auto; ${index === 0 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+                                        ${index === 0 ? 'disabled' : ''}>
+                                    ↑
+                                </button>
+                                <button class="btn" onclick="moveSurvey(${survey.id}, 'down')" 
+                                        style="padding: 5px 10px; font-size: 0.8rem; min-width: auto; ${index === surveys.length - 1 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
+                                        ${index === surveys.length - 1 ? 'disabled' : ''}>
+                                    ↓
+                                </button>
+                            </div>
                             <button class="btn ${survey.active ? 'btn-warning' : 'btn-success'}" 
                                     onclick="toggleActive(${survey.id}, ${survey.active})"
-                                    style="flex: 1;">
+                                    style="flex: 1; ${survey.ever_activated && !survey.active ? 'opacity: 0.5; cursor: not-allowed;' : ''}"
+                                    ${survey.ever_activated && !survey.active ? 'disabled' : ''}>
                                 ${survey.active ? '⏸️ Désactiver' : '▶️ Activer'}
                             </button>
                             <button class="btn btn-done ${survey.ever_activated ? 'active' : ''}" 
@@ -1003,6 +1021,50 @@
 
             } catch (error) {
                 console.error('❌ Erreur toggleActive:', error);
+                alert('❌ Erreur: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // DÉPLACER SONDAGE
+        // ============================================
+        async function moveSurvey(surveyId, direction) {
+            try {
+                // Trouver l'index du sondage actuel
+                const currentIndex = allSurveys.findIndex(s => s.id === surveyId);
+                if (currentIndex === -1) {
+                    alert('❌ Sondage introuvable');
+                    return;
+                }
+                
+                // Vérifier si le déplacement est possible
+                if (direction === 'up' && currentIndex === 0) return;
+                if (direction === 'down' && currentIndex === allSurveys.length - 1) return;
+                
+                const currentSurvey = allSurveys[currentIndex];
+                const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+                const targetSurvey = allSurveys[targetIndex];
+                
+                // Échanger les ordres
+                const { error: error1 } = await supabaseClient
+                    .from('surveys')
+                    .update({ ordre: targetSurvey.ordre })
+                    .eq('id', currentSurvey.id);
+                
+                if (error1) throw error1;
+                
+                const { error: error2 } = await supabaseClient
+                    .from('surveys')
+                    .update({ ordre: currentSurvey.ordre })
+                    .eq('id', targetSurvey.id);
+                
+                if (error2) throw error2;
+                
+                // Recharger les sondages
+                await loadSurveys();
+                
+            } catch (error) {
+                console.error('❌ Erreur moveSurvey:', error);
                 alert('❌ Erreur: ' + error.message);
             }
         }
@@ -1083,6 +1145,108 @@
                 `;
                 editorNL.appendChild(item);
             });
+        }
+
+        // ============================================
+        // TRADUCTION AUTOMATIQUE NL
+        // ============================================
+        async function translateAllToNL() {
+            try {
+                // Vérifier si la clé API DeepL est configurée
+                if (!window.DEEPL_API_KEY || window.DEEPL_API_KEY === 'VOTRE_CLE_DEEPL_ICI') {
+                    alert('❌ Clé API DeepL manquante.\n\nAjoutez dans config.js:\nwindow.DEEPL_API_KEY = "votre_clé_ici";\n\nObtenez une clé gratuite sur: https://www.deepl.com/pro-api');
+                    return;
+                }
+
+                // Récupérer les textes FR à traduire
+                const titleFR = document.getElementById('surveyTitle').value.trim();
+                const descriptionFR = document.getElementById('surveyDescription').value.trim();
+                const thankyouFR = document.getElementById('msgThankyouFr').value.trim();
+                
+                // Récupérer les candidats FR
+                const playerInputsFR = document.querySelectorAll('#playersEditor .player-item input');
+                const playersFR = Array.from(playerInputsFR).map(input => input.value.trim()).filter(v => v);
+
+                if (!titleFR && !descriptionFR && !thankyouFR && playersFR.length === 0) {
+                    alert('⚠️ Veuillez remplir au moins un champ FR à traduire.');
+                    return;
+                }
+
+                // Afficher un message de chargement
+                const translateBtn = event.target;
+                const originalText = translateBtn.innerHTML;
+                translateBtn.innerHTML = '⏳ Traduction en cours...';
+                translateBtn.disabled = true;
+
+                // Préparer tous les textes à traduire en un seul appel
+                const textsToTranslate = [];
+                if (titleFR) textsToTranslate.push(titleFR);
+                if (descriptionFR) textsToTranslate.push(descriptionFR);
+                if (thankyouFR) textsToTranslate.push(thankyouFR);
+                textsToTranslate.push(...playersFR);
+
+                // Appeler l'API DeepL
+                const response = await fetch('https://api-free.deepl.com/v2/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `DeepL-Auth-Key ${window.DEEPL_API_KEY}`,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'text': textsToTranslate,
+                        'target_lang': 'NL',
+                        'source_lang': 'FR'
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `Erreur API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const translations = data.translations.map(t => t.text);
+
+                // Remplir les champs NL avec les traductions
+                let index = 0;
+                if (titleFR) {
+                    document.getElementById('surveyTitleNl').value = translations[index];
+                    index++;
+                }
+                if (descriptionFR) {
+                    document.getElementById('surveyDescriptionNl').value = translations[index];
+                    index++;
+                }
+                if (thankyouFR) {
+                    document.getElementById('msgThankyouNl').value = translations[index];
+                    index++;
+                }
+
+                // Remplir les candidats NL
+                const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
+                nlInputs.forEach((input, i) => {
+                    if (index < translations.length) {
+                        input.value = translations[index];
+                        index++;
+                    }
+                });
+
+                // Restaurer le bouton
+                translateBtn.innerHTML = originalText;
+                translateBtn.disabled = false;
+
+                alert('✅ Traduction automatique terminée !');
+
+            } catch (error) {
+                console.error('❌ Erreur traduction:', error);
+                alert('❌ Erreur lors de la traduction:\n' + error.message);
+                
+                // Restaurer le bouton en cas d'erreur
+                if (event && event.target) {
+                    event.target.innerHTML = '🌐 Traduire automatiquement';
+                    event.target.disabled = false;
+                }
+            }
         }
 
         // ============================================
