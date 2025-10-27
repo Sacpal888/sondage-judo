@@ -966,6 +966,7 @@
                 if (error || !activeSurvey) {
                     // Aucun sondage actif, afficher le message de fin
                     document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section
                     await showEndMessage();
                     return null;
                 }
@@ -977,6 +978,7 @@
                 
             } catch (error) {
                 console.error('Erreur lors de la detection du sondage actif:', error);
+                document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section même en cas d'erreur
                 showError('Erreur de connexion a la base de donnees.');
                 return null;
             }
@@ -1584,8 +1586,7 @@
                         box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
                         transition: all 0.3s;
                         margin-top: 20px;
-                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 40px rgba(212, 175, 55, 0.6)';" 
-                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(212, 175, 55, 0.4)';">
+                    ">
                         🔄 ACTUALISER / VERNIEUWEN
                     </button>
                     
