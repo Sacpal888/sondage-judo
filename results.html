@@ -24,12 +24,20 @@
             padding: 20px;
         }
         
+        .container-wrapper {
+            max-width: 1900px;
+            max-height: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: visible;
+        }
+        
         .container {
             width: fit-content;
             min-width: 500px;
             max-width: 1900px;
             min-height: auto;
-            max-height: 1000px;
             height: auto;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
             border: 3px solid #d4af37;
@@ -38,6 +46,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
+            transform-origin: top center;
         }
         
         .header {
@@ -318,24 +327,26 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>
-                <span class="title-fr" id="surveyTitle">Résultats</span>
-                <span class="title-nl" id="surveyTitleNl"></span>
-            </h1>
-            <div class="subtitle">
-                <span class="subtitle-fr" id="surveyDescription">Classement</span>
-                <span class="subtitle-nl" id="surveyDescriptionNl"></span>
+    <div class="container-wrapper">
+        <div class="container">
+            <div class="header">
+                <h1>
+                    <span class="title-fr" id="surveyTitle">Résultats</span>
+                    <span class="title-nl" id="surveyTitleNl"></span>
+                </h1>
+                <div class="subtitle">
+                    <span class="subtitle-fr" id="surveyDescription">Classement</span>
+                    <span class="subtitle-nl" id="surveyDescriptionNl"></span>
+                </div>
             </div>
+            
+            <div id="loadingMessage" class="loading">
+                <span class="loading-fr">Chargement des résultats...</span>
+                <span class="loading-nl"><br>Resultaten laden...</span>
+            </div>
+            
+            <div id="resultsGrid" class="results-grid" style="display: none;"></div>
         </div>
-        
-        <div id="loadingMessage" class="loading">
-            <span class="loading-fr">Chargement des résultats...</span>
-            <span class="loading-nl"><br>Resultaten laden...</span>
-        </div>
-        
-        <div id="resultsGrid" class="results-grid" style="display: none;"></div>
     </div>
 
     <script>
@@ -582,36 +593,62 @@
         // AUTO-SCALING WHEN CONTENT OVERFLOWS
         // ============================================
         function adjustContainerScale() {
+            const wrapper = document.querySelector('.container-wrapper');
             const container = document.querySelector('.container');
-            const header = document.querySelector('.header');
-            const grid = document.getElementById('resultsGrid');
             
-            if (!container || !grid) return;
+            if (!wrapper || !container) return;
             
             // Réinitialiser le scale avant de mesurer
             container.style.transform = 'scale(1)';
-            container.style.transformOrigin = 'top center';
             
-            // Attendre que le DOM soit complètement rendu
-            requestAnimationFrame(() => {
-                // Hauteur disponible dans le container
-                const maxContainerHeight = 1000; // max-height du container
-                const containerPadding = 60; // padding top + bottom (30px * 2)
+            // Attendre plusieurs frames pour que le DOM soit complètement rendu
+            setTimeout(() => {
+                // Hauteurs maximales autorisées
+                const maxHeight = 1000;
+                const maxWidth = 1900;
                 
-                // Hauteur totale du contenu (header + grid)
-                const headerHeight = header.offsetHeight;
-                const gridHeight = grid.scrollHeight;
-                const totalContentHeight = headerHeight + gridHeight + 50; // +50 pour les marges
+                // Box-shadow: 0 20px 60px => ajouter les marges de l'ombre
+                // L'ombre s'étend de 60px sur les côtés et en haut, 80px en bas (20px offset + 60px blur)
+                const shadowMargin = {
+                    top: 60,
+                    right: 60,
+                    bottom: 80,
+                    left: 60
+                };
                 
-                // Si le contenu dépasse, calculer le ratio de réduction
-                if (totalContentHeight > maxContainerHeight) {
-                    const scale = maxContainerHeight / totalContentHeight;
-                    console.log(`📏 Contenu trop grand (${totalContentHeight}px > ${maxContainerHeight}px), réduction à ${(scale * 100).toFixed(1)}%`);
+                // Mesurer les dimensions réelles du container (sans l'ombre)
+                const containerHeight = container.offsetHeight;
+                const containerWidth = container.offsetWidth;
+                
+                // Ajouter les marges de l'ombre pour obtenir les dimensions totales
+                const actualHeight = containerHeight + shadowMargin.top + shadowMargin.bottom;
+                const actualWidth = containerWidth + shadowMargin.left + shadowMargin.right;
+                
+                console.log(`📏 Container: ${containerWidth}x${containerHeight}px`);
+                console.log(`📏 Avec ombre: ${actualWidth}x${actualHeight}px`);
+                console.log(`📏 Limites max: ${maxWidth}x${maxHeight}px`);
+                
+                // Calculer les ratios de réduction nécessaires
+                let scaleX = actualWidth > maxWidth ? maxWidth / actualWidth : 1;
+                let scaleY = actualHeight > maxHeight ? maxHeight / actualHeight : 1;
+                
+                // Prendre le plus petit ratio pour que tout rentre (ombre comprise)
+                const scale = Math.min(scaleX, scaleY);
+                
+                // Si une réduction est nécessaire
+                if (scale < 1) {
+                    console.log(`🔽 Réduction nécessaire à ${(scale * 100).toFixed(1)}%`);
                     container.style.transform = `scale(${scale})`;
+                    
+                    // Ajuster la taille du wrapper pour éviter l'espace vide
+                    wrapper.style.width = `${actualWidth * scale}px`;
+                    wrapper.style.height = `${actualHeight * scale}px`;
                 } else {
-                    console.log(`✅ Contenu adapté (${totalContentHeight}px <= ${maxContainerHeight}px)`);
+                    console.log(`✅ Contenu adapté, pas de réduction nécessaire`);
+                    wrapper.style.width = 'auto';
+                    wrapper.style.height = 'auto';
                 }
-            });
+            }, 100); // Délai pour s'assurer que le rendu est terminé
         }
 
         // ============================================
