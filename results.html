@@ -29,9 +29,9 @@
             min-height: 820px;
             height: auto;
             background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
-            border: 5px solid #d4af37;
-            border-radius: 25px;
-            padding: 30px;
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 30px 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
@@ -84,7 +84,7 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-auto-flow: column;
-            gap: 15px;
+            gap: 20px;
             flex: 1;
         }
         
@@ -92,7 +92,7 @@
             background: rgba(26, 47, 74, 0.6);
             border: 2px solid #d4af37;
             border-radius: 12px;
-            padding: 18px;
+            padding: 20px;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
@@ -120,7 +120,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         .player-name-container {
@@ -186,7 +186,7 @@
             height: 25px;
             overflow: hidden;
             border: 1px solid rgba(212, 175, 55, 0.3);
-            margin-top: 8px;
+            margin-top: 10px;
         }
         
         .progress-bar {
@@ -229,97 +229,86 @@
 
         /* Pour 3 résultats par colonne */
         .results-grid.three-per-column {
-            grid-template-rows: repeat(3, auto);
+            grid-template-rows: repeat(3, 1fr);
         }
 
         /* Pour 2 résultats par colonne */
         .results-grid.two-per-column {
-            grid-template-rows: repeat(2, auto);
+            grid-template-rows: repeat(2, 1fr);
         }
 
         /* Pour 1 résultat par colonne */
         .results-grid.one-per-column {
-            grid-template-rows: repeat(1, auto);
+            grid-template-rows: repeat(1, 1fr);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1 id="resultsTitle"></h1>
-            <p class="subtitle" id="resultsSubtitle"></p>
+            <h1>
+                <span class="title-fr">Résultats</span>
+                <span class="title-nl">Resultaten</span>
+            </h1>
+            <div class="subtitle">
+                <span class="subtitle-fr">Classement</span>
+                <span class="subtitle-nl">Rangschikking</span>
+            </div>
         </div>
         
         <div id="loadingMessage" class="loading">
-            âÂÂ³ Chargement des résultats...
+            Chargement des résultats...<br>
+            Resultaten laden...
         </div>
         
-        <div id="resultsGrid" class="results-grid" style="display: none;">
-            <!-- Les résultats seront insérés ici -->
-        </div>
+        <div id="resultsGrid" class="results-grid" style="display: none;"></div>
     </div>
 
     <script>
+        // ============================================
+        // GLOBAL VARIABLES
+        // ============================================
         let supabaseClient = null;
         let currentSurveyId = null;
         let refreshInterval = null;
         let isBilingualMode = false;
 
         // ============================================
-        // GET URL PARAMETERS
+        // URL PARAMETERS
         // ============================================
         async function getUrlParams() {
-            // TOUJOURS detecter automatiquement le sondage actif
-            // Ne plus utiliser le parametre ?id= dans l'URL pour eviter de rester bloque sur un ancien sondage
-            try {
-                // Initialiser Supabase temporairement pour la detection
-                if (!supabaseClient) {
-                    if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                        showError('Configuration manquante. Contactez l\'administrateur.');
-                        return null;
-                    }
-                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                }
-                
-                // Chercher le sondage actif
-                const { data: activeSurvey, error } = await supabaseClient
-                    .from('surveys')
-                    .select('id')
-                    .eq('active', true)
-                    .maybeSingle();
-                
-                if (error || !activeSurvey) {
-                    showError('Aucun sondage actif pour le moment.');
-                    return null;
-                }
-                
-                console.log('Sondage actif detecte automatiquement:', activeSurvey.id);
-                return activeSurvey.id;
-                
-            } catch (error) {
-                console.error('Erreur lors de la detection du sondage actif:', error);
-                showError('Erreur de connexion a la base de donnees.');
+            const urlParams = new URLSearchParams(window.location.search);
+            const surveyId = urlParams.get('survey') || urlParams.get('id');
+
+            if (!surveyId) {
+                showError('Aucun ID de sondage spécifié dans l\'URL');
                 return null;
             }
+
+            console.log('📊 Survey ID:', surveyId);
+            return surveyId;
         }
 
         // ============================================
         // SUPABASE INITIALIZATION
         // ============================================
         async function initSupabase() {
+            if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                console.error('❌ Configuration Supabase manquante dans config.js');
+                showError('Configuration manquante. Veuillez vérifier config.js');
+                return false;
+            }
+
             try {
-                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                    showError('Configuration manquante. Contactez l\'administrateur.');
-                    return false;
-                }
-                
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('âœ… Supabase initialisé');
-                
+                supabaseClient = supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+                console.log('✅ Supabase initialisé');
                 return true;
             } catch (error) {
-                console.error('Erreur initialisation Supabase:', error);
-                showError('Erreur lors de l\'initialisation: ' + error.message);
+                console.error('❌ Erreur lors de l\'initialisation de Supabase:', error);
+                showError('Erreur de connexion à la base de données');
                 return false;
             }
         }
@@ -328,119 +317,53 @@
         // LOAD RESULTS
         // ============================================
         async function loadResults() {
-            if (!supabaseClient) return;
-            
             try {
-                // Charger les informations du sondage
-                const { data: survey, error: surveyError } = await supabaseClient
-                    .from('surveys')
-                    .select('*')
-                    .eq('id', currentSurveyId)
-                    .single();
-
-                if (surveyError) throw surveyError;
-                if (!survey) throw new Error('Sondage introuvable');
-
-                // Charger le mode bilingue global depuis config_messages
-                const { data: configMessages } = await supabaseClient
-                    .from('config_messages')
-                    .select('bilingual_mode')
-                    .maybeSingle();
-                
-                isBilingualMode = configMessages?.bilingual_mode || false;
-                console.log('Mode bilingue global:', isBilingualMode);
-
-                // Charger les messages (FR par défaut)
-                let titleFr = survey.titre || 'Sondage';
-                let invitationFr = survey.description || 'Votez pour votre choix !';
-                let titleNl = null;
-                let invitationNl = null;
-
-                // Si mode bilingue, charger aussi les traductions NL
-                if (isBilingualMode) {
-                    const { data: surveyTranslation } = await supabaseClient
-                        .from('survey_translations')
-                        .select('*')
-                        .eq('survey_id', currentSurveyId)
-                        .eq('language_code', 'nl')
-                        .maybeSingle();
-
-                    if (surveyTranslation && surveyTranslation.active) {
-                        titleNl = surveyTranslation.titre;
-                        invitationNl = surveyTranslation.description;
-                    }
+                if (!supabaseClient || !currentSurveyId) {
+                    console.error('❌ Supabase non initialisé ou survey_id manquant');
+                    return;
                 }
 
-                // Construire le titre avec FR + NL si bilingue
-                let displayTitle = '<span class="title-fr">' + titleFr + '</span>';
-                if (isBilingualMode && titleNl) {
-                    displayTitle += '<span class="title-nl">' + titleNl + '</span>';
-                }
+                console.log('🔄 Chargement des résultats pour le sondage:', currentSurveyId);
 
-                // Construire le sous-titre avec FR + NL si bilingue
-                let displayInvitation = '<span class="subtitle-fr">' + invitationFr + '</span>';
-                if (isBilingualMode && invitationNl) {
-                    displayInvitation += '<span class="subtitle-nl">' + invitationNl + '</span>';
-                }
-
-                // Mettre ÃƒÂ  jour les titres
-                document.getElementById('resultsTitle').innerHTML = displayTitle;
-                document.getElementById('resultsSubtitle').innerHTML = displayInvitation;
-
-                // Charger les joueurs du sondage
+                // Récupérer les candidats du sondage actuel
                 const { data: players, error: playersError } = await supabaseClient
-                    .from('survey_players')
-                    .select('id, nom, ordre')
+                    .from('players')
+                    .select('id, name, name_nl')
                     .eq('survey_id', currentSurveyId)
-                    .order('ordre', { ascending: true });
+                    .order('name', { ascending: true });
 
                 if (playersError) throw playersError;
+                
                 if (!players || players.length === 0) {
                     throw new Error('Aucun candidat trouvé pour ce sondage');
                 }
 
-                // Charger les traductions NL des joueurs SI mode bilingue
-                let translationsMap = {};
-                if (isBilingualMode) {
-                    const { data: translations } = await supabaseClient
-                        .from('survey_player_translations')
-                        .select('player_id, nom')
-                        .in('player_id', players.map(p => p.id))
-                        .eq('language_code', 'nl');
+                console.log('👥 Candidats trouvés:', players.length);
 
-                    if (translations) {
-                        translations.forEach(t => {
-                            translationsMap[t.player_id] = t.nom;
-                        });
-                    }
-                }
+                // Vérifier si on est en mode bilingue
+                isBilingualMode = players.some(p => p.name_nl && p.name_nl.trim() !== '');
 
-                // Charger TOUS les votes pour ce sondage
+                // Récupérer tous les votes du sondage actuel
                 const { data: votes, error: votesError } = await supabaseClient
                     .from('votes')
                     .select('player_id, language_code')
                     .eq('survey_id', currentSurveyId);
 
-                if (votesError) {
-                    console.error('Erreur chargement votes:', votesError);
-                    throw votesError;
-                }
+                if (votesError) throw votesError;
 
-                console.log(`Ã°Å¸â€œÅ  ${votes ? votes.length : 0} votes trouvés pour le sondage #${currentSurveyId}`);
+                console.log('🗳️  Votes trouvés:', votes ? votes.length : 0);
 
-                // Calculer les résultats par joueur
+                // Créer une map des résultats
                 const resultsMap = {};
                 let totalVotes = 0;
                 let totalVotesFr = 0;
                 let totalVotesNl = 0;
 
-                // Initialiser tous les joueurs avec 0 votes
                 players.forEach(player => {
                     resultsMap[player.id] = {
                         player_id: player.id,
-                        player_name: player.nom,
-                        player_name_nl: translationsMap[player.id] || null,
-                        ordre: player.ordre,
+                        player_name: player.name,
+                        player_name_nl: player.name_nl,
                         total_votes: 0,
                         votes_fr: 0,
                         votes_nl: 0,
@@ -481,7 +404,7 @@
                     return a.player_name.localeCompare(b.player_name);
                 });
 
-                console.log('Ã°Å¸â€œÅ  Résultats calculés:', results);
+                console.log('📊 Résultats calculés:', results);
 
                 // Afficher les résultats
                 displayResults(results || [], totalVotes);
@@ -491,10 +414,10 @@
                 document.getElementById('resultsGrid').style.display = 'grid';
 
                 const totalPlayers = results.length;
-                console.log(`Ã°Å¸â€œÅ  Résultats mis ÃƒÂ  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
+                console.log(`📊 Résultats mis à jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
             } catch (error) {
-                console.error('âÂÅ’ Erreur lors du chargement des résultats:', error);
+                console.error('❌ Erreur lors du chargement des résultats:', error);
                 console.error('Details:', {
                     message: error.message,
                     code: error.code,
@@ -510,9 +433,9 @@
                 
                 // Afficher des conseils selon le type d'erreur
                 if (error.message && error.message.includes('permission denied')) {
-                    errorMessage += '\n\nâÅ¡Â ïÂ¸Â Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
+                    errorMessage += '\n\n⚠️ Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
                 } else if (error.message && error.message.includes('Aucun candidat')) {
-                    errorMessage += '\n\nâÅ¡Â ïÂ¸Â Ajoutez des candidats au sondage #' + currentSurveyId;
+                    errorMessage += '\n\n⚠️ Ajoutez des candidats au sondage #' + currentSurveyId;
                 }
                 
                 showError(errorMessage);
@@ -532,7 +455,7 @@
 
             grid.innerHTML = '';
 
-            // Limiter ÃƒÂ  6 premiers résultats
+            // Limiter à 6 premiers résultats
             const topResults = results.slice(0, 6);
 
             // Définir le nombre de lignes selon le nombre de résultats
@@ -556,7 +479,7 @@
                 let displayNameNl = result.player_name_nl;
                 
                 if (isBilingualMode && displayNameNl) {
-                    // Enlever les emojis du nom NL (ils sont déjÃƒÂ  dans le FR)
+                    // Enlever les emojis du nom NL (ils sont déjà dans le FR)
                     displayNameNl = removeEmojis(displayNameNl);
                 }
 
