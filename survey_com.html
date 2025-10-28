@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sondage</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .container {
+            width: fit-content;
+            min-width: min(500px, 90vw);
+            max-width: 95%;
+            background: rgba(13, 39, 68, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            max-height: none;
+            height: auto;
+            overflow: visible;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+           MAIN SURVEY SECTION
+        ======================================== */
+        .page-title {
+            font-size: 4rem;
+            font-weight: bold;
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            line-height: 1.2;
+        }
+
+        .invitation-text {
+            font-size: 3.3rem;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .players-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 0;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Layout pour 2 candidats : cote a cote centres */
+        .players-grid.layout-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 3 candidats : cote a cote centres */
+        .players-grid.layout-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 4 candidats : 2 colonnes de 2 */
+        .players-grid.layout-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Layout pour 5 candidats : 2 colonnes de 2 + 1 centre en bas */
+        .players-grid.layout-5 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .players-grid.layout-5 .player-card:nth-child(5) {
+            grid-column: 1 / -1;
+            max-width: 450px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Layout pour 6 candidats : 2 colonnes de 3 */
+        .players-grid.layout-6 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Pour plus de 6 candidats : grille standard 3 colonnes */
+        .players-grid.layout-default {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .player-card {
+            background: linear-gradient(135deg, #1a2f4a 0%, #0d2744 100%);
+            border: 3px solid rgba(212, 175, 55, 0.5);
+            border-radius: 15px;
+            padding: 35px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+            height: 100%;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            border-color: #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .player-card.selected {
+            background: linear-gradient(135deg, #d4af37 0%, #f0d46f 100%);
+            border-color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .player-card.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .player-name {
+            font-size: 3.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 20px;
+            word-wrap: break-word;
+            line-height: 1.3;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .player-card.selected .player-name {
+            color: #0a1828;
+        }
+
+        .vote-button {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            color: #0a1828;
+            border: 2px solid #f4d03f;
+            padding: 20px 25px;
+            border-radius: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50%;
+            min-height: 70px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vote-button:hover {
+            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        .player-card.selected .vote-button {
+            background: #0a1828;
+            color: #f4d03f;
+            border-color: #f4d03f;
+        }
+
+        /* ========================================
+           THANK YOU SECTION
+        ======================================== */
+        .thank-you {
+            display: none;
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(26, 47, 74, 0.8);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            transition: all 0.5s ease;
+        }
+
+        .thank-you.show {
+            display: block;
+            animation: thankYouAppear 0.5s ease forwards;
+        }
+
+        @keyframes thankYouAppear {
+            0% { 
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .thank-you-icon {
+            font-size: 7rem;
+            margin-bottom: 30px;
+            animation: celebrate 1s ease;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-10deg); }
+            75% { transform: scale(1.2) rotate(10deg); }
+        }
+
+        .thank-you-title {
+            font-size: 4.5rem;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 25px;
+        }
+
+        .thank-you-text {
+            font-size: 3rem;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           LOADING & ERROR MESSAGES
+        ======================================== */
+        .loading-message {
+            text-align: center;
+            font-size: 3rem;
+            color: #d4af37;
+            padding: 50px;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            padding: 30px;
+            color: #ffffff;
+            text-align: center;
+            font-size: 2rem;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           RESPONSIVE
+        ======================================== */
+        /* Tablettes */
+        @media (max-width: 1024px) {
+            .players-grid,
+            .players-grid.layout-2,
+            .players-grid.layout-3,
+            .players-grid.layout-4,
+            .players-grid.layout-5,
+            .players-grid.layout-6,
+            .players-grid.layout-default {
+                grid-template-columns: repeat(2, 1fr) !important;
+                max-width: 100%;
+            }
+
+            .players-grid.layout-5 .player-card:nth-child(5) {
+                grid-column: 1 / -1;
+                max-width: 50%;
+            }
+
+            .player-card {
+                min-height: 260px;
+            }
+            
+            .page-title {
+                font-size: 4rem;
+            }
+            
+            .invitation-text {
+                font-size: 3rem;
+            }
+            
+            .player-name {
+                font-size: 2.8rem;
+            }
+            
+            .vote-button {
+                font-size: 1.6rem;
+                min-height: 60px;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 20px;
+                max-width: 98%;
+            }
+
+
+            .page-title {
+                font-size: 3rem;
+            }
+
+            .invitation-text {
+                font-size: 2.5rem;
+            }
+
+            .players-grid,
+            .players-grid.layout-2,
+            .players-grid.layout-3,
+            .players-grid.layout-4,
+            .players-grid.layout-5,
+            .players-grid.layout-6,
+            .players-grid.layout-default {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+                max-width: 100%;
+            }
+
+            .players-grid.layout-5 .player-card:nth-child(5) {
+                grid-column: 1;
+                max-width: 100%;
+            }
+
+            .player-card {
+                padding: 30px 20px;
+                min-height: 240px;
+            }
+
+            .player-name {
+                font-size: 2.3rem;
+            }
+
+            .vote-button {
+                font-size: 1.4rem;
+                padding: 15px 20px;
+                min-height: 55px;
+                width: 60%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+
+            .invitation-text {
+                font-size: 2rem;
+            }
+
+            .player-card {
+                min-height: 220px;
+            }
+
+            .player-name {
+                font-size: 1.8rem;
+            }
+
+            .vote-button {
+                font-size: 1.2rem;
+                width: 70%;
+                min-height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ========================================
+             BILINGUAL COOKIE CONSENT
+        ======================================== -->
+
+        <!-- ========================================
+             SURVEY SECTION
+        ======================================== -->
+        <div id="surveySection">
+            <div id="logoContainer" class="logo-container" style="display: none;"></div>
+            
+            <div id="loadingMessage" class="loading-message">
+                â³ Chargement du sondage...
+            </div>
+
+            <div id="voteSection" style="display: none;">
+                <h1 id="pageTitle" class="page-title">Titre du sondage</h1>
+                <p id="invitationText" class="invitation-text">Votez pour votre choix !</p>
+                <div id="playersGrid" class="players-grid"></div>
+            </div>
+
+            <div id="thankYou" class="thank-you">
+                <p id="thankYouText" class="thank-you-text">Votre vote a été enregistré avec succès.</p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const COOKIE_VOTED_PREFIX = 'onlive_voted_';
+
+        let supabaseClient = null;
+        let currentSurveyId = null;
+        let currentLanguage = 'fr'; // Toujours français
+        let hasVoted = false;
+        let selectedPlayerId = null;
+        let sessionId = generateSessionId();
+
+        // ============================================
+        // SESSION ID GENERATION
+        // ============================================
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // ============================================
+        // COOKIE MANAGEMENT
+        // ============================================
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // ============================================
+        // URL PARAMETERS
+        // ============================================
+        async function getUrlParams() {
+            // TOUJOURS detecter automatiquement le sondage actif
+            // Ne plus utiliser le parametre ?id= dans l'URL pour eviter de rester bloque sur un ancien sondage
+            try {
+                // Initialiser Supabase si ce n'est pas deja fait
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        throw new Error('Configuration Supabase manquante');
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+                
+                // Chercher le sondage actif
+                const { data: activeSurvey, error } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('active', true)
+                    .maybeSingle();
+                
+                if (error || !activeSurvey || !activeSurvey.id) {
+                    // Aucun sondage actif, afficher le message de fin
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section
+                    await showEndMessage();
+                    return null;
+                }
+                
+                currentSurveyId = activeSurvey.id;
+                console.log('Sondage actif detecte automatiquement:', currentSurveyId);
+                return { id: currentSurveyId };
+                
+            } catch (error) {
+                console.error('Erreur lors de la detection du sondage actif:', error);
+                document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section mÃªme en cas d'erreur
+                showError('Erreur de connexion a la base de donnees.');
+                return null;
+            }
+        }
+
+        // ============================================
+
+
+        // ============================================
+        // SURVEY INITIALIZATION
+        // ============================================
+        async function initializeSurvey() {
+            console.log(` Initialisation du sondage #${currentSurveyId} en ${currentLanguage}`);
+            
+            try {
+                // Initialiser Supabase
+                if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                    throw new Error('Configuration Supabase manquante');
+                }
+
+                supabaseClient = supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+
+                // Charger les donnÃ©es du sondage
+                const { data: survey, error: surveyError } = await supabaseClient
+                    .from('surveys')
+                    .select('*')
+                    .eq('id', currentSurveyId)
+                    .maybeSingle();
+
+                if (surveyError) throw surveyError;
+                if (!survey) {
+                    showError(` Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+                    return;
+                }
+                if (!survey.active) {
+                    // Charger le message "aucun sondage actif" depuis la config
+                    const { data: configMessages } = await supabaseClient
+                        .from('config_messages')
+                        .select('end_message_fr, end_message_nl')
+                        .maybeSingle();
+                    
+                    let noActiveMessage = ' Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.';
+                    
+                    if (configMessages) {
+                        if (currentLanguage === 'nl' && configMessages.end_message_nl) {
+                            noActiveMessage = configMessages.end_message_nl.replace(/\n/g, '<br>');
+                        } else if (configMessages.end_message_fr) {
+                            noActiveMessage = configMessages.end_message_fr.replace(/\n/g, '<br>');
+                        }
+                    }
+                    
+                    showError(noActiveMessage);
+                    
+                    // DESACTIVE : Polling automatique désactivé - tout est manuel
+                    // startPollingForActiveSurvey(currentSurveyId);
+                    return;
+                }
+
+                console.log('Sondage chargÃ©:', survey);
+
+                // Charger les messages (FR par défaut, puis NL si sélectionné)
+                let messages = {
+                    title: survey.titre || 'Sondage',
+                    invitation: survey.description || 'Votez pour votre choix !',
+                    thankyou: survey.msg_thankyou || 'Merci pour votre vote !'
+                };
+
+                if (currentLanguage === 'nl') {
+                    const { data: translation } = await supabaseClient
+                        .from('survey_translations')
+                        .select('*')
+                        .eq('survey_id', currentSurveyId)
+                        .eq('language_code', 'nl')
+                        .maybeSingle();
+
+                    if (translation && translation.active) {
+                        messages = {
+                            title: translation.titre || messages.title,
+                            invitation: translation.description || messages.invitation,
+                            thankyou: translation.msg_thankyou || 'Bedankt voor uw stem!'
+                        };
+                        document.documentElement.lang = 'nl';
+                    }
+                }
+
+                // Appliquer les messages
+                document.getElementById('pageTitle').textContent = messages.title;
+                document.title = messages.title;
+                document.getElementById('invitationText').innerHTML = messages.invitation.replace(/\n/g, '<br>');
+                document.getElementById('thankYouText').innerHTML = messages.thankyou.replace(/\n/g, '<br>');
+
+                // Charger le logo
+                if (survey.logo_base64) {
+                    document.getElementById('logoContainer').style.display = 'flex';
+                    document.getElementById('logoContainer').innerHTML = `<img src="${survey.logo_base64}" alt="Logo">`;
+                } else {
+                    document.getElementById('logoContainer').style.display = 'none';
+                }
+
+                // Vérifier si l'utilisateur a déjÃ  voté
+                const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
+                if (votedCookie === 'true') {
+                    console.log('Utilisateur a déjÃ  voté');
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    
+                    const thankYouDiv = document.getElementById('thankYou');
+                    addRefreshButton(thankYouDiv);
+                    thankYouDiv.classList.add('show');
+                    return;
+                }
+
+                // Charger les candidats
+                const { data: players, error: playersError } = await supabaseClient
+                    .from('survey_players')
+                    .select('*')
+                    .eq('survey_id', currentSurveyId)
+                    .order('ordre', { ascending: true });
+
+                if (playersError) throw playersError;
+
+                if (!players || players.length === 0) {
+                    showError('Aucun candidat disponible pour ce sondage.');
+                    return;
+                }
+
+                console.log(' Joueurs chargés:', players);
+                console.log(' Premier joueur:', players[0]);
+                console.log(' Structure d\'un joueur:', Object.keys(players[0]));
+
+                // Si langue NL, charger les traductions des candidats
+                let playerTranslationsMap = {};
+                if (currentLanguage === 'nl') {
+                    const { data: translations } = await supabaseClient
+                        .from('survey_player_translations')
+                        .select('player_id, nom')
+                        .in('player_id', players.map(p => p.id))
+                        .eq('language_code', 'nl');
+                    
+                    if (translations) {
+                        translations.forEach(t => {
+                            playerTranslationsMap[t.player_id] = t.nom;
+                        });
+                    }
+                }
+
+                // Afficher les candidats
+                const grid = document.getElementById('playersGrid');
+                grid.innerHTML = '';
+
+                players.forEach(player => {
+                    // Utiliser la traduction NL si disponible, sinon le nom FR
+                    const playerName = playerTranslationsMap[player.id] || player.nom;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'player-card';
+                    card.dataset.playerId = player.id;
+                    card.innerHTML = `
+                        <div class="player-name">${escapeHtml(playerName)}</div>
+                        <button class="vote-button" onclick="confirmVote(${player.id})">Voter</button>
+                    `;
+                    
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('vote-button')) {
+                            selectPlayer(player.id);
+                        }
+                    });
+                    
+                    grid.appendChild(card);
+                });
+
+                // Appliquer le layout adapte au nombre de candidats
+                applyGridLayout(players.length);
+
+                // Ajuster la taille de police
+                adjustFontSize();
+
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('voteSection').style.display = 'block';
+
+            } catch (error) {
+                console.error('Erreur chargement sondage:', error);
+                showError('Erreur de chargement: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // GRID LAYOUT ADAPTATION
+        // ============================================
+        function applyGridLayout(count) {
+            const grid = document.getElementById('playersGrid');
+            
+            // Retirer toutes les classes de layout existantes
+            grid.classList.remove('layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-default');
+            
+            // Appliquer le layout selon le nombre de candidats
+            if (count === 2) {
+                grid.classList.add('layout-2');
+            } else if (count === 3) {
+                grid.classList.add('layout-3');
+            } else if (count === 4) {
+                grid.classList.add('layout-4');
+            } else if (count === 5) {
+                grid.classList.add('layout-5');
+            } else if (count === 6) {
+                grid.classList.add('layout-6');
+            } else {
+                grid.classList.add('layout-default');
+            }
+            
+            console.log(` Layout applique pour ${count} candidats`);
+        }
+
+        // ============================================
+        // FONT SIZE ADJUSTMENT
+        // ============================================
+        function adjustFontSize() {
+            const playerNames = document.querySelectorAll('.player-name');
+            if (playerNames.length === 0) return;
+
+            // Detecter le breakpoint actuel
+            const width = window.innerWidth;
+            let maxFontSize, minFontSize;
+            
+            if (width <= 480) {
+                // Tres petit mobile : invitation-text = 2rem, donc max = 1.8rem
+                maxFontSize = 1.8;
+                minFontSize = 1.2;
+            } else if (width <= 768) {
+                // Mobile : invitation-text = 2.5rem, donc max = 2.3rem
+                maxFontSize = 2.3;
+                minFontSize = 1.4;
+            } else if (width <= 1024) {
+                // Tablette : invitation-text = 3rem, donc max = 2.8rem
+                maxFontSize = 2.8;
+                minFontSize = 1.8;
+            } else {
+                // Desktop : invitation-text = 3.3rem, donc max = 3.2rem
+                maxFontSize = 3.2;
+                minFontSize = 2.0;
+            }
+
+            let maxLength = 0;
+            playerNames.forEach(nameEl => {
+                const length = nameEl.textContent.length;
+                if (length > maxLength) {
+                    maxLength = length;
+                }
+            });
+
+            let fontSize;
+            if (maxLength <= 15) {
+                fontSize = maxFontSize;
+            } else if (maxLength <= 20) {
+                fontSize = Math.max(maxFontSize - 0.3, minFontSize);
+            } else if (maxLength <= 25) {
+                fontSize = Math.max(maxFontSize - 0.6, minFontSize);
+            } else if (maxLength <= 30) {
+                fontSize = Math.max(maxFontSize - 0.9, minFontSize);
+            } else if (maxLength <= 40) {
+                fontSize = Math.max(maxFontSize - 1.2, minFontSize);
+            } else {
+                fontSize = minFontSize;
+            }
+
+            playerNames.forEach(nameEl => {
+                nameEl.style.fontSize = fontSize + 'rem';
+            });
+
+            console.log(`Taille de police ajustee a ${fontSize}rem (max: ${maxFontSize}rem, breakpoint: ${width}px) pour max length: ${maxLength}`);
+        }
+
+        // ============================================
+        // VOTING
+        // ============================================
+        function selectPlayer(playerId) {
+            if (hasVoted) return;
+            
+            document.querySelectorAll('.player-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+                selectedPlayerId = playerId;
+            }
+        }
+        
+        async function confirmVote(playerId) {
+            if (hasVoted) return;
+            
+            document.querySelectorAll('.player-card').forEach(card => {
+                if (card.dataset.playerId != playerId) {
+                    card.classList.add('disabled');
+                }
+            });
+            
+            await saveVote(playerId);
+        }
+
+        // Helper pour ajouter le bouton actualiser
+        function addRefreshButton(targetDiv) {
+            if (document.getElementById('refreshBtn')) {
+                return; // Bouton dÃ©jÃ  prÃ©sent
+            }
+            
+            const refreshContainer = document.createElement('div');
+            refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
+            
+            // Bouton d'actualisation
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'refreshBtn';
+            refreshBtn.style.cssText = `
+                background: linear-gradient(135deg, #d4af37, #f0d46f);
+                color: #0a1828;
+                border: none;
+                padding: 20px 50px;
+                font-size: 1.8rem;
+                font-weight: bold;
+                border-radius: 15px;
+                cursor: pointer;
+                box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                transition: all 0.3s;
+            `;
+            refreshBtn.textContent = currentLanguage === 'fr' 
+                ? ' ACTUALISER'
+                : ' VERNIEUWEN';
+            refreshBtn.addEventListener('click', refreshWithCooldown);
+            
+            // Message de cooldown
+            const cooldownMsg = document.createElement('div');
+            cooldownMsg.id = 'cooldownMsg';
+            cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
+            
+            refreshContainer.appendChild(refreshBtn);
+            refreshContainer.appendChild(cooldownMsg);
+            targetDiv.appendChild(refreshContainer);
+        }
+
+        async function saveVote(playerId) {
+            if (!supabaseClient) return;
+            
+            try {
+                console.log(' Tentative de vote:', {
+                    survey_id: currentSurveyId,
+                    player_id: playerId,
+                    language_code: currentLanguage,
+                    session_id: sessionId
+                });
+
+                // Insérer le vote
+                const { data, error: insertError } = await supabaseClient
+                    .from('votes')
+                    .insert({
+                        survey_id: currentSurveyId,
+                        player_id: playerId,
+                        language_code: currentLanguage,
+                        session_id: sessionId,
+                        voted_at: new Date().toISOString()
+                    })
+                    .select();
+                
+                if (insertError) {
+                    console.error(' Erreur Supabase détaillée:', insertError);
+                    console.error('Code:', insertError.code);
+                    console.error('Message:', insertError.message);
+                    console.error('Details:', insertError.details);
+                    console.error('Hint:', insertError.hint);
+                    throw insertError;
+                }
+                
+                console.log('✅ Vote enregistré avec succès:', data);
+                
+                // Set cookie pour empêcher les votes multiples
+                setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
+                
+                hasVoted = true;
+                
+                setTimeout(() => {
+                    document.getElementById('voteSection').style.display = 'none';
+                    const thankYouDiv = document.getElementById('thankYou');
+                    addRefreshButton(thankYouDiv);
+                    thankYouDiv.classList.add('show');
+                }, 800);
+                
+            } catch (error) {
+                console.error('❌ Erreur lors du vote:', error);
+                
+                // Message d'erreur plus détaillé
+                let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
+                if (error.message) {
+                    errorMessage += '\n\nDétails: ' + error.message;
+                }
+                if (error.hint) {
+                    errorMessage += '\n\nSuggestion: ' + error.hint;
+                }
+                errorMessage += '\n\nVeuillez contacter l\'administrateur ou vérifier la console (F12) pour plus de détails.';
+                
+                alert(errorMessage);
+                
+                document.querySelectorAll('.player-card').forEach(card => {
+                    card.classList.remove('disabled');
+                });
+            }
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        // ============================================
+        // END MESSAGE
+        // ============================================
+        async function showEndMessage() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('config_messages')
+                    .select('end_message_fr, end_message_nl')
+                    .single();
+                
+                let messageFr = 'Le sondage est actuellement fermé. Revenez bientot !';
+                let messageNl = 'De enquete is momenteel gesloten. Kom snel terug!';
+                
+                if (data && !error) {
+                    if (data.end_message_fr) messageFr = data.end_message_fr;
+                    if (data.end_message_nl) messageNl = data.end_message_nl;
+                }
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('voteSection').style.display = 'none';
+                document.getElementById('thankYou').classList.remove('show');
+                document.getElementById('errorMessage').style.display = 'none';
+                
+                // Creer et afficher le message de fin avec bouton manuel
+                const endMessageDiv = document.createElement('div');
+                endMessageDiv.id = 'endMessageDisplay';
+                endMessageDiv.style.cssText = `
+                    text-align: center;
+                    padding: 60px 30px;
+                    background: rgba(13, 39, 68, 0.95);
+                    border-radius: 20px;
+                    margin: 20px auto;
+                    max-width: 800px;
+                `;
+                
+                endMessageDiv.innerHTML = `
+                    <div style="font-size: 4rem; margin-bottom: 30px;">â³</div>
+                    <div style="color: ${currentLanguage === 'fr' ? '#ffffff' : '#f4d03f'}; font-size: 2rem; font-weight: bold; margin-bottom: 40px; line-height: 1.4;">
+                        ${escapeHtml(currentLanguage === 'fr' ? messageFr : messageNl)}
+                    </div>
+                `;
+                
+                const container = document.querySelector('.container');
+                container.appendChild(endMessageDiv);
+                
+            } catch (error) {
+                console.error('Erreur chargement message de fin:', error);
+                showError('Aucun sondage actif pour le moment.');
+            }
+        }
+        
+        // Fonction d'actualisation avec compte à  rebours de 10 secondes
+        const COOLDOWN_SECONDS = 10;
+        let countdownInterval = null;
+
+        async function refreshWithCooldown() {
+            const btn = document.getElementById('refreshBtn');
+            const cooldownMsg = document.getElementById('cooldownMsg');
+            
+            // Sauvegarder l'ID du sondage actuel pour détecter les changements
+            const initialSurveyId = currentSurveyId;
+            
+            // Pas de nouveau sondage, appliquer le cooldown
+            // Désactiver et cacher le bouton
+            btn.style.display = 'none';
+            
+            // Afficher le message de cooldown
+            cooldownMsg.style.display = 'block';
+            
+            let remaining = COOLDOWN_SECONDS;
+            
+            // Afficher le compte initial
+            if (currentLanguage === 'fr') {
+                cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> secondes...`;
+            } else {
+                cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconden...`;
+            }
+            
+            // Démarrer le compte à rebours
+            countdownInterval = setInterval(async () => {
+                remaining--;
+                
+                if (remaining > 0) {
+                    // Mettre à jour l'affichage
+                    if (currentLanguage === 'fr') {
+                        cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
+                    } else {
+                        cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
+                    }
+                } else {
+                    // Temps écoulé, vérification finale UNIQUE
+                    clearInterval(countdownInterval);
+                    
+                    try {
+                        const { data: activeSurvey } = await supabaseClient
+                            .from('surveys')
+                            .select('id')
+                            .eq('active', true)
+                            .maybeSingle();
+                        
+                        // Vérifier si c'est un NOUVEAU sondage (ID différent)
+                        if (activeSurvey && activeSurvey.id !== initialSurveyId) {
+                            console.log('Nouveau sondage détecté après cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafraîchissement');
+                            window.location.reload();
+                        } else if (!activeSurvey) {
+                            // Plus aucun sondage actif
+                            console.log('Aucun sondage actif après cooldown, rafraîchissement');
+                            window.location.reload();
+                        } else {
+                            // Même sondage toujours actif, rafraîchir quand même pour voir les résultats mis à jour
+                            console.log('Même sondage toujours actif, rafraîchissement');
+                            window.location.reload();
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors de la vérification finale du sondage:', error);
+                        // En cas d'erreur, rafraîchir quand même
+                        window.location.reload();
+                    }
+                }
+            }, 1000);
+        }
+
+        function showError(message) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('voteSection').style.display = 'none';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // POLLING POUR SONDAGE ACTIF
+        // ============================================
+        let pollingInterval = null;
+        
+        function startPollingForActiveSurvey(surveyId) {
+            // Vérifier toutes les 5 secondes si le sondage devient actif
+            pollingInterval = setInterval(async () => {
+                try {
+                    const { data: survey } = await supabaseClient
+                        .from('surveys')
+                        .select('active')
+                        .eq('id', surveyId)
+                        .maybeSingle();
+                    
+                    if (survey && survey.active) {
+                        // Le sondage est maintenant actif, rafraîchir la page
+                        clearInterval(pollingInterval);
+                        window.location.reload();
+                    }
+                } catch (error) {
+                    console.error('Erreur polling:', error);
+                }
+            }, 5000); // Toutes les 5 secondes
+        }
+
+        // ============================================
+        // AUTO-REFRESH POUR NOUVEAU SONDAGE
+        // ============================================
+        let surveyCheckInterval = null;
+        
+        async function checkForNewSurvey() {
+            try {
+                // Initialiser Supabase si ce n'est pas deja fait
+                if (!supabaseClient) {
+                    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+                        return; // Pas de config, on ne peut pas verifier
+                    }
+                    supabaseClient = supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                }
+                
+                // Vérifier s'il y a un nouveau sondage actif
+                const { data: activeSurvey } = await supabaseClient
+                    .from('surveys')
+                    .select('id')
+                    .eq('active', true)
+                    .maybeSingle();
+                
+                // VÃ©rifier changement de sondage
+                if (activeSurvey) {
+                    // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
+                    if (!currentSurveyId) {
+                        console.log('Nouveau sondage actif detecte:', activeSurvey.id);
+                        window.location.reload();
+                        return;
+                    }
+                    // Cas 2: Un autre sondage est maintenant actif
+                    else if (activeSurvey.id !== currentSurveyId) {
+                        console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
+                        window.location.reload();
+                        return;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors de la verification du sondage actif:', error);
+            }
+        }
+        
+        function startSurveyCheck() {
+            // Verifier toutes les 10 secondes
+            surveyCheckInterval = setInterval(checkForNewSurvey, 10000);
+        }
+        
+        function stopSurveyCheck() {
+            if (surveyCheckInterval) {
+                clearInterval(surveyCheckInterval);
+                surveyCheckInterval = null;
+            }
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Afficher directement la section du sondage
+            document.getElementById('surveySection').classList.remove('hidden');
+            
+            // Charger le sondage actif
+            const urlParams = await getUrlParams();
+            if (urlParams) {
+                // Initialiser le sondage
+                await initializeSurvey();
+            }
+            // Si pas de sondage actif, getUrlParams() a déjà affiché le message de fin
+            
+            // ACTIVER le polling automatique toutes les 10 secondes
+            startSurveyCheck();
+        });
+
+        // Reajuster la taille de police lors du redimensionnement
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                adjustFontSize();
+            }, 250);
+        });
+    </script>
+</body>
+</html>
