@@ -1020,10 +1020,7 @@
 
         function adjustConsentDisplay() {
             if (!isBilingualMode) {
-                // En mode monolingue, forcer le francais
-                currentLanguage = 'fr';
-                
-                // Masquer tous les elements NL
+                // En mode monolingue, masquer les elements NL
                 const nlElements = document.querySelectorAll('.consent-title-nl, .consent-text-nl, .btn-accept-nl');
                 nlElements.forEach(el => el.style.display = 'none');
                 
@@ -1110,12 +1107,6 @@
         }
 
         async function acceptConsent(language) {
-            // Forcer le français si le mode bilingue n'est pas activé
-            if (!isBilingualMode && language === 'nl') {
-                    console.warn('ATTENTION Mode bilingue désactivé : forçage du français au lieu de NL');
-                language = 'fr';
-            }
-            
             console.log(`Consentement accepté avec langue: ${language}`);
             
             // Sauvegarder le consentement
@@ -1817,17 +1808,15 @@
                 }
                 // Si pas de sondage actif, getUrlParams() a déjà  affiché le message de fin
             } else if (consent === 'declined') {
-                // Consentement refusé : afficher le message de refus IMMÉDIATEMENT
+                // Consentement refusé : ATTENDRE le chargement du mode avant d'afficher
+                await loadSurveyBilingualMode();
                 document.getElementById('cookieConsent').classList.add('hidden');
                 document.getElementById('consentDeclined').classList.remove('hidden');
-                // Charger le mode bilingue en arrière-plan (non bloquant)
-                loadSurveyBilingualMode();
             } else {
-                // Pas de consentement : afficher l'écran de consentement IMMÉDIATEMENT
+                // Pas de consentement : ATTENDRE le chargement du mode avant d'afficher
+                await loadSurveyBilingualMode();
                 document.getElementById('cookieConsent').classList.remove('hidden');
                 document.getElementById('surveySection').classList.add('hidden');
-                // Charger le mode bilingue en arrière-plan (non bloquant)
-                loadSurveyBilingualMode();
             }
             
             // DéSACTIVé : Polling automatique désactivé pour économiser les requêtes
