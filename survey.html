@@ -1489,53 +1489,7 @@
                 
                 setTimeout(() => {
                     document.getElementById('voteSection').style.display = 'none';
-                    
-                    const thankYouDiv = document.getElementById('thankYou');
-                    
-                    // Vérifier si le bouton n'existe pas déjà
-                    if (!document.getElementById('refreshBtn')) {
-                        const refreshContainer = document.createElement('div');
-                        refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
-                        
-                        // Instructions selon la langue
-                        const instructions = document.createElement('div');
-                        instructions.style.cssText = 'color: #d4af37; font-size: 1.2rem; margin-bottom: 20px; font-weight: bold;';
-                        instructions.innerHTML = currentLanguage === 'fr' 
-                            ? '⚠️ Attendez l\'annonce de l\'animateur avant d\'actualiser'
-                            : '⚠️ Wacht op de aankondiging van de presentator voordat u vernieuwt';
-                        
-                        // Bouton d'actualisation avec texte selon la langue
-                        const refreshBtn = document.createElement('button');
-                        refreshBtn.id = 'refreshBtn';
-                        refreshBtn.onclick = refreshWithCooldown;
-                        refreshBtn.style.cssText = `
-                            background: linear-gradient(135deg, #d4af37, #f0d46f);
-                            color: #0a1828;
-                            border: none;
-                            padding: 20px 50px;
-                            font-size: 1.8rem;
-                            font-weight: bold;
-                            border-radius: 15px;
-                            cursor: pointer;
-                            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-                            transition: all 0.3s;
-                        `;
-                        refreshBtn.textContent = currentLanguage === 'fr' 
-                            ? '🔄 ACTUALISER'
-                            : '🔄 VERNIEUWEN';
-                        
-                        // Message de cooldown
-                        const cooldownMsg = document.createElement('div');
-                        cooldownMsg.id = 'cooldownMsg';
-                        cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
-                        
-                        refreshContainer.appendChild(instructions);
-                        refreshContainer.appendChild(refreshBtn);
-                        refreshContainer.appendChild(cooldownMsg);
-                        thankYouDiv.appendChild(refreshContainer);
-                    }
-                    
-                    thankYouDiv.classList.add('show');
+                    document.getElementById('thankYou').classList.add('show');
                 }, 800);
                 
             } catch (error) {
