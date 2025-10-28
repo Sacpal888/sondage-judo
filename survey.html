@@ -168,7 +168,7 @@
             left: 100%;
         }
 
-        /* Bouton Français (blanc) */
+        /* Bouton FranÃ§ais (blanc) */
         .btn-accept-fr {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: #ffffff;
@@ -182,7 +182,7 @@
             box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
         }
 
-        /* Bouton Néerlandais (jaune) */
+        /* Bouton NÃ©erlandais (jaune) */
         .btn-accept-nl {
             background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
             color: #1a2f4a;
@@ -753,7 +753,7 @@
                     </div>
 
                     <div class="consent-text-nl">
-                        <strong>Nederlands :</strong> We gebruiken essentiële cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
+                        <strong>Nederlands :</strong> We gebruiken essentiÃ«le cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
                         Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquête in uw voorkeurtaal.
                         <br><br>
                         <a class="privacy-link" onclick="showPrivacyPolicy()"> Volledig privacybeleid</a>
@@ -772,7 +772,7 @@
                         </button>
                     </div>
                     <button class="btn-decline" onclick="declineConsent()">
-                      Je refuse / Ik weiger
+                        âŒ Je refuse / Ik weiger
                     </button>
                 </div>
             </div>
@@ -961,7 +961,7 @@
                     .eq('active', true)
                     .maybeSingle();
                 
-                if (error || !activeSurvey) {
+                if (error || !activeSurvey || !activeSurvey.id) {
                     // Aucun sondage actif, afficher le message de fin
                     document.getElementById('loadingMessage').style.display = 'none';
                     document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section
@@ -1109,7 +1109,7 @@
             }
         }
 
-        function acceptConsent(language) {
+        async function acceptConsent(language) {
             // Forcer le français si le mode bilingue n'est pas activé
             if (!isBilingualMode && language === 'nl') {
                     console.warn('ATTENTION Mode bilingue désactivé : forçage du français au lieu de NL');
@@ -1128,6 +1128,13 @@
             // Masquer l'écran de consentement et afficher le sondage
             document.getElementById('cookieConsent').classList.add('hidden');
             document.getElementById('surveySection').classList.remove('hidden');
+            
+            // Charger le sondage actif AVANT d'initialiser
+            const urlParams = await getUrlParams();
+            if (!urlParams) {
+                // Pas de sondage actif, getUrlParams() a déjà affiché le message
+                return;
+            }
             
             // Initialiser le sondage dans la langue choisie
             initializeSurvey();
