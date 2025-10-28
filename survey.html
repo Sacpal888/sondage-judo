@@ -1255,7 +1255,45 @@
                 if (votedCookie === 'true') {
                     console.log('✓ Utilisateur a déjà voté');
                     document.getElementById('loadingMessage').style.display = 'none';
-                    document.getElementById('thankYou').classList.add('show');
+                    
+                    const thankYouDiv = document.getElementById('thankYou');
+                    
+                    // Ajouter le bouton actualiser
+                    if (!document.getElementById('refreshBtn')) {
+                        const refreshContainer = document.createElement('div');
+                        refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
+                        
+                        // Bouton d'actualisation
+                        const refreshBtn = document.createElement('button');
+                        refreshBtn.id = 'refreshBtn';
+                        refreshBtn.onclick = refreshWithCooldown;
+                        refreshBtn.style.cssText = `
+                            background: linear-gradient(135deg, #d4af37, #f0d46f);
+                            color: #0a1828;
+                            border: none;
+                            padding: 20px 50px;
+                            font-size: 1.8rem;
+                            font-weight: bold;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                            transition: all 0.3s;
+                        `;
+                        refreshBtn.textContent = currentLanguage === 'fr' 
+                            ? '🔄 ACTUALISER'
+                            : '🔄 VERNIEUWEN';
+                        
+                        // Message de cooldown
+                        const cooldownMsg = document.createElement('div');
+                        cooldownMsg.id = 'cooldownMsg';
+                        cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
+                        
+                        refreshContainer.appendChild(refreshBtn);
+                        refreshContainer.appendChild(cooldownMsg);
+                        thankYouDiv.appendChild(refreshContainer);
+                    }
+                    
+                    thankYouDiv.classList.add('show');
                     return;
                 }
 
@@ -1489,7 +1527,45 @@
                 
                 setTimeout(() => {
                     document.getElementById('voteSection').style.display = 'none';
-                    document.getElementById('thankYou').classList.add('show');
+                    
+                    const thankYouDiv = document.getElementById('thankYou');
+                    
+                    // Ajouter le bouton actualiser après le vote
+                    if (!document.getElementById('refreshBtn')) {
+                        const refreshContainer = document.createElement('div');
+                        refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
+                        
+                        // Bouton d'actualisation
+                        const refreshBtn = document.createElement('button');
+                        refreshBtn.id = 'refreshBtn';
+                        refreshBtn.onclick = refreshWithCooldown;
+                        refreshBtn.style.cssText = `
+                            background: linear-gradient(135deg, #d4af37, #f0d46f);
+                            color: #0a1828;
+                            border: none;
+                            padding: 20px 50px;
+                            font-size: 1.8rem;
+                            font-weight: bold;
+                            border-radius: 15px;
+                            cursor: pointer;
+                            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                            transition: all 0.3s;
+                        `;
+                        refreshBtn.textContent = currentLanguage === 'fr' 
+                            ? '🔄 ACTUALISER'
+                            : '🔄 VERNIEUWEN';
+                        
+                        // Message de cooldown
+                        const cooldownMsg = document.createElement('div');
+                        cooldownMsg.id = 'cooldownMsg';
+                        cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
+                        
+                        refreshContainer.appendChild(refreshBtn);
+                        refreshContainer.appendChild(cooldownMsg);
+                        thankYouDiv.appendChild(refreshContainer);
+                    }
+                    
+                    thankYouDiv.classList.add('show');
                 }, 800);
                 
             } catch (error) {
@@ -1555,46 +1631,6 @@
                     <div style="font-size: 4rem; margin-bottom: 30px;">⏳</div>
                     <div style="color: ${currentLanguage === 'fr' ? '#ffffff' : '#f4d03f'}; font-size: 2rem; font-weight: bold; margin-bottom: 40px; line-height: 1.4;">
                         ${escapeHtml(currentLanguage === 'fr' ? messageFr : messageNl)}
-                    </div>
-                    
-                    <!-- Instructions importantes -->
-                    <div style="background: rgba(212, 175, 55, 0.1); border: 2px solid #d4af37; border-radius: 15px; padding: 20px; margin: 30px 0;">
-                        <div style="color: #d4af37; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;">
-                            ⚠️ ${currentLanguage === 'fr' ? 'INSTRUCTIONS' : 'INSTRUCTIES'}
-                        </div>
-                        <div style="color: #ffffff; font-size: 1.2rem; line-height: 1.6; text-align: left;">
-                            ${currentLanguage === 'fr' ? `
-                                • Attendez l'annonce de l'animateur<br>
-                                • Cliquez UNIQUEMENT quand on vous le dit<br>
-                                • Ne pas actualiser sans consigne
-                            ` : `
-                                • Wacht op de aankondiging van de presentator<br>
-                                • Klik ALLEEN wanneer u dat wordt gevraagd<br>
-                                • Vernieuw niet zonder instructie
-                            `}
-                        </div>
-                    </div>
-                    
-                    <!-- Bouton d'actualisation -->
-                    <button id="refreshBtn" onclick="refreshWithCooldown()" style="
-                        background: linear-gradient(135deg, #d4af37, #f0d46f);
-                        color: #0a1828;
-                        border: none;
-                        padding: 20px 50px;
-                        font-size: 1.8rem;
-                        font-weight: bold;
-                        border-radius: 15px;
-                        cursor: pointer;
-                        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-                        transition: all 0.3s;
-                        margin-top: 20px;
-                    ">
-                        🔄 ${currentLanguage === 'fr' ? 'ACTUALISER' : 'VERNIEUWEN'}
-                    </button>
-                    
-                    <!-- Message de cooldown -->
-                    <div id="cooldownMsg" style="display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;">
-                        ⏱️ ${currentLanguage === 'fr' ? 'Veuillez patienter...' : 'Even geduld...'}
                     </div>
                 `;
                 
