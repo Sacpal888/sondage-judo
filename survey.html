@@ -1810,16 +1810,17 @@
                 }
                 // Si pas de sondage actif, getUrlParams() a déjà  affiché le message de fin
             } else if (consent === 'declined') {
-                // Consentement refusé : afficher le message de refus
-                await loadSurveyBilingualMode();
+                // Consentement refusé : afficher le message de refus IMMÉDIATEMENT
                 document.getElementById('cookieConsent').classList.add('hidden');
                 document.getElementById('consentDeclined').classList.remove('hidden');
+                // Charger le mode bilingue en arrière-plan (non bloquant)
+                loadSurveyBilingualMode();
             } else {
-                // Pas de consentement : afficher l'écran de consentement
-                await loadSurveyBilingualMode();
+                // Pas de consentement : afficher l'écran de consentement IMMÉDIATEMENT
                 document.getElementById('cookieConsent').classList.remove('hidden');
                 document.getElementById('surveySection').classList.add('hidden');
-                adjustConsentDisplay();
+                // Charger le mode bilingue en arrière-plan (non bloquant)
+                loadSurveyBilingualMode();
             }
             
             // DéSACTIVé : Polling automatique désactivé pour économiser les requêtes
