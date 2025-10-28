@@ -1257,42 +1257,7 @@
                     document.getElementById('loadingMessage').style.display = 'none';
                     
                     const thankYouDiv = document.getElementById('thankYou');
-                    
-                    // Ajouter le bouton actualiser
-                    if (!document.getElementById('refreshBtn')) {
-                        const refreshContainer = document.createElement('div');
-                        refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
-                        
-                        // Bouton d'actualisation
-                        const refreshBtn = document.createElement('button');
-                        refreshBtn.id = 'refreshBtn';
-                        refreshBtn.onclick = refreshWithCooldown;
-                        refreshBtn.style.cssText = `
-                            background: linear-gradient(135deg, #d4af37, #f0d46f);
-                            color: #0a1828;
-                            border: none;
-                            padding: 20px 50px;
-                            font-size: 1.8rem;
-                            font-weight: bold;
-                            border-radius: 15px;
-                            cursor: pointer;
-                            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-                            transition: all 0.3s;
-                        `;
-                        refreshBtn.textContent = currentLanguage === 'fr' 
-                            ? '🔄 ACTUALISER'
-                            : '🔄 VERNIEUWEN';
-                        
-                        // Message de cooldown
-                        const cooldownMsg = document.createElement('div');
-                        cooldownMsg.id = 'cooldownMsg';
-                        cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
-                        
-                        refreshContainer.appendChild(refreshBtn);
-                        refreshContainer.appendChild(cooldownMsg);
-                        thankYouDiv.appendChild(refreshContainer);
-                    }
-                    
+                    addRefreshButton(thankYouDiv);
                     thankYouDiv.classList.add('show');
                     return;
                 }
@@ -1486,6 +1451,45 @@
             await saveVote(playerId);
         }
 
+        // Helper pour ajouter le bouton actualiser
+        function addRefreshButton(targetDiv) {
+            if (document.getElementById('refreshBtn')) {
+                return; // Bouton déjà présent
+            }
+            
+            const refreshContainer = document.createElement('div');
+            refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
+            
+            // Bouton d'actualisation
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'refreshBtn';
+            refreshBtn.style.cssText = `
+                background: linear-gradient(135deg, #d4af37, #f0d46f);
+                color: #0a1828;
+                border: none;
+                padding: 20px 50px;
+                font-size: 1.8rem;
+                font-weight: bold;
+                border-radius: 15px;
+                cursor: pointer;
+                box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+                transition: all 0.3s;
+            `;
+            refreshBtn.textContent = currentLanguage === 'fr' 
+                ? '🔄 ACTUALISER'
+                : '🔄 VERNIEUWEN';
+            refreshBtn.addEventListener('click', refreshWithCooldown);
+            
+            // Message de cooldown
+            const cooldownMsg = document.createElement('div');
+            cooldownMsg.id = 'cooldownMsg';
+            cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
+            
+            refreshContainer.appendChild(refreshBtn);
+            refreshContainer.appendChild(cooldownMsg);
+            targetDiv.appendChild(refreshContainer);
+        }
+
         async function saveVote(playerId) {
             if (!supabaseClient) return;
             
@@ -1527,44 +1531,8 @@
                 
                 setTimeout(() => {
                     document.getElementById('voteSection').style.display = 'none';
-                    
                     const thankYouDiv = document.getElementById('thankYou');
-                    
-                    // Ajouter le bouton actualiser après le vote
-                    if (!document.getElementById('refreshBtn')) {
-                        const refreshContainer = document.createElement('div');
-                        refreshContainer.style.cssText = 'margin-top: 30px; text-align: center;';
-                        
-                        // Bouton d'actualisation
-                        const refreshBtn = document.createElement('button');
-                        refreshBtn.id = 'refreshBtn';
-                        refreshBtn.onclick = refreshWithCooldown;
-                        refreshBtn.style.cssText = `
-                            background: linear-gradient(135deg, #d4af37, #f0d46f);
-                            color: #0a1828;
-                            border: none;
-                            padding: 20px 50px;
-                            font-size: 1.8rem;
-                            font-weight: bold;
-                            border-radius: 15px;
-                            cursor: pointer;
-                            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
-                            transition: all 0.3s;
-                        `;
-                        refreshBtn.textContent = currentLanguage === 'fr' 
-                            ? '🔄 ACTUALISER'
-                            : '🔄 VERNIEUWEN';
-                        
-                        // Message de cooldown
-                        const cooldownMsg = document.createElement('div');
-                        cooldownMsg.id = 'cooldownMsg';
-                        cooldownMsg.style.cssText = 'display: none; color: #f4d03f; font-size: 1.3rem; margin-top: 20px; font-weight: bold;';
-                        
-                        refreshContainer.appendChild(refreshBtn);
-                        refreshContainer.appendChild(cooldownMsg);
-                        thankYouDiv.appendChild(refreshContainer);
-                    }
-                    
+                    addRefreshButton(thankYouDiv);
                     thankYouDiv.classList.add('show');
                 }, 800);
                 
