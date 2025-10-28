@@ -715,13 +715,13 @@
         }
         
         function startAutoRefresh() {
-            // Actualiser les résultats toutes les 2 secondes
+            // Actualiser les résultats toutes les 3 secondes
             refreshInterval = setInterval(() => {
                 loadResults();
-            }, 2000);
+            }, 3000);
             
-            // Vérifier si un nouveau sondage est actif toutes les 5 secondes
-            surveyCheckInterval = setInterval(checkForNewSurvey, 5000);
+            // Vérifier si un nouveau sondage est actif toutes les 9 secondes
+            surveyCheckInterval = setInterval(checkForNewSurvey, 9000);
         }
 
         function stopAutoRefresh() {
