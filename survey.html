@@ -168,7 +168,7 @@
             left: 100%;
         }
 
-        /* Bouton FranÃ§ais (blanc) */
+        /* Bouton Français (blanc) */
         .btn-accept-fr {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: #ffffff;
@@ -182,7 +182,7 @@
             box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
         }
 
-        /* Bouton NÃ©erlandais (jaune) */
+        /* Bouton Néerlandais (jaune) */
         .btn-accept-nl {
             background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
             color: #1a2f4a;
@@ -753,7 +753,7 @@
                     </div>
 
                     <div class="consent-text-nl">
-                        <strong>Nederlands :</strong> We gebruiken essentiÃ«le cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
+                        <strong>Nederlands :</strong> We gebruiken essentiële cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
                         Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquête in uw voorkeurtaal.
                         <br><br>
                         <a class="privacy-link" onclick="showPrivacyPolicy()"> Volledig privacybeleid</a>
@@ -772,7 +772,7 @@
                         </button>
                     </div>
                     <button class="btn-decline" onclick="declineConsent()">
-                        âŒ Je refuse / Ik weiger
+                      Je refuse / Ik weiger
                     </button>
                 </div>
             </div>
@@ -1522,7 +1522,7 @@
                     throw insertError;
                 }
                 
-                console.log('Vote enregistrÃ© avec succÃ¨s:', data);
+                console.log('✅ Vote enregistré avec succès:', data);
                 
                 // Set cookie pour empêcher les votes multiples
                 setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
@@ -1537,7 +1537,7 @@
                 }, 800);
                 
             } catch (error) {
-                console.error('âŒ Erreur lors du vote:', error);
+                console.error('❌ Erreur lors du vote:', error);
                 
                 // Message d'erreur plus détaillé
                 let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
@@ -1774,7 +1774,7 @@
                 // Vérifier changement du mode bilingue
                 const newBilingualMode = configData?.bilingual_mode || false;
                 if (newBilingualMode !== isBilingualMode) {
-                    console.log('Changement du mode bilingue dÃ©tectÃ©:', isBilingualMode, 'newBilingualMode);
+                    console.log('Changement du mode bilingue détecté:', isBilingualMode, '→', newBilingualMode);
                     window.location.reload();
                 }
                 
