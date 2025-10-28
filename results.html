@@ -345,6 +345,8 @@
         let supabaseClient = null;
         let currentSurveyId = null;
         let refreshInterval = null;
+        let bilingualCheckInterval = null;
+        let bilingualModeEnabled = false; // Mode bilingue global (vérifié toutes les 5 min)
         let isBilingualMode = false;
         let currentZoom = 1; // Mémoriser le zoom actuel
 
@@ -429,6 +431,25 @@
         }
 
         // ============================================
+        // CHECK BILINGUAL MODE (toutes les 5 minutes)
+        // ============================================
+        async function checkBilingualMode() {
+            try {
+                if (!supabaseClient) return;
+                
+                const { data: configData } = await supabaseClient
+                    .from('config_messages')
+                    .select('bilingual_mode')
+                    .single();
+
+                bilingualModeEnabled = configData?.bilingual_mode || false;
+                console.log('🌐 Mode bilingue vérifié:', bilingualModeEnabled);
+            } catch (error) {
+                console.error('Erreur vérification mode bilingue:', error);
+            }
+        }
+
+        // ============================================
         // LOAD RESULTS
         // ============================================
         async function loadResults() {
@@ -439,15 +460,6 @@
                 }
 
                 console.log('🔄 Chargement des résultats pour le sondage:', currentSurveyId);
-
-                // Vérifier le mode bilingue global depuis config_messages
-                const { data: configData, error: configError } = await supabaseClient
-                    .from('config_messages')
-                    .select('bilingual_mode')
-                    .single();
-
-                const bilingualModeEnabled = configData?.bilingual_mode || false;
-                console.log('🌐 Mode bilingue global:', bilingualModeEnabled);
 
                 // Charger les informations du sondage (titre et description)
                 const { data: surveyData, error: surveyError } = await supabaseClient
@@ -722,6 +734,9 @@
             
             // Vérifier si un nouveau sondage est actif toutes les 9 secondes
             surveyCheckInterval = setInterval(checkForNewSurvey, 9000);
+            
+            // Vérifier le mode bilingue toutes les 5 minutes (300 secondes)
+            bilingualCheckInterval = setInterval(checkBilingualMode, 300000);
         }
 
         function stopAutoRefresh() {
@@ -732,6 +747,10 @@
             if (surveyCheckInterval) {
                 clearInterval(surveyCheckInterval);
                 surveyCheckInterval = null;
+            }
+            if (bilingualCheckInterval) {
+                clearInterval(bilingualCheckInterval);
+                bilingualCheckInterval = null;
             }
         }
 
@@ -764,6 +783,7 @@
 
             const initialized = await initSupabase();
             if (initialized) {
+                await checkBilingualMode(); // Vérifier le mode bilingue au démarrage
                 await loadResults();
                 startAutoRefresh();
             }
