@@ -1122,11 +1122,14 @@
                 const nlElements = document.querySelectorAll('.consent-title-nl, .consent-text-nl, .btn-accept-nl');
                 nlElements.forEach(el => el.style.display = 'none');
                 
-                // Masquer les sections NL de la politique de confidentialite
-                const privacySections = document.querySelectorAll('#privacyPolicy h3, #privacyPolicy .privacy-section');
+                // Masquer les sections NL et afficher les sections FR de la politique de confidentialite
+                const privacySections = document.querySelectorAll('#privacyPolicy .privacy-section');
                 privacySections.forEach(section => {
-                    if (section.textContent.includes('') || section.textContent.includes('Nederlands')) {
+                    const sectionText = section.textContent;
+                    if (sectionText.includes('') || sectionText.includes('Nederlands')) {
                         section.style.display = 'none';
+                    } else {
+                        section.style.display = 'block';
                     }
                 });
                 
@@ -1160,12 +1163,10 @@
                 const nlElements = document.querySelectorAll('.consent-title-nl, .consent-text-nl, .btn-accept-nl');
                 nlElements.forEach(el => el.style.display = '');
                 
-                // Afficher les sections NL de la politique de confidentialite
-                const privacySections = document.querySelectorAll('#privacyPolicy h3, #privacyPolicy .privacy-section');
+                // Afficher toutes les sections de la politique de confidentialite en mode bilingue
+                const privacySections = document.querySelectorAll('#privacyPolicy .privacy-section');
                 privacySections.forEach(section => {
-                    if (section.textContent.includes('') || section.textContent.includes('Nederlands')) {
-                        section.style.display = '';
-                    }
+                    section.style.display = 'block';
                 });
                 
                 // Restaurer la largeur normale du bouton FR
