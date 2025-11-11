@@ -651,7 +651,7 @@
  <h1> Administration Multi-Sondages</h1>
  <div class="user-info-container">
  <span class="user-email" id="userEmail">Chargement...</span>
- <button class="logout-btn" onclick="handleLogout()">🚪 Déconnexion</button>
+ <button class="logout-btn" onclick="handleLogout()">ðŸšª Déconnexion</button>
  </div>
  </div>
 
@@ -683,16 +683,16 @@
  </div>
 
  <button class="btn btn-success" onclick="saveGlobalMessages()" style="margin-top: 10px;">
- 💾 Enregistrer les messages
+ ðŸ’¾ Enregistrer les messages
  </button>
  </div>
  </div>
 
- <!-- ContrÃ´les -->
+ <!-- ContrÃƒÂ´les -->
  <div class="section">
  <div class="controls">
- <button class="btn btn-success" onclick="openCreateModal()">➕ Créer un sondage</button>
- <button class="btn" onclick="loadSurveys()">🔄 Actualiser</button>
+ <button class="btn btn-success" onclick="openCreateModal()">âž• Créer un sondage</button>
+ <button class="btn" onclick="loadSurveys()">ðŸ”„ Actualiser</button>
  <div class="bilingual-toggle">
  <label class="toggle-label">
  <input type="checkbox" id="globalBilingualMode" onchange="toggleGlobalBilingualMode()">
@@ -758,7 +758,7 @@
  <label class="form-label">Candidats / Questions *</label>
  <p class="info-text">Ajoutez au moins 2 candidats/questions pour votre sondage. Si NL est activé, vous pourrez les traduire ci-dessous.</p>
  <div id="playersEditor" class="players-editor"></div>
- <button type="button" class="btn" onclick="addPlayerField()">➕ Ajouter un candidat</button>
+ <button type="button" class="btn" onclick="addPlayerField()">âž• Ajouter un candidat</button>
  </div>
 
  <!-- Traduction NL - Toujours visible -->
@@ -798,8 +798,8 @@
 
  <!-- Actions -->
  <div class="modal-actions">
- <button type="button" class="btn btn-danger" onclick="closeModal()">âŒ Annuler</button>
- <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+ <button type="button" class="btn btn-danger" onclick="closeModal()">âÂÅ’ Annuler</button>
+ <button type="submit" class="btn btn-success">ðŸ’¾ Enregistrer</button>
  </div>
 
  <!-- URLs Preview -->
@@ -855,7 +855,7 @@
  }
 
  async function handleLogout() {
- if (confirm('ÃŠtes-vous sÃ»r de vouloir vous déconnecter ?')) {
+ if (confirm('ÃƒÅ tes-vous sÃƒÂ»r de vouloir vous déconnecter ?')) {
  await supabaseClient.auth.signOut();
  window.location.href = 'login.html';
  }
@@ -894,12 +894,12 @@
  // Afficher les sondages
  displaySurveys(allSurveys, statsMap);
  
- // Mettre à jour les stats globales
+ // Mettre Ã  jour les stats globales
  document.getElementById('totalSurveysCount').textContent = allSurveys.length;
 
  } catch (error) {
  console.error('Erreur chargement sondages:', error);
- alert('âŒ Erreur: ' + error.message);
+ alert('âÂÅ’ Erreur: ' + error.message);
  }
  }
 
@@ -926,7 +926,7 @@
  <div class="survey-header">
  <div class="survey-title">${escapeHtml(survey.titre)}</div>
  <span class="${survey.active ? 'active-badge' : 'inactive-badge'}">
- ${survey.active ? ' Actif' : 'âšª Inactif'}
+ ${survey.active ? ' Actif' : '⚫ Inactif'}
  </span>
  </div>
 
@@ -935,7 +935,7 @@
  <div class="language-badges">
  <span class="lang-badge fr"> Français</span>
  <span class="lang-badge nl ${nlActive ? '' : 'inactive'}">
- Nederlands ${nlActive ? ' : '
+ Nederlands ${nlActive ? '✓' : '✗'}
  </span>
  </div>
 
@@ -964,29 +964,29 @@
  <button class="btn" onclick="moveSurvey(${survey.id}, 'up')" 
  style="padding: 5px 10px; font-size: 0.8rem; min-width: auto; ${index === 0 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
  ${index === 0 ? 'disabled' : ''}>
- â†‘
+ â" "˜
  </button>
  <button class="btn" onclick="moveSurvey(${survey.id}, 'down')" 
  style="padding: 5px 10px; font-size: 0.8rem; min-width: auto; ${index === surveys.length - 1 ? 'opacity: 0.3; cursor: not-allowed;' : ''}"
  ${index === surveys.length - 1 ? 'disabled' : ''}>
- â†“
+ â" "
  </button>
  </div>
  <button class="btn ${survey.active ? 'btn-warning' : 'btn-success'}" 
  onclick="toggleActive(${survey.id}, ${survey.active})"
  style="flex: 1; ${survey.ever_activated && !survey.active ? 'opacity: 0.5; cursor: not-allowed;' : ''}"
  ${survey.ever_activated && !survey.active ? 'disabled' : ''}>
- ${survey.active ? ' Désactiver' : ' Activer'}
+ ${survey.active ? 'Â Désactiver' : 'Â Activer'}
  </button>
  <button class="btn btn-done ${survey.ever_activated ? 'active' : ''}" 
  onclick="toggleEverActivated(${survey.id}, ${survey.ever_activated})"
  style="flex: 1;">
- ${survey.ever_activated ? ' Déjà fait' : 'â¬œ Déjà fait'}
+ ${survey.ever_activated ? ' DéjÃ  fait' : 'âÂ¬Å“ DéjÃ  fait'}
  </button>
  </div>
  <div style="display: flex; gap: 8px; width: 100%;">
- <button class="btn btn-info" onclick="editSurvey(${survey.id})" style="flex: 1;"> Modifier</button>
- <button class="btn btn-warning" onclick="resetVotes(${survey.id})" style="flex: 1;">🔄 Reset votes</button>
+ <button class="btn btn-info" onclick="editSurvey(${survey.id})" style="flex: 1;">Â Modifier</button>
+ <button class="btn btn-warning" onclick="resetVotes(${survey.id})" style="flex: 1;">ðŸ”„ Reset votes</button>
  </div>
  <button class="btn btn-danger" onclick="deleteSurvey(${survey.id})" style="width: 100%;"> Supprimer</button>
  </div>
@@ -996,13 +996,13 @@
  }
 
  // ============================================
- // ACTIVER/DÃ‰SACTIVER SONDAGE
+ // ACTIVER/DÃƒ"°SACTIVER SONDAGE
  // ============================================
  async function toggleActive(surveyId, currentActive) {
  try {
  if (!currentActive) {
  // Désactiver tous les autres sondages de l'utilisateur
- console.log('🔄 Désactivation des autres sondages...');
+ console.log('ðŸ”„ Désactivation des autres sondages...');
  const { error: deactivateError } = await supabaseClient
  .from('surveys')
  .update({ active: false })
@@ -1015,7 +1015,7 @@
  }
 
  // Activer/désactiver le sondage actuel
- console.log('🔄 Mise à jour du sondage #' + surveyId);
+ console.log('ðŸ”„ Mise Ã  jour du sondage #' + surveyId);
  const updateData = { active: !currentActive };
  
  // Si on active pour la première fois, marquer comme "ever_activated"
@@ -1031,24 +1031,24 @@
 
  if (error) throw error;
 
- alert(currentActive ? ' Sondage désactivé' : ' Sondage activé (vos autres sondages ont été désactivés)');
+ alert(currentActive ? 'Â Sondage désactivé' : ' Sondage activé (vos autres sondages ont été désactivés)');
  await loadSurveys();
 
  } catch (error) {
- console.error('âŒ Erreur toggleActive:', error);
- alert('âŒ Erreur: ' + error.message);
+ console.error('âÂÅ’ Erreur toggleActive:', error);
+ alert('âÂÅ’ Erreur: ' + error.message);
  }
  }
 
  // ============================================
- // DÃ‰PLACER SONDAGE
+ // DÃƒ"°PLACER SONDAGE
  // ============================================
  async function moveSurvey(surveyId, direction) {
  try {
  // Trouver l'index du sondage actuel
  const currentIndex = allSurveys.findIndex(s => s.id === surveyId);
  if (currentIndex === -1) {
- alert('âŒ Sondage introuvable');
+ alert('âÂÅ’ Sondage introuvable');
  return;
  }
  
@@ -1060,7 +1060,7 @@
  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
  const targetSurvey = allSurveys[targetIndex];
  
- // Ã‰changer les ordres
+ // Ãƒ"°changer les ordres
  const { error: error1 } = await supabaseClient
  .from('surveys')
  .update({ ordre: targetSurvey.ordre })
@@ -1079,8 +1079,8 @@
  await loadSurveys();
  
  } catch (error) {
- console.error('âŒ Erreur moveSurvey:', error);
- alert('âŒ Erreur: ' + error.message);
+ console.error('âÂÅ’ Erreur moveSurvey:', error);
+ alert('âÂÅ’ Erreur: ' + error.message);
  }
  }
 
@@ -1093,13 +1093,13 @@
 
  // Vérifier le type de fichier
  if (!file.type.startsWith('image/')) {
- alert('âŒ Veuillez sélectionner une image');
+ alert('âÂÅ’ Veuillez sélectionner une image');
  return;
  }
 
  // Vérifier la taille (max 2MB)
  if (file.size > 2 * 1024 * 1024) {
- alert('âŒ L\'image est trop grande (max 2MB)');
+ alert('âÂÅ’ L\'image est trop grande (max 2MB)');
  return;
  }
 
@@ -1115,7 +1115,7 @@
  reader.readAsDataURL(file);
  } catch (error) {
  console.error('Erreur upload logo:', error);
- alert('âŒ Erreur lors du chargement du logo');
+ alert('âÂÅ’ Erreur lors du chargement du logo');
  }
  });
 
@@ -1167,7 +1167,7 @@
  // ============================================
  function translateAllToNL() {
  try {
- // Récupérer les textes FR à traduire
+ // Récupérer les textes FR Ã  traduire
  const titleFR = document.getElementById('surveyTitle').value.trim();
  const descriptionFR = document.getElementById('surveyDescription').value.trim();
  const thankyouFR = document.getElementById('msgThankyouFr').value.trim();
@@ -1180,7 +1180,7 @@
  })).filter(p => p.text);
 
  if (!titleFR && !descriptionFR && !thankyouFR && playersFR.length === 0) {
- alert('âš ï¸ Veuillez remplir au moins un champ FR à traduire.');
+ alert('âÅ¡Â ïÂ¸Â Veuillez remplir au moins un champ FR Ã  traduire.');
  return;
  }
 
@@ -1216,11 +1216,11 @@
  '1. DeepL s\'ouvre dans un nouvel onglet\n' +
  '2. Collez (Ctrl+V ou Cmd+V) dans le champ de gauche\n' +
  '3. Attendez la traduction automatique\n' +
- '4. Copiez toute la traduction à droite\n' +
+ '4. Copiez toute la traduction Ã  droite\n' +
  '5. Revenez ici et collez dans les champs NL\n\n' +
  ' Gardez les séparateurs ---TITRE---, ---CANDIDAT1--- etc. pour vous repérer !');
  }).catch(err => {
- // Si le presse-papiers ne fonctionne pas, afficher le texte à copier manuellement
+ // Si le presse-papiers ne fonctionne pas, afficher le texte Ã  copier manuellement
  console.error('Erreur copie presse-papiers:', err);
  
  // Créer une zone de texte temporaire pour afficher le texte
@@ -1252,8 +1252,8 @@
  });
 
  } catch (error) {
- console.error('âŒ Erreur:', error);
- alert('âŒ Erreur:\n' + error.message);
+ console.error('âÂÅ’ Erreur:', error);
+ alert('âÂÅ’ Erreur:\n' + error.message);
  }
  }
 
@@ -1431,7 +1431,7 @@
 
  if (updateError) throw updateError;
 
- // âš¡ NOUVELLE LOGIQUE : Mise à jour intelligente des candidats pour préserver les votes
+ // âÅ¡Â¡ NOUVELLE LOGIQUE : Mise Ã  jour intelligente des candidats pour préserver les votes
  // Récupérer les candidats existants
  const { data: existingPlayers, error: fetchError } = await supabaseClient
  .from('survey_players')
@@ -1446,10 +1446,10 @@
  
  let insertedPlayers = [];
 
- // Mettre à jour ou créer les candidats
+ // Mettre Ã  jour ou créer les candidats
  for (let i = 0; i < newCount; i++) {
  if (i < existingCount) {
- // Mettre à jour le candidat existant
+ // Mettre Ã  jour le candidat existant
  const { error: updatePlayerError } = await supabaseClient
  .from('survey_players')
  .update({
@@ -1460,7 +1460,7 @@
  
  if (updatePlayerError) throw updatePlayerError;
  
- // Ajouter à la liste pour les traductions
+ // Ajouter Ã  la liste pour les traductions
  insertedPlayers.push(existingPlayers[i]);
  } else {
  // Insérer un nouveau candidat
@@ -1523,7 +1523,7 @@
  .from('survey_translations')
  .upsert(nlData, { onConflict: 'survey_id,language_code' });
  
- // âš¡ NOUVELLE LOGIQUE : Mise à jour intelligente des traductions des candidats
+ // âÅ¡Â¡ NOUVELLE LOGIQUE : Mise Ã  jour intelligente des traductions des candidats
  // Récupérer les traductions existantes
  const { data: existingTranslations } = await supabaseClient
  .from('survey_player_translations')
@@ -1538,7 +1538,7 @@
  });
  }
  
- // Mettre à jour ou créer les traductions
+ // Mettre Ã  jour ou créer les traductions
  for (let i = 0; i < insertedPlayers.length; i++) {
  const playerId = insertedPlayers[i].id;
  const nlName = playersNL[i] ? playersNL[i].trim() : '';
@@ -1546,7 +1546,7 @@
  if (nlName) {
  // Il y a une traduction NL
  if (translationsMap[playerId]) {
- // Mettre à jour la traduction existante
+ // Mettre Ã  jour la traduction existante
  await supabaseClient
  .from('survey_player_translations')
  .update({ nom: nlName })
@@ -1563,7 +1563,7 @@
  });
  }
  } else if (translationsMap[playerId]) {
- // Pas de traduction NL mais il y en avait une â†’ supprimer
+ // Pas de traduction NL mais il y en avait une â" ' supprimer
  await supabaseClient
  .from('survey_player_translations')
  .delete()
@@ -1587,7 +1587,7 @@
  .eq('language_code', 'nl');
  }
 
- alert(' Sondage mis à jour !');
+ alert(' Sondage mis Ã  jour !');
 
  } else {
  // ===== CREATE =====
@@ -1606,7 +1606,7 @@
  .single();
 
  if (createError) throw createError;
- if (!newSurvey) throw new Error('Ã‰chec de création du sondage');
+ if (!newSurvey) throw new Error('Ãƒ"°chec de création du sondage');
 
  // Insérer les candidats
  const playersData = players.map((nom, index) => ({
@@ -1677,7 +1677,7 @@
  });
 
  function showError(message) {
- document.getElementById('errorContainer').innerHTML = `<div class="error-message">âš ï¸ ${message}</div>`;
+ document.getElementById('errorContainer').innerHTML = `<div class="error-message">âÅ¡Â ïÂ¸Â ${message}</div>`;
  }
 
  function showUrls(surveyId) {
@@ -1691,7 +1691,7 @@
  // ============================================
  // AFFICHER LES URLs
  // ============================================
- /* FONCTION DÃ‰SACTIVÃ‰E - Bouton URLs supprimé
+ /* FONCTION DÃƒ"°SACTIVÃƒ"°E - Bouton URLs supprimé
  function viewUrls(surveyId) {
  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
  const urls = `
@@ -1732,7 +1732,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  } catch (error) {
  console.error('Erreur:', error);
- alert('âŒ Erreur: ' + error.message);
+ alert('âÂÅ’ Erreur: ' + error.message);
  }
  }
 
@@ -1765,12 +1765,12 @@ ${baseUrl}results.html?id=${surveyId}
 
  } catch (error) {
  console.error('Erreur:', error);
- alert('âŒ Erreur: ' + error.message);
+ alert('âÂÅ’ Erreur: ' + error.message);
  }
  }
 
  // ============================================
- // RESET "DÃ‰JÃ€ ACTIVÃ‰"
+ // RESET "DÃƒ"°JÃƒâ‚¬ ACTIVÃƒ"°"
  // ============================================
  async function toggleEverActivated(surveyId, currentValue) {
  const newValue = !currentValue;
@@ -1788,7 +1788,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  } catch (error) {
  console.error('Erreur:', error);
- alert('âŒ Erreur: ' + error.message);
+ alert('âÂÅ’ Erreur: ' + error.message);
  }
  }
 
@@ -1905,7 +1905,7 @@ ${baseUrl}results.html?id=${surveyId}
  globalBilingualMode = isEnabled;
  
  try {
- // Vérifier si une ligne existe déjà
+ // Vérifier si une ligne existe déjÃ 
  const { data: existing, error: selectError } = await supabaseClient
  .from('config_messages')
  .select('id')
@@ -1927,7 +1927,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  if (result.error) throw result.error;
 
- // Mettre à jour toutes les traductions NL existantes
+ // Mettre Ã  jour toutes les traductions NL existantes
  await supabaseClient
  .from('survey_translations')
  .update({ active: isEnabled })
@@ -1935,14 +1935,14 @@ ${baseUrl}results.html?id=${surveyId}
 
  alert(isEnabled ? 
  ' Mode bilingue activé ! Toutes les traductions NL sont maintenant actives.' : 
- ' Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
+ 'Â Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
  
  await loadSurveys(); // Rafraîchir l'affichage
  
  } catch (error) {
  console.error('Erreur toggle mode bilingue:', error);
- alert('âŒ Erreur: ' + error.message);
- // Revenir à l'état précédent
+ alert('âÂÅ’ Erreur: ' + error.message);
+ // Revenir Ã  l'état précédent
  document.getElementById('globalBilingualMode').checked = !isEnabled;
  globalBilingualMode = !isEnabled;
  }
