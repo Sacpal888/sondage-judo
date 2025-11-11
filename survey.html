@@ -8,16 +8,16 @@
  <script src="config.js"></script>
  <style>
  /* Variables CSS pour le design personnalisable */
-        :root {
-            --background-color: var(--border-title-color);
-            --container-bg-color: var(--container-bg-color);
-            --text-color: var(--text-color);
-            --border-title-color: var(--border-title-color);
-            --button-color: #2196F3;
-            --button-gradient-start: #1a5490;
-            --button-gradient-end: #2196F3;
-            --button-style: gradient; /* 'solid' ou 'gradient' */
-        }
+ :root {
+ --background-color: var(--border-title-color);
+ --container-bg-color: var(--container-bg-color);
+ --text-color: var(--text-color);
+ --border-title-color: var(--border-title-color);
+ --button-color: #2196F3;
+ --button-gradient-start: #1a5490;
+ --button-gradient-end: #2196F3;
+ --button-style: gradient; /* 'solid' ou 'gradient' */
+ }
 
 
  * {
@@ -181,7 +181,7 @@
  left: 100%;
  }
 
- /* Bouton Français (blanc) */
+ /* Bouton Francais (blanc) */
  .btn-accept-fr {
  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
  color: var(--text-color);
@@ -195,7 +195,7 @@
  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
  }
 
- /* Bouton NÃƒÆ’Ã‚Â©erlandais (jaune) */
+ /* Bouton N �Æ’ ��' �"š ��Â©erlandais (jaune) */
  .btn-accept-nl {
  background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
  color: #1a2f4a;
@@ -756,7 +756,7 @@
  }
  }
 
- /* Très petits écrans */
+ /* Tres petits ecrans */
  @media (max-width: 480px) {
  body {
  padding: 10px;
@@ -840,25 +840,25 @@
  }
  }
  
-        /* Boutons avec support des deux styles */
-        .vote-button,
-        .consent-btn-accept,
-        .consent-btn-decline,
-        button[type="submit"],
-        .refresh-btn {
-            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end)) !important;
-        }
+ /* Boutons avec support des deux styles */
+ .vote-button,
+ .consent-btn-accept,
+ .consent-btn-decline,
+ button[type="submit"],
+ .refresh-btn {
+ background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end)) !important;
+ }
 
-        /* Si le style est "solid", JavaScript ajoutera cette classe */
-        .btn-solid-style .vote-button,
-        .btn-solid-style .consent-btn-accept,
-        .btn-solid-style .consent-btn-decline,
-        .btn-solid-style button[type="submit"],
-        .btn-solid-style .refresh-btn {
-            background: var(--button-color) !important;
-        }
+ /* Si le style est "solid", JavaScript ajoutera cette classe */
+ .btn-solid-style .vote-button,
+ .btn-solid-style .consent-btn-accept,
+ .btn-solid-style .consent-btn-decline,
+ .btn-solid-style button[type="submit"],
+ .btn-solid-style .refresh-btn {
+ background: var(--button-color) !important;
+ }
 
-    </style>
+ </style>
 </head>
 <body>
  <div class="container">
@@ -870,21 +870,21 @@
  <div class="cookie-icon"></div>
  
  <div class="consent-title-bilingual">
- <div class="consent-title-fr"> Cookies et Confidentialité</div>
+ <div class="consent-title-fr"> Cookies et Confidentialite</div>
  <div class="consent-title-nl"> Cookies en Privacy</div>
  </div>
 
  <div class="consent-text-container">
  <div class="consent-text-fr">
- <strong>Français :</strong> Nous utilisons des cookies essentiels pour enregistrer votre vote et garantir l'intégralité de ce sondage. 
- En cliquant sur le bouton de votre langue, vous acceptez notre utilisation des cookies et accédez au sondage dans votre langue préférée.
+ <strong>Francais :</strong> Nous utilisons des cookies essentiels pour enregistrer votre vote et garantir l'integralite de ce sondage. 
+ En cliquant sur le bouton de votre langue, vous acceptez notre utilisation des cookies et accedez au sondage dans votre langue preferee.
  <br><br>
- <a class="privacy-link" onclick="showPrivacyPolicy()"> Politique de confidentialité complète</a>
+ <a class="privacy-link" onclick="showPrivacyPolicy()"> Politique de confidentialite complete</a>
  </div>
 
  <div class="consent-text-nl">
- <strong>Nederlands :</strong> We gebruiken essentielle cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
- Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquête in uw voorkeurtaal.
+ <strong>Nederlands :</strong> We gebruiken essentielle cookies om uw stem te registreren en de integriteit van deze enquete te garanderen. 
+ Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquete in uw voorkeurtaal.
  <br><br>
  <a class="privacy-link" onclick="showPrivacyPolicy()"> Volledig privacybeleid</a>
  </div>
@@ -894,7 +894,7 @@
  <div class="language-buttons">
  <button class="btn-consent-lang btn-accept-fr" onclick="acceptConsent('fr')">
  <span class="lang-flag"></span>
- J'accepte (Français)
+ J'accepte (Francais)
  </button>
  <button class="btn-consent-lang btn-accept-nl" onclick="acceptConsent('nl')">
  <span class="lang-flag"></span>
@@ -914,40 +914,40 @@
  <div id="privacyPolicy" class="privacy-policy hidden">
  <div class="privacy-content">
  <div class="policy-icon"></div>
- <h2 class="privacy-title">Politique de Confidentialité / Privacybeleid</h2>
+ <h2 class="privacy-title">Politique de Confidentialite / Privacybeleid</h2>
 
  <div class="privacy-section">
- <h3> Français - Utilisation des Cookies</h3>
- <p>Ce sondage utilise des cookies techniques strictement nécessaires pour :</p>
+ <h3> Francais - Utilisation des Cookies</h3>
+ <p>Ce sondage utilise des cookies techniques strictement necessaires pour :</p>
  <ul>
  <li>Enregistrer votre consentement aux cookies</li>
  <li>Garantir qu'une personne ne peut voter qu'une seule fois</li>
- <li>Assurer l'intégrité et la validité des résultats du sondage</li>
+ <li>Assurer l'integrite et la validite des resultats du sondage</li>
  </ul>
- <p><strong>Durée de conservation :</strong> Les cookies expirent après 1 jour.</p>
+ <p><strong>Duree de conservation :</strong> Les cookies expirent apres 1 jour.</p>
  </div>
 
  <div class="privacy-section">
  <h3> Nederlands - Gebruik van Cookies</h3>
- <p>Deze enquête gebruikt strikt noodzakelijke technische cookies om:</p>
+ <p>Deze enquete gebruikt strikt noodzakelijke technische cookies om:</p>
  <ul>
  <li>Uw toestemming voor cookies te registreren</li>
- <li>Ervoor te zorgen dat een persoon slechts ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â©n keer kan stemmen</li>
- <li>De integriteit en geldigheid van de enquêteresultaten te waarborgen</li>
+ <li>Ervoor te zorgen dat een persoon slechts  �Æ’ ��' �"š ��Â© �Æ’ ��' �"š ��Â©n keer kan stemmen</li>
+ <li>De integriteit en geldigheid van de enqueteresultaten te waarborgen</li>
  </ul>
  <p><strong>Bewaartermijn:</strong> Cookies verlopen na 1 dag.</p>
  </div>
 
  <div class="privacy-section">
- <h3> Données Collectées</h3>
- <p>Les informations suivantes sont collectées :</p>
+ <h3> Donnees Collectees</h3>
+ <p>Les informations suivantes sont collectees :</p>
  <ul>
- <li>Votre vote (candidat sélectioné)</li>
+ <li>Votre vote (candidat selectione)</li>
  <li>Date et heure du vote</li>
  <li>Langue choisie (FR ou NL)</li>
- <li>Identifiant de session anonyme (pour éviter les votes multiples)</li>
+ <li>Identifiant de session anonyme (pour eviter les votes multiples)</li>
  </ul>
- <p><strong>Aucune donnée personnelle identifiable n'est collectée.</strong></p>
+ <p><strong>Aucune donnee personnelle identifiable n'est collectee.</strong></p>
  </div>
 
  <div class="privacy-section">
@@ -965,12 +965,12 @@
  <div class="privacy-section">
  <h3> Vos Droits</h3>
  <p>Vous avez le droit de refuser l'utilisation de cookies. Dans ce cas, vous ne pourrez pas participer au sondage.</p>
- <p>Les données sont stockées de manière sécurisée et ne sont jamais partagées avec des tiers.</p>
+ <p>Les donnees sont stockees de maniere securisee et ne sont jamais partagees avec des tiers.</p>
  </div>
 
  <div class="privacy-section">
  <h3> Uw Rechten</h3>
- <p>U heeft het recht om het gebruik van cookies te weigeren. In dat geval kunt u niet deelnemen aan de enquête.</p>
+ <p>U heeft het recht om het gebruik van cookies te weigeren. In dat geval kunt u niet deelnemen aan de enquete.</p>
  <p>Gegevens worden veilig opgeslagen en worden nooit met derden gedeeld.</p>
  </div>
 
@@ -988,13 +988,13 @@
  <div class="declined-icon"></div>
  <h2 class="declined-title">Participation Impossible / Deelname Onmogelijk</h2>
  <p class="declined-text">
- <strong> Français :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l'intégrité du sondage. Vous ne pouvez pas participer.
+ <strong> Francais :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l'integrite du sondage. Vous ne pouvez pas participer.
  </p>
  <p class="declined-text">
- <strong> Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentielle cookies de integriteit van de enquête niet garanderen. U kunt niet deelnemen.
+ <strong> Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentielle cookies de integriteit van de enquete niet garanderen. U kunt niet deelnemen.
  </p>
  <div style="margin-top: 25px;">
- <button class="btn-back" onclick="backToConsent()">Reconsidérer / Heroverwegen</button>
+ <button class="btn-back" onclick="backToConsent()">Reconsiderer / Heroverwegen</button>
  </div>
  </div>
  </div>
@@ -1016,7 +1016,7 @@
  </div>
 
  <div id="thankYou" class="thank-you">
- <p id="thankYouText" class="thank-you-text">Votre vote a été enregistré avec succès.</p>
+ <p id="thankYouText" class="thank-you-text">Votre vote a ete enregistre avec succes.</p>
  </div>
 
  <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -1025,51 +1025,51 @@
 
  <script>
 
-        // ============================================
-        // CHARGER LE DESIGN ACTIF DEPUIS SUPABASE
-        // ============================================
-        async function loadActiveDesign() {
-            try {
-                const { data: preset, error } = await supabaseClient
-                    .from('design_presets')
-                    .select('*')
-                    .eq('is_active', true)
-                    .maybeSingle();
+ // ============================================
+ // CHARGER LE DESIGN ACTIF DEPUIS SUPABASE
+ // ============================================
+ async function loadActiveDesign() {
+ try {
+ const { data: preset, error } = await supabaseClient
+ .from('design_presets')
+ .select('*')
+ .eq('is_active', true)
+ .maybeSingle();
 
-                if (error) {
-                    console.error('Erreur chargement design:', error);
-                    return; // Garder le design par défaut
-                }
+ if (error) {
+ console.error('Erreur chargement design:', error);
+ return; // Garder le design par defaut
+ }
 
-                if (!preset) {
-                    console.log('Aucun design actif, utilisation du design par défaut');
-                    return;
-                }
+ if (!preset) {
+ console.log('Aucun design actif, utilisation du design par defaut');
+ return;
+ }
 
-                // Appliquer les variables CSS
-                const root = document.documentElement;
-                if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
-                if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
-                if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
-                if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
+ // Appliquer les variables CSS
+ const root = document.documentElement;
+ if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
+ if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
+ if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
+ if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
 
-                // Boutons
-                // Boutons
-                if (preset.button_style === 'solid' && preset.button_color) {
-                    root.style.setProperty('--button-color', preset.button_color);
-                    document.body.classList.add('btn-solid-style');
-                } else if (preset.button_style === 'gradient') {
-                    if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
-                    if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
-                    document.body.classList.remove('btn-solid-style');
-                }
+ // Boutons
+ // Boutons
+ if (preset.button_style === 'solid' && preset.button_color) {
+ root.style.setProperty('--button-color', preset.button_color);
+ document.body.classList.add('btn-solid-style');
+ } else if (preset.button_style === 'gradient') {
+ if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
+ if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
+ document.body.classList.remove('btn-solid-style');
+ }
 
-                console.log('Design "' + preset.preset_name + '" appliqué');
+ console.log('Design "' + preset.preset_name + '" applique');
 
-            } catch (error) {
-                console.error('Erreur lors du chargement du design:', error);
-            }
-        }
+ } catch (error) {
+ console.error('Erreur lors du chargement du design:', error);
+ }
+ }
 
  // ============================================
  // CONFIGURATION
@@ -1118,7 +1118,7 @@
  // URL PARAMETERS
  // ============================================
  async function getUrlParams() {
- // TOUJOURS détectér automatiquement le sondage actif
+ // TOUJOURS detecter automatiquement le sondage actif
  // Ne plus utiliser le parametre ?id= dans l'URL pour eviter de rester bloque sur un ancien sondage
  try {
  // Initialiser Supabase si ce n'est pas deja fait
@@ -1148,13 +1148,13 @@
  }
  
  currentSurveyId = activeSurvey.id;
- console.log('Sondage actif détecté automatiquement:', currentSurveyId);
+ console.log('Sondage actif detecte automatiquement:', currentSurveyId);
  await loadSurveyBilingualMode();
  return { id: currentSurveyId };
  
  } catch (error) {
  console.error('Erreur lors de la detection du sondage actif:', error);
- document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section mÃƒÆ’Ã‚Âªme en cas d'erreur
+ document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section m �Æ’ ��' �"š ��Âªme en cas d'erreur
  showError('Erreur de connexion a la base de donnees.');
  return null;
  }
@@ -1206,7 +1206,7 @@
  const privacySections = document.querySelectorAll('#privacyPolicy .privacy-section');
  privacySections.forEach(section => {
  const sectionText = section.textContent;
- if (sectionText.includes('Ã°Å¸â€¡Â§Ã°Å¸â€¡Âª') || sectionText.includes('Nederlands')) {
+ if (sectionText.includes('') || sectionText.includes('Nederlands')) {
  section.style.display = 'none';
  } else {
  section.style.display = 'block';
@@ -1266,7 +1266,7 @@
  const consent = getCookie(COOKIE_CONSENT_NAME);
  
  if (consent === 'accepted') {
- // VÃƒÆ’Ã‚Â©rifier la langue prÃƒÆ’Ã‚Â©fÃƒÆ’Ã‚Â©rÃƒÆ’Ã‚Â©e sauvegardÃƒÆ’Ã‚Â©e
+ // V �Æ’ ��' �"š ��Â©rifier la langue pr �Æ’ ��' �"š ��Â©f �Æ’ ��' �"š ��Â©r �Æ’ ��' �"š ��Â©e sauvegard �Æ’ ��' �"š ��Â©e
  const savedLang = getCookie(COOKIE_LANG_NAME);
  if (savedLang) {
  currentLanguage = savedLang;
@@ -1277,16 +1277,16 @@
  document.getElementById('surveySection').classList.remove('hidden');
  initializeSurvey();
  } else {
- // Afficher l'ÃƒÆ’Ã‚Â©cran de consentement bilingue
+ // Afficher l' �Æ’ ��' �"š ��Â©cran de consentement bilingue
  document.getElementById('cookieConsent').classList.remove('hidden');
  document.getElementById('surveySection').classList.add('hidden');
- // Appliquer l'ajustement du mode bilingue aprÃƒÆ’Ã‚Â¨s l'affichage du modal
+ // Appliquer l'ajustement du mode bilingue apr �Æ’ ��' �"š ��Â¨s l'affichage du modal
  adjustConsentDisplay();
  }
  }
 
  async function acceptConsent(language) {
- console.log(`Consentement accepté avec langue: ${language}`);
+ console.log(`Consentement accepte avec langue: ${language}`);
  
  // Sauvegarder le consentement
  setCookie(COOKIE_CONSENT_NAME, 'accepted', 365);
@@ -1295,14 +1295,14 @@
  currentLanguage = language;
  setCookie(COOKIE_LANG_NAME, language, 365);
  
- // Masquer l'écran de consentement et afficher le sondage
+ // Masquer l'ecran de consentement et afficher le sondage
  document.getElementById('cookieConsent').classList.add('hidden');
  document.getElementById('surveySection').classList.remove('hidden');
  
  // Charger le sondage actif AVANT d'initialiser
  const urlParams = await getUrlParams();
  if (!urlParams) {
- // Pas de sondage actif, getUrlParams() a déjÃ  affiché le message
+ // Pas de sondage actif, getUrlParams() a dej �Â  affiche le message
  return;
  }
  
@@ -1311,7 +1311,7 @@
  }
 
  function declineConsent() {
- console.log('Consentement refusé');
+ console.log('Consentement refuse');
  setCookie(COOKIE_CONSENT_NAME, 'declined', 1);
  
  document.getElementById('cookieConsent').classList.add('hidden');
@@ -1350,7 +1350,7 @@
  window.SUPABASE_ANON_KEY
  );
 
- // Charger les donnÃƒÆ’Ã‚Â©es du sondage
+ // Charger les donn �Æ’ ��' �"š ��Â©es du sondage
  const { data: survey, error: surveyError } = await supabaseClient
  .from('surveys')
  .select('*')
@@ -1359,7 +1359,7 @@
 
  if (surveyError) throw surveyError;
  if (!survey) {
- showError(` Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a été supprimé.<br><br>Contactez l'administrateur.`);
+ showError(` Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a ete supprime.<br><br>Contactez l'administrateur.`);
  return;
  }
  if (!survey.active) {
@@ -1369,7 +1369,7 @@
  .select('end_message_fr, end_message_nl')
  .maybeSingle();
  
- let noActiveMessage = ' Aucun sondage actif pour le moment.<br><br>Veuillez réessayer plus tard.';
+ let noActiveMessage = ' Aucun sondage actif pour le moment.<br><br>Veuillez reessayer plus tard.';
  
  if (configMessages) {
  if (currentLanguage === 'nl' && configMessages.end_message_nl) {
@@ -1381,14 +1381,14 @@
  
  showError(noActiveMessage);
  
- // DÃ‰SACTIVÃ‰ : Polling automatique désactivé - tout est manuel
+ // D �"°SACTIV �"° : Polling automatique desactive - tout est manuel
  // startPollingForActiveSurvey(currentSurveyId);
  return;
  }
 
- console.log('Sondage chargé:', survey);
+ console.log('Sondage charge:', survey);
 
- // Charger les messages (FR par défaut, puis NL si sélectionné)
+ // Charger les messages (FR par defaut, puis NL si selectionne)
  let messages = {
  title: survey.titre || 'Sondage',
  invitation: survey.description || 'Votez pour votre choix !',
@@ -1427,10 +1427,10 @@
  document.getElementById('logoContainer').style.display = 'none';
  }
 
- // Vérifier si l'utilisateur a déjÃ  voté
+ // Verifier si l'utilisateur a dej �Â  vote
  const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
  if (votedCookie === 'true') {
- console.log('Utilisateur a déjÃ  voté');
+ console.log('Utilisateur a dej �Â  vote');
  document.getElementById('loadingMessage').style.display = 'none';
  
  const thankYouDiv = document.getElementById('thankYou');
@@ -1453,7 +1453,7 @@
  return;
  }
 
- console.log(' Joueurs chargés:', players);
+ console.log(' Joueurs charges:', players);
  console.log(' Premier joueur:', players[0]);
  console.log(' Structure d\'un joueur:', Object.keys(players[0]));
 
@@ -1504,7 +1504,7 @@
  // Ajuster la taille de police
  adjustFontSize();
 
- // Ajuster l'échelle du container si nécessaire
+ // Ajuster l'echelle du container si necessaire
  adjustContainerScale();
 
  document.getElementById('loadingMessage').style.display = 'none';
@@ -1621,13 +1621,13 @@
  if (totalHeight > maxHeight) {
  currentZoom = maxHeight / totalHeight;
  container.style.zoom = currentZoom;
- console.log(` Zoom appliqué au container: ${(currentZoom * 100).toFixed(1)}%`);
+ console.log(` Zoom applique au container: ${(currentZoom * 100).toFixed(1)}%`);
  } else {
- console.log(' Container dans les limites, pas de zoom nécessaire');
+ console.log(' Container dans les limites, pas de zoom necessaire');
  }
  });
  } else {
- // Appels suivants: le zoom est déjÃ  appliqué
+ // Appels suivants: le zoom est dej �Â  applique
  container.style.zoom = currentZoom;
  }
  }
@@ -1661,7 +1661,7 @@
  // Helper pour ajouter le bouton actualiser
  function addRefreshButton(targetDiv) {
  if (document.getElementById('refreshBtn')) {
- return; // Bouton dÃƒÆ’Ã‚Â©jÃƒÆ’Ã‚Â  prÃƒÆ’Ã‚Â©sent
+ return; // Bouton d �Æ’ ��' �"š ��Â©j �Æ’ ��' �"š ��Â  pr �Æ’ ��' �"š ��Â©sent
  }
  
  const refreshContainer = document.createElement('div');
@@ -1708,7 +1708,7 @@
  session_id: sessionId
  });
 
- // Insérer le vote
+ // Inserer le vote
  const { data, error: insertError } = await supabaseClient
  .from('votes')
  .insert({
@@ -1721,7 +1721,7 @@
  .select();
  
  if (insertError) {
- console.error(' Erreur Supabase détaillée:', insertError);
+ console.error(' Erreur Supabase detaillee:', insertError);
  console.error('Code:', insertError.code);
  console.error('Message:', insertError.message);
  console.error('Details:', insertError.details);
@@ -1729,9 +1729,9 @@
  throw insertError;
  }
  
- console.log('Ã¢Å“â€¦ Vote enregistré avec succès:', data);
+ console.log(' �Â¢ ��"aâ‚¬Â¦ Vote enregistre avec succes:', data);
  
- // Set cookie pour empêcher les votes multiples
+ // Set cookie pour empecher les votes multiples
  setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
  
  hasVoted = true;
@@ -1744,17 +1744,17 @@
  }, 800);
  
  } catch (error) {
- console.error('Ã¢ÂÅ’ Erreur lors du vote:', error);
+ console.error(' �Â¢ ��Â ��' Erreur lors du vote:', error);
  
- // Message d'erreur plus détaillé
+ // Message d'erreur plus detaille
  let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
  if (error.message) {
- errorMessage += '\n\nDétails: ' + error.message;
+ errorMessage += '\n\nDetails: ' + error.message;
  }
  if (error.hint) {
  errorMessage += '\n\nSuggestion: ' + error.hint;
  }
- errorMessage += '\n\nVeuillez contacter l\'administrateur ou vérifier la console (F12) pour plus de détails.';
+ errorMessage += '\n\nVeuillez contacter l\'administrateur ou verifier la console (F12) pour plus de details.';
  
  alert(errorMessage);
  
@@ -1777,7 +1777,7 @@
  .select('end_message_fr, end_message_nl')
  .single();
  
- let messageFr = 'Le sondage est actuellement fermé. Revenez bientot !';
+ let messageFr = 'Le sondage est actuellement ferme. Revenez bientot !';
  let messageNl = 'De enquete is momenteel gesloten. Kom snel terug!';
  
  if (data && !error) {
@@ -1818,7 +1818,7 @@
  }
  }
  
- // Fonction d'actualisation avec compte Ã  Ã‚Â  rebours de 10 secondes
+ // Fonction d'actualisation avec compte  �Â   �"š ��Â  rebours de 10 secondes
  const COOLDOWN_SECONDS = 10;
  let countdownInterval = null;
 
@@ -1826,11 +1826,11 @@
  const btn = document.getElementById('refreshBtn');
  const cooldownMsg = document.getElementById('cooldownMsg');
  
- // Sauvegarder l'ID du sondage actuel pour détecter les changements
+ // Sauvegarder l'ID du sondage actuel pour detecter les changements
  const initialSurveyId = currentSurveyId;
  
  // Pas de nouveau sondage, appliquer le cooldown
- // Désactiver et cacher le bouton
+ // Desactiver et cacher le bouton
  btn.style.display = 'none';
  
  // Afficher le message de cooldown
@@ -1840,24 +1840,24 @@
  
  // Afficher le compte initial
  if (currentLanguage === 'fr') {
- cooldownMsg.innerHTML = `Ã¢ÂÂ±Ã¯Â¸Â Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> secondes...`;
+ cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> secondes...`;
  } else {
- cooldownMsg.innerHTML = `Ã¢ÂÂ±Ã¯Â¸Â Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconden...`;
+ cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconden...`;
  }
  
- // Démarrer le compte Ã  rebours
+ // Demarrer le compte  �Â  rebours
  countdownInterval = setInterval(async () => {
  remaining--;
  
  if (remaining > 0) {
- // Mettre Ã  jour l'affichage
+ // Mettre  �Â  jour l'affichage
  if (currentLanguage === 'fr') {
- cooldownMsg.innerHTML = `Ã¢ÂÂ±Ã¯Â¸Â Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
+ cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
  } else {
- cooldownMsg.innerHTML = `Ã¢ÂÂ±Ã¯Â¸Â Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
+ cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
  }
  } else {
- // Temps écoulé, vérification finale UNIQUE
+ // Temps ecoule, verification finale UNIQUE
  clearInterval(countdownInterval);
  
  try {
@@ -1867,22 +1867,22 @@
  .eq('active', true)
  .maybeSingle();
  
- // Vérifier si c'est un NOUVEAU sondage (ID différent)
+ // Verifier si c'est un NOUVEAU sondage (ID different)
  if (activeSurvey && activeSurvey.id !== initialSurveyId) {
- console.log('Nouveau sondage détecté après cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafraÃ®chissement');
+ console.log('Nouveau sondage detecte apres cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafra �Â®chissement');
  window.location.reload();
  } else if (!activeSurvey) {
  // Plus aucun sondage actif
- console.log('Aucun sondage actif après cooldown, rafraÃ®chissement');
+ console.log('Aucun sondage actif apres cooldown, rafra �Â®chissement');
  window.location.reload();
  } else {
- // Même sondage toujours actif, rafraÃ®chir quand même pour voir les résultats mis Ã  jour
- console.log('Même sondage toujours actif, rafraÃ®chissement');
+ // Meme sondage toujours actif, rafra �Â®chir quand meme pour voir les resultats mis  �Â  jour
+ console.log('Meme sondage toujours actif, rafra �Â®chissement');
  window.location.reload();
  }
  } catch (error) {
- console.error('Erreur lors de la vérification finale du sondage:', error);
- // En cas d'erreur, rafraÃ®chir quand même
+ console.error('Erreur lors de la verification finale du sondage:', error);
+ // En cas d'erreur, rafra �Â®chir quand meme
  window.location.reload();
  }
  }
@@ -1908,7 +1908,7 @@
  let pollingInterval = null;
  
  function startPollingForActiveSurvey(surveyId) {
- // Vérifier toutes les 5 secondes si le sondage devient actif
+ // Verifier toutes les 5 secondes si le sondage devient actif
  pollingInterval = setInterval(async () => {
  try {
  const { data: survey } = await supabaseClient
@@ -1918,7 +1918,7 @@
  .maybeSingle();
  
  if (survey && survey.active) {
- // Le sondage est maintenant actif, rafraÃ®chir la page
+ // Le sondage est maintenant actif, rafra �Â®chir la page
  clearInterval(pollingInterval);
  window.location.reload();
  }
@@ -1946,7 +1946,7 @@
  );
  }
  
- // Optimisation : faire les 2 requÃƒÆ’Ã‚Âªtes en parallÃƒÆ’Ã‚Â¨le pour rÃƒÆ’Ã‚Â©duire le nombre d'appels
+ // Optimisation : faire les 2 requ �Æ’ ��' �"š ��Âªtes en parall �Æ’ ��' �"š ��Â¨le pour r �Æ’ ��' �"š ��Â©duire le nombre d'appels
  const [surveyResult, configResult] = await Promise.all([
  supabaseClient
  .from('surveys')
@@ -1962,26 +1962,26 @@
  const activeSurvey = surveyResult.data;
  const configData = configResult.data;
  
- // VÃƒÆ’Ã‚Â©rifier changement de sondage
+ // V �Æ’ ��' �"š ��Â©rifier changement de sondage
  if (activeSurvey) {
  // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
  if (!currentSurveyId) {
- console.log('Nouveau sondage actif détecté:', activeSurvey.id);
+ console.log('Nouveau sondage actif detecte:', activeSurvey.id);
  window.location.reload();
  return;
  }
  // Cas 2: Un autre sondage est maintenant actif
  else if (activeSurvey.id !== currentSurveyId) {
- console.log('Nouveau sondage actif détecté:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
+ console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
  window.location.reload();
  return;
  }
  }
  
- // Vérifier changement du mode bilingue
+ // Verifier changement du mode bilingue
  const newBilingualMode = configData?.bilingual_mode || false;
  if (newBilingualMode !== isBilingualMode) {
- console.log('Changement du mode bilingue détecté:', isBilingualMode, 'Ã¢â€ â€™', newBilingualMode);
+ console.log('Changement du mode bilingue detecte:', isBilingualMode, ' �Â¢aâ‚¬Â aâ‚¬â„¢', newBilingualMode);
  window.location.reload();
  }
  
@@ -1991,7 +1991,7 @@
  }
  
  function startSurveyCheck() {
- // Verifier toutes les 5 secondes (au lieu de 2) pour rÃƒÆ’Ã‚Â©duire la charge sur Supabase
+ // Verifier toutes les 5 secondes (au lieu de 2) pour r �Æ’ ��' �"š ��Â©duire la charge sur Supabase
  surveyCheckInterval = setInterval(checkForNewSurvey, 5000);
  }
  
@@ -2006,18 +2006,18 @@
  // INITIALIZATION
  // ============================================
  window.addEventListener('DOMContentLoaded', async () => {
- // TOUJOURS vérifier le consentement d'abord
+ // TOUJOURS verifier le consentement d'abord
  const consent = getCookie(COOKIE_CONSENT_NAME);
  
  if (consent === 'accepted') {
- // Consentement accepté : charger le sondage
+ // Consentement accepte : charger le sondage
  const urlParams = await getUrlParams();
  if (urlParams) {
  checkCookieConsent();
  }
- // Si pas de sondage actif, getUrlParams() a déjÃ  affiché le message de fin
+ // Si pas de sondage actif, getUrlParams() a dej �Â  affiche le message de fin
  } else if (consent === 'declined') {
- // Consentement refusé : ATTENDRE le chargement du mode avant d'afficher
+ // Consentement refuse : ATTENDRE le chargement du mode avant d'afficher
  await loadSurveyBilingualMode();
  document.getElementById('cookieConsent').classList.add('hidden');
  document.getElementById('consentDeclined').classList.remove('hidden');
@@ -2028,22 +2028,22 @@
  document.getElementById('surveySection').classList.add('hidden');
  }
  
- // DéSACTIVé : Polling automatique désactivé pour économiser les requêtes
- // Les utilisateurs utilisent le bouton manuel "Actualiser" sur annonce du présentateur
+ // DeSACTIVe : Polling automatique desactive pour economiser les requetes
+ // Les utilisateurs utilisent le bouton manuel "Actualiser" sur annonce du presentateur
  // startSurveyCheck();
  });
  
- // Arreter la vérification quand la page est masquée
+ // Arreter la verification quand la page est masquee
  document.addEventListener('visibilitychange', () => {
  if (document.hidden) {
  stopSurveyCheck();
  } else {
- // DÃ‰SACTIVÃ‰ : Polling automatique désactivé
+ // D �"°SACTIV �"° : Polling automatique desactive
  // startSurveyCheck();
  }
  });
 
- // Réajuster la taille de police lors du redimensionnement
+ // Reajuster la taille de police lors du redimensionnement
  let resizeTimeout;
  window.addEventListener('resize', () => {
  clearTimeout(resizeTimeout);
@@ -2051,6 +2051,119 @@
  adjustFontSize();
  }, 250);
  });
- </script>
+ 
+ // ============================================
+ // CHARGEMENT AUTOMATIQUE DU DESIGN
+ // ============================================
+ async function loadAndApplyDesign() {
+ try {
+ const { data, error } = await supabaseClient
+ .from('settings')
+ .select('*')
+ .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
+ 
+ if (error) {
+ console.log('Erreur chargement design:', error);
+ return;
+ }
+ 
+ const design = {};
+ if (data) {
+ data.forEach(item => {
+ design[item.key] = item.value;
+ });
+ }
+ 
+ // Appliquer les couleurs et polices
+ const titleColor = design.design_title_color;
+ const textColor = design.design_text_color;
+ const fontFamily = design.design_font_family;
+ const bgColor = design.design_bg_color;
+ const borderColor = design.design_border_color;
+ 
+ if (titleColor || textColor || fontFamily || bgColor || borderColor) {
+ const style = document.createElement('style');
+ let css = '';
+ 
+ if (titleColor) {
+ css += `h1, h2, h3, .player-name, .survey-title { color: ${titleColor} !important; }\n`;
+ }
+ 
+ if (textColor) {
+ css += `body, p, span, div, .stat-label { color: ${textColor} !important; }\n`;
+ }
+ 
+ if (fontFamily) {
+ css += `body, * { font-family: ${fontFamily} !important; }\n`;
+ }
+ 
+ if (bgColor) {
+ css += `.player-card { background: ${bgColor} !important; }\n`;
+ }
+ 
+ if (borderColor) {
+ css += `.player-card { border-color: ${borderColor} !important; }\n`;
+ }
+ 
+ style.textContent = css;
+ document.head.appendChild(style);
+ 
+ console.log('Design personnalise applique');
+ }
+ 
+ } catch (error) {
+ console.error('Erreur application design:', error);
+ }
+ }
+
+ // Charger le design au chargement
+ window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
+</script>
+
+ async function loadAndApplyDesign() {
+ try {
+ const { data, error } = await supabaseClient
+ .from('settings')
+ .select('*')
+ .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
+ 
+ if (error) return;
+ 
+ const design = {};
+ if (data) {
+ data.forEach(item => {
+ design[item.key] = item.value;
+ });
+ }
+ 
+ if (design.design_title_color || design.design_text_color || design.design_font_family || design.design_bg_color || design.design_border_color) {
+ const style = document.createElement('style');
+ let css = '';
+ 
+ if (design.design_title_color) {
+ css += 'h1, h2, h3, .player-name, .survey-title { color: ' + design.design_title_color + ' !important; }\n';
+ }
+ if (design.design_text_color) {
+ css += 'body, p, span, div, .stat-label { color: ' + design.design_text_color + ' !important; }\n';
+ }
+ if (design.design_font_family) {
+ css += 'body, * { font-family: ' + design.design_font_family + ' !important; }\n';
+ }
+ if (design.design_bg_color) {
+ css += '.player-card, .survey-card, .result-card { background: ' + design.design_bg_color + ' !important; }\n';
+ }
+ if (design.design_border_color) {
+ css += '.player-card, .survey-card, .result-card { border-color: ' + design.design_border_color + ' !important; }\n';
+ }
+ 
+ style.textContent = css;
+ document.head.appendChild(style);
+ }
+ } catch (error) {
+ console.error('Erreur chargement design:', error);
+ }
+ }
+
+ window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </body>
 </html>
