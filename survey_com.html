@@ -15,7 +15,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+            background: transparent;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -442,6 +442,7 @@
         let currentSurveyId = null;
         let currentLanguage = 'fr'; // Toujours français
         let hasVoted = false;
+        let currentZoom = 1; // Zoom actuel du container
         let selectedPlayerId = null;
         let sessionId = generateSessionId();
 
@@ -511,7 +512,7 @@
                 
             } catch (error) {
                 console.error('Erreur lors de la detection du sondage actif:', error);
-                document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section mÃªme en cas d'erreur
+                document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section même en cas d'erreur
                 showError('Erreur de connexion a la base de donnees.');
                 return null;
             }
@@ -537,7 +538,7 @@
                     window.SUPABASE_ANON_KEY
                 );
 
-                // Charger les donnÃ©es du sondage
+                // Charger les données du sondage
                 const { data: survey, error: surveyError } = await supabaseClient
                     .from('surveys')
                     .select('*')
@@ -573,7 +574,7 @@
                     return;
                 }
 
-                console.log('Sondage chargÃ©:', survey);
+                console.log('Sondage chargé:', survey);
 
                 // Charger les messages (FR par défaut, puis NL si sélectionné)
                 let messages = {
@@ -685,6 +686,9 @@
                     grid.appendChild(card);
                 });
 
+                // Ajuster l\'échelle du container si nécessaire
+                adjustContainerScale();
+
                 // Appliquer le layout adapte au nombre de candidats
                 applyGridLayout(players.length);
 
@@ -786,8 +790,38 @@
             console.log(`Taille de police ajustee a ${fontSize}rem (max: ${maxFontSize}rem, breakpoint: ${width}px) pour max length: ${maxLength}`);
         }
 
+
         // ============================================
-        // VOTING
+        // CONTAINER SCALE ADJUSTMENT
+        // ============================================
+        function adjustContainerScale() {
+            const container = document.querySelector('.container');
+            
+            if (!container) return;
+            
+            // Sauvegarder le zoom actuel (ou 1 si premier appel)
+            if (currentZoom === 1) {
+                // Premier appel: mesurer sans zoom
+                requestAnimationFrame(() => {
+                    const maxHeight = 1000;
+                    const containerHeight = container.offsetHeight;
+                    const totalHeight = containerHeight + 140; // avec ombre
+                    
+                    if (totalHeight > maxHeight) {
+                        currentZoom = maxHeight / totalHeight;
+                        container.style.zoom = currentZoom;
+                        console.log(`🔽 Zoom appliqué au container: ${(currentZoom * 100).toFixed(1)}%`);
+                    } else {
+                        console.log('✅ Container dans les limites, pas de zoom nécessaire');
+                    }
+                });
+            } else {
+                // Appels suivants: le zoom est déjà appliqué
+                container.style.zoom = currentZoom;
+            }
+        }
+
+
         // ============================================
         function selectPlayer(playerId) {
             if (hasVoted) return;
@@ -818,7 +852,7 @@
         // Helper pour ajouter le bouton actualiser
         function addRefreshButton(targetDiv) {
             if (document.getElementById('refreshBtn')) {
-                return; // Bouton dÃ©jÃ  prÃ©sent
+                return; // Bouton déjÃ  présent
             }
             
             const refreshContainer = document.createElement('div');
@@ -1110,7 +1144,7 @@
                     .eq('active', true)
                     .maybeSingle();
                 
-                // VÃ©rifier changement de sondage
+                // Vérifier changement de sondage
                 if (activeSurvey) {
                     // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
                     if (!currentSurveyId) {
