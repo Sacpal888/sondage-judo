@@ -997,7 +997,7 @@
  }
 
  // ============================================
- // ACTIVER/DÃƒ"°SACTIVER SONDAGE
+ // ACTIVER/DESACTIVER SONDAGE
  // ============================================
  async function toggleActive(surveyId, currentActive) {
  try {
@@ -1042,7 +1042,7 @@
  }
 
  // ============================================
- // DÃƒ"°PLACER SONDAGE
+ // DEPLACER SONDAGE
  // ============================================
  async function moveSurvey(surveyId, direction) {
  try {
@@ -1061,7 +1061,7 @@
  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
  const targetSurvey = allSurveys[targetIndex];
  
- // Ãƒ"°changer les ordres
+ // Echanger les ordres
  const { error: error1 } = await supabaseClient
  .from('surveys')
  .update({ ordre: targetSurvey.ordre })
@@ -1181,7 +1181,7 @@
  })).filter(p => p.text);
 
  if (!titleFR && !descriptionFR && !thankyouFR && playersFR.length === 0) {
- alert(' ï¸ Veuillez remplir au moins un champ FR Ã  traduire.');
+ alert('  Veuillez remplir au moins un champ FR Ã  traduire.');
  return;
  }
 
@@ -1678,7 +1678,7 @@
  });
 
  function showError(message) {
- document.getElementById('errorContainer').innerHTML = `<div class="error-message"> ï¸ ${message}</div>`;
+ document.getElementById('errorContainer').innerHTML = `<div class="error-message">  ${message}</div>`;
  }
 
  function showUrls(surveyId) {
