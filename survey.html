@@ -168,7 +168,7 @@
             left: 100%;
         }
 
-        /* Bouton FranÃ§ais (blanc) */
+        /* Bouton Français (blanc) */
         .btn-accept-fr {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: #ffffff;
@@ -182,7 +182,7 @@
             box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
         }
 
-        /* Bouton NÃ©erlandais (jaune) */
+        /* Bouton NÃƒÂ©erlandais (jaune) */
         .btn-accept-nl {
             background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
             color: #1a2f4a;
@@ -851,7 +851,7 @@
                     </div>
 
                     <div class="consent-text-nl">
-                        <strong>Nederlands :</strong> We gebruiken essentiële cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
+                        <strong>Nederlands :</strong> We gebruiken essentielle cookies om uw stem te registreren en de integriteit van deze enquête te garanderen. 
                         Door op de knop van uw taal te klikken, accepteert u ons gebruik van cookies en krijgt u toegang tot de enquête in uw voorkeurtaal.
                         <br><br>
                         <a class="privacy-link" onclick="showPrivacyPolicy()"> Volledig privacybeleid</a>
@@ -900,7 +900,7 @@
                     <p>Deze enquête gebruikt strikt noodzakelijke technische cookies om:</p>
                     <ul>
                         <li>Uw toestemming voor cookies te registreren</li>
-                        <li>Ervoor te zorgen dat een persoon slechts Ã©Ã©n keer kan stemmen</li>
+                        <li>Ervoor te zorgen dat een persoon slechts ÃƒÂ©ÃƒÂ©n keer kan stemmen</li>
                         <li>De integriteit en geldigheid van de enquêteresultaten te waarborgen</li>
                     </ul>
                     <p><strong>Bewaartermijn:</strong> Cookies verlopen na 1 dag.</p>
@@ -959,7 +959,7 @@
                     <strong> Français :</strong> Nous respectons votre choix. Malheureusement, sans accepter les cookies essentiels, nous ne pouvons pas garantir l'intégrité du sondage. Vous ne pouvez pas participer.
                 </p>
                 <p class="declined-text">
-                    <strong> Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentiële cookies de integriteit van de enquête niet garanderen. U kunt niet deelnemen.
+                    <strong> Nederlands :</strong> We respecteren uw keuze. Helaas kunnen we zonder essentielle cookies de integriteit van de enquête niet garanderen. U kunt niet deelnemen.
                 </p>
                 <div style="margin-top: 25px;">
                     <button class="btn-back" onclick="backToConsent()">Reconsidérer / Heroverwegen</button>
@@ -1006,6 +1006,7 @@
         let hasVoted = false;
         let selectedPlayerId = null;
         let sessionId = generateSessionId();
+        let currentZoom = 1; // Zoom actuel du container
 
         // ============================================
         // SESSION ID GENERATION
@@ -1038,7 +1039,7 @@
         // URL PARAMETERS
         // ============================================
         async function getUrlParams() {
-            // TOUJOURS detecter automatiquement le sondage actif
+            // TOUJOURS détectér automatiquement le sondage actif
             // Ne plus utiliser le parametre ?id= dans l'URL pour eviter de rester bloque sur un ancien sondage
             try {
                 // Initialiser Supabase si ce n'est pas deja fait
@@ -1068,13 +1069,13 @@
                 }
                 
                 currentSurveyId = activeSurvey.id;
-                console.log('Sondage actif detecte automatiquement:', currentSurveyId);
+                console.log('Sondage actif détecté automatiquement:', currentSurveyId);
                 await loadSurveyBilingualMode();
                 return { id: currentSurveyId };
                 
             } catch (error) {
                 console.error('Erreur lors de la detection du sondage actif:', error);
-                document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section mÃªme en cas d'erreur
+                document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section mÃƒÂªme en cas d'erreur
                 showError('Erreur de connexion a la base de donnees.');
                 return null;
             }
@@ -1126,7 +1127,7 @@
                 const privacySections = document.querySelectorAll('#privacyPolicy .privacy-section');
                 privacySections.forEach(section => {
                     const sectionText = section.textContent;
-                    if (sectionText.includes('🇧🇪') || sectionText.includes('Nederlands')) {
+                    if (sectionText.includes('ðŸ‡§ðŸ‡ª') || sectionText.includes('Nederlands')) {
                         section.style.display = 'none';
                     } else {
                         section.style.display = 'block';
@@ -1186,7 +1187,7 @@
             const consent = getCookie(COOKIE_CONSENT_NAME);
             
             if (consent === 'accepted') {
-                // VÃ©rifier la langue prÃ©fÃ©rÃ©e sauvegardÃ©e
+                // VÃƒÂ©rifier la langue prÃƒÂ©fÃƒÂ©rÃƒÂ©e sauvegardÃƒÂ©e
                 const savedLang = getCookie(COOKIE_LANG_NAME);
                 if (savedLang) {
                     currentLanguage = savedLang;
@@ -1197,10 +1198,10 @@
                 document.getElementById('surveySection').classList.remove('hidden');
                 initializeSurvey();
             } else {
-                // Afficher l'Ã©cran de consentement bilingue
+                // Afficher l'ÃƒÂ©cran de consentement bilingue
                 document.getElementById('cookieConsent').classList.remove('hidden');
                 document.getElementById('surveySection').classList.add('hidden');
-                // Appliquer l'ajustement du mode bilingue aprÃ¨s l'affichage du modal
+                // Appliquer l'ajustement du mode bilingue aprÃƒÂ¨s l'affichage du modal
                 adjustConsentDisplay();
             }
         }
@@ -1222,7 +1223,7 @@
             // Charger le sondage actif AVANT d'initialiser
             const urlParams = await getUrlParams();
             if (!urlParams) {
-                // Pas de sondage actif, getUrlParams() a déjà affiché le message
+                // Pas de sondage actif, getUrlParams() a déjà  affiché le message
                 return;
             }
             
@@ -1270,7 +1271,7 @@
                     window.SUPABASE_ANON_KEY
                 );
 
-                // Charger les donnÃ©es du sondage
+                // Charger les donnÃƒÂ©es du sondage
                 const { data: survey, error: surveyError } = await supabaseClient
                     .from('surveys')
                     .select('*')
@@ -1301,12 +1302,12 @@
                     
                     showError(noActiveMessage);
                     
-                    // DESACTIVE : Polling automatique désactivé - tout est manuel
+                    // DÉSACTIVÉ : Polling automatique désactivé - tout est manuel
                     // startPollingForActiveSurvey(currentSurveyId);
                     return;
                 }
 
-                console.log('Sondage chargÃ©:', survey);
+                console.log('Sondage chargé:', survey);
 
                 // Charger les messages (FR par défaut, puis NL si sélectionné)
                 let messages = {
@@ -1347,10 +1348,10 @@
                     document.getElementById('logoContainer').style.display = 'none';
                 }
 
-                // Vérifier si l'utilisateur a déjÃ  voté
+                // Vérifier si l'utilisateur a déjà  voté
                 const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
                 if (votedCookie === 'true') {
-                    console.log('Utilisateur a déjÃ  voté');
+                    console.log('Utilisateur a déjà  voté');
                     document.getElementById('loadingMessage').style.display = 'none';
                     
                     const thankYouDiv = document.getElementById('thankYou');
@@ -1423,6 +1424,9 @@
 
                 // Ajuster la taille de police
                 adjustFontSize();
+
+                // Ajuster l'échelle du container si nécessaire
+                adjustContainerScale();
 
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('voteSection').style.display = 'block';
@@ -1520,8 +1524,35 @@
         }
 
         // ============================================
-        // VOTING
+        // CONTAINER SCALE ADJUSTMENT
         // ============================================
+        function adjustContainerScale() {
+            const container = document.querySelector('.container');
+            
+            if (!container) return;
+            
+            // Sauvegarder le zoom actuel (ou 1 si premier appel)
+            if (currentZoom === 1) {
+                // Premier appel: mesurer sans zoom
+                requestAnimationFrame(() => {
+                    const maxHeight = 1000;
+                    const containerHeight = container.offsetHeight;
+                    const totalHeight = containerHeight + 140; // avec ombre
+                    
+                    if (totalHeight > maxHeight) {
+                        currentZoom = maxHeight / totalHeight;
+                        container.style.zoom = currentZoom;
+                        console.log(`🔽 Zoom appliqué au container: ${(currentZoom * 100).toFixed(1)}%`);
+                    } else {
+                        console.log('✅ Container dans les limites, pas de zoom nécessaire');
+                    }
+                });
+            } else {
+                // Appels suivants: le zoom est déjà appliqué
+                container.style.zoom = currentZoom;
+            }
+        }
+
         function selectPlayer(playerId) {
             if (hasVoted) return;
             
@@ -1551,7 +1582,7 @@
         // Helper pour ajouter le bouton actualiser
         function addRefreshButton(targetDiv) {
             if (document.getElementById('refreshBtn')) {
-                return; // Bouton dÃ©jÃ  prÃ©sent
+                return; // Bouton dÃƒÂ©jÃƒÂ  prÃƒÂ©sent
             }
             
             const refreshContainer = document.createElement('div');
@@ -1619,7 +1650,7 @@
                     throw insertError;
                 }
                 
-                console.log('✅ Vote enregistré avec succès:', data);
+                console.log('âœ… Vote enregistré avec succès:', data);
                 
                 // Set cookie pour empêcher les votes multiples
                 setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
@@ -1634,7 +1665,7 @@
                 }, 800);
                 
             } catch (error) {
-                console.error('❌ Erreur lors du vote:', error);
+                console.error('âŒ Erreur lors du vote:', error);
                 
                 // Message d'erreur plus détaillé
                 let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
@@ -1708,7 +1739,7 @@
             }
         }
         
-        // Fonction d'actualisation avec compte à  rebours de 10 secondes
+        // Fonction d'actualisation avec compte à Â  rebours de 10 secondes
         const COOLDOWN_SECONDS = 10;
         let countdownInterval = null;
 
@@ -1730,21 +1761,21 @@
             
             // Afficher le compte initial
             if (currentLanguage === 'fr') {
-                cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> secondes...`;
+                cooldownMsg.innerHTML = `â±ï¸ Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> secondes...`;
             } else {
-                cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconden...`;
+                cooldownMsg.innerHTML = `â±ï¸ Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconden...`;
             }
             
-            // Démarrer le compte à rebours
+            // Démarrer le compte à  rebours
             countdownInterval = setInterval(async () => {
                 remaining--;
                 
                 if (remaining > 0) {
-                    // Mettre à jour l'affichage
+                    // Mettre à  jour l'affichage
                     if (currentLanguage === 'fr') {
-                        cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
+                        cooldownMsg.innerHTML = `â±ï¸ Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
                     } else {
-                        cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
+                        cooldownMsg.innerHTML = `â±ï¸ Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
                     }
                 } else {
                     // Temps écoulé, vérification finale UNIQUE
@@ -1766,7 +1797,7 @@
                             console.log('Aucun sondage actif après cooldown, rafraîchissement');
                             window.location.reload();
                         } else {
-                            // Même sondage toujours actif, rafraîchir quand même pour voir les résultats mis à jour
+                            // Même sondage toujours actif, rafraîchir quand même pour voir les résultats mis à  jour
                             console.log('Même sondage toujours actif, rafraîchissement');
                             window.location.reload();
                         }
@@ -1836,7 +1867,7 @@
                     );
                 }
                 
-                // Optimisation : faire les 2 requÃªtes en parallÃ¨le pour rÃ©duire le nombre d'appels
+                // Optimisation : faire les 2 requÃƒÂªtes en parallÃƒÂ¨le pour rÃƒÂ©duire le nombre d'appels
                 const [surveyResult, configResult] = await Promise.all([
                     supabaseClient
                         .from('surveys')
@@ -1852,17 +1883,17 @@
                 const activeSurvey = surveyResult.data;
                 const configData = configResult.data;
                 
-                // VÃ©rifier changement de sondage
+                // VÃƒÂ©rifier changement de sondage
                 if (activeSurvey) {
                     // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
                     if (!currentSurveyId) {
-                        console.log('Nouveau sondage actif detecte:', activeSurvey.id);
+                        console.log('Nouveau sondage actif détecté:', activeSurvey.id);
                         window.location.reload();
                         return;
                     }
                     // Cas 2: Un autre sondage est maintenant actif
                     else if (activeSurvey.id !== currentSurveyId) {
-                        console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
+                        console.log('Nouveau sondage actif détecté:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
                         window.location.reload();
                         return;
                     }
@@ -1871,7 +1902,7 @@
                 // Vérifier changement du mode bilingue
                 const newBilingualMode = configData?.bilingual_mode || false;
                 if (newBilingualMode !== isBilingualMode) {
-                    console.log('Changement du mode bilingue détecté:', isBilingualMode, '→', newBilingualMode);
+                    console.log('Changement du mode bilingue détecté:', isBilingualMode, 'â†’', newBilingualMode);
                     window.location.reload();
                 }
                 
@@ -1881,7 +1912,7 @@
         }
         
         function startSurveyCheck() {
-            // Verifier toutes les 5 secondes (au lieu de 2) pour rÃ©duire la charge sur Supabase
+            // Verifier toutes les 5 secondes (au lieu de 2) pour rÃƒÂ©duire la charge sur Supabase
             surveyCheckInterval = setInterval(checkForNewSurvey, 5000);
         }
         
@@ -1905,7 +1936,7 @@
                 if (urlParams) {
                     checkCookieConsent();
                 }
-                // Si pas de sondage actif, getUrlParams() a déjà  affiché le message de fin
+                // Si pas de sondage actif, getUrlParams() a déjà   affiché le message de fin
             } else if (consent === 'declined') {
                 // Consentement refusé : ATTENDRE le chargement du mode avant d'afficher
                 await loadSurveyBilingualMode();
@@ -1928,12 +1959,12 @@
             if (document.hidden) {
                 stopSurveyCheck();
             } else {
-                // DESACTIVE : Polling automatique désactivé
+                // DÉSACTIVÉ : Polling automatique désactivé
                 // startSurveyCheck();
             }
         });
 
-        // Reajuster la taille de police lors du redimensionnement
+        // Réajuster la taille de police lors du redimensionnement
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
