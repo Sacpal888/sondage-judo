@@ -3,21 +3,21 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=1920, height=1080">
- <title>Résultats - Sondage</title>
+ <title>Resultats - Sondage</title>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  <script src="config.js"></script>
  <style>
  /* Variables CSS pour le design personnalisable */
-        :root {
-            --background-color: var(--border-title-color);
-            --container-bg-color: var(--container-bg-color);
-            --text-color: var(--text-color);
-            --border-title-color: var(--border-title-color);
-            --button-color: #2196F3;
-            --button-gradient-start: #1a5490;
-            --button-gradient-end: #2196F3;
-            --button-style: gradient;
-        }
+ :root {
+ --background-color: var(--border-title-color);
+ --container-bg-color: var(--container-bg-color);
+ --text-color: var(--text-color);
+ --border-title-color: var(--border-title-color);
+ --button-color: #2196F3;
+ --button-gradient-start: #1a5490;
+ --button-gradient-end: #2196F3;
+ --button-style: gradient;
+ }
 
 
  * {
@@ -80,7 +80,7 @@
  color: #f4d03f;
  }
 
- /* Masquer les éléments NL si mode bilingue désactivé */
+ /* Masquer les elements NL si mode bilingue desactive */
  body:not(.bilingual-mode) .title-nl,
  body:not(.bilingual-mode) .subtitle-nl,
  body:not(.bilingual-mode) .loading-nl {
@@ -92,7 +92,7 @@
  display: block;
  }
  
- /* Masquer les éléments NL si mode bilingue désactivé */
+ /* Masquer les elements NL si mode bilingue desactive */
  body:not(.bilingual-mode) .title-nl,
  body:not(.bilingual-mode) .subtitle-nl,
  body:not(.bilingual-mode) .loading-nl {
@@ -119,7 +119,7 @@
  color: #f4d03f;
  }
  
- /* Grille des résultats - adapte selon le nombre de résultats */
+ /* Grille des resultats - adapte selon le nombre de resultats */
  .results-grid {
  display: flex;
  flex-wrap: wrap;
@@ -130,7 +130,7 @@
  align-items: flex-start;
  }
 
- /* Layout pour 2 résultats : cÃ´te Ã  cÃ´te centrés */
+ /* Layout pour 2 resultats : c �Â´te  �Â  c �Â´te centres */
  .results-grid.layout-2 {
  display: grid;
  grid-template-columns: repeat(2, 1fr);
@@ -139,7 +139,7 @@
  margin: 0 auto;
  }
 
- /* Layout pour 3 résultats : cÃ´te Ã  cÃ´te centrés */
+ /* Layout pour 3 resultats : c �Â´te  �Â  c �Â´te centres */
  .results-grid.layout-3 {
  display: grid;
  grid-template-columns: repeat(3, 1fr);
@@ -148,7 +148,7 @@
  margin: 0 auto;
  }
 
- /* Layout pour 4 résultats : 2 colonnes de 2 */
+ /* Layout pour 4 resultats : 2 colonnes de 2 */
  .results-grid.layout-4 {
  display: grid;
  grid-template-columns: repeat(2, 1fr);
@@ -157,7 +157,7 @@
  margin: 0 auto;
  }
 
- /* Layout pour 5 résultats : 2 colonnes de 2 + 1 centré en bas */
+ /* Layout pour 5 resultats : 2 colonnes de 2 + 1 centre en bas */
  .results-grid.layout-5 {
  display: grid;
  grid-template-columns: repeat(2, 1fr);
@@ -173,7 +173,7 @@
  width: 100%;
  }
 
- /* Layout pour 6 résultats : 2 colonnes de 3 */
+ /* Layout pour 6 resultats : 2 colonnes de 3 */
  .results-grid.layout-6 {
  display: grid;
  grid-template-columns: repeat(2, 1fr);
@@ -182,7 +182,7 @@
  margin: 0 auto;
  }
 
- /* Pour plus de 6 résultats : grille standard 3 colonnes */
+ /* Pour plus de 6 resultats : grille standard 3 colonnes */
  .results-grid.layout-default {
  display: grid;
  grid-template-columns: repeat(3, 1fr);
@@ -329,24 +329,24 @@
  grid-column: 1 / -1;
  }
  
-        /* Boutons avec support des deux styles */
-        .refresh-btn,
-        button[type="submit"] {
-            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end)) !important;
-        }
+ /* Boutons avec support des deux styles */
+ .refresh-btn,
+ button[type="submit"] {
+ background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end)) !important;
+ }
 
-        .btn-solid-style .refresh-btn,
-        .btn-solid-style button[type="submit"] {
-            background: var(--button-color) !important;
-        }
+ .btn-solid-style .refresh-btn,
+ .btn-solid-style button[type="submit"] {
+ background: var(--button-color) !important;
+ }
 
-    </style>
+ </style>
 </head>
 <body>
  <div class="container">
  <div class="header">
  <h1>
- <span class="title-fr" id="surveyTitle">Résultats</span>
+ <span class="title-fr" id="surveyTitle">Resultats</span>
  <span class="title-nl" id="surveyTitleNl"></span>
  </h1>
  <div class="subtitle">
@@ -356,7 +356,7 @@
  </div>
  
  <div id="loadingMessage" class="loading">
- <span class="loading-fr">Chargement des résultats...</span>
+ <span class="loading-fr">Chargement des resultats...</span>
  <span class="loading-nl"><br>Resultaten laden...</span>
  </div>
  
@@ -365,48 +365,48 @@
 
  <script>
 
-        // ============================================
-        // CHARGER LE DESIGN ACTIF DEPUIS SUPABASE
-        // ============================================
-        async function loadActiveDesign() {
-            try {
-                const { data: preset, error } = await supabaseClient
-                    .from('design_presets')
-                    .select('*')
-                    .eq('is_active', true)
-                    .maybeSingle();
+ // ============================================
+ // CHARGER LE DESIGN ACTIF DEPUIS SUPABASE
+ // ============================================
+ async function loadActiveDesign() {
+ try {
+ const { data: preset, error } = await supabaseClient
+ .from('design_presets')
+ .select('*')
+ .eq('is_active', true)
+ .maybeSingle();
 
-                if (error) {
-                    console.error('Erreur chargement design:', error);
-                    return;
-                }
+ if (error) {
+ console.error('Erreur chargement design:', error);
+ return;
+ }
 
-                if (!preset) {
-                    console.log('Aucun design actif');
-                    return;
-                }
+ if (!preset) {
+ console.log('Aucun design actif');
+ return;
+ }
 
-                const root = document.documentElement;
-                if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
-                if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
-                if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
-                if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
+ const root = document.documentElement;
+ if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
+ if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
+ if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
+ if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
 
-                // Boutons
-                if (preset.button_style === 'solid' && preset.button_color) {
-                    root.style.setProperty('--button-color', preset.button_color);
-                    document.body.classList.add('btn-solid-style');
-                } else if (preset.button_style === 'gradient') {
-                    if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
-                    if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
-                    document.body.classList.remove('btn-solid-style');
-                }
+ // Boutons
+ if (preset.button_style === 'solid' && preset.button_color) {
+ root.style.setProperty('--button-color', preset.button_color);
+ document.body.classList.add('btn-solid-style');
+ } else if (preset.button_style === 'gradient') {
+ if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
+ if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
+ document.body.classList.remove('btn-solid-style');
+ }
 
-                console.log('Design appliqué:', preset.preset_name);
-            } catch (error) {
-                console.error('Erreur chargement design:', error);
-            }
-        }
+ console.log('Design applique:', preset.preset_name);
+ } catch (error) {
+ console.error('Erreur chargement design:', error);
+ }
+ }
 
  // ============================================
  // GLOBAL VARIABLES
@@ -415,9 +415,9 @@
  let currentSurveyId = null;
  let refreshInterval = null;
  let bilingualCheckInterval = null;
- let bilingualModeEnabled = false; // Mode bilingue global (vérifié toutes les 5 min)
+ let bilingualModeEnabled = false; // Mode bilingue global (verifie toutes les 5 min)
  let isBilingualMode = false;
- let currentZoom = 1; // Mémoriser le zoom actuel
+ let currentZoom = 1; // Memoriser le zoom actuel
 
  // ============================================
  // URL PARAMETERS
@@ -426,7 +426,7 @@
  const urlParams = new URLSearchParams(window.location.search);
  let surveyId = urlParams.get('survey') || urlParams.get('id');
 
- // Si aucun ID n'est fourni dans l'URL, récupérer le sondage actif
+ // Si aucun ID n'est fourni dans l'URL, recuperer le sondage actif
  if (!surveyId) {
  console.log(' Aucun ID dans l\'URL, recherche du sondage actif...');
  
@@ -434,7 +434,7 @@
  // Initialiser Supabase si pas encore fait
  if (!supabaseClient) {
  if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
- showError('Configuration manquante. Veuillez vérifier config.js');
+ showError('Configuration manquante. Veuillez verifier config.js');
  return null;
  }
  supabaseClient = supabase.createClient(
@@ -443,7 +443,7 @@
  );
  }
  
- // Récupérer le sondage actif
+ // Recuperer le sondage actif
  const { data: activeSurvey, error } = await supabaseClient
  .from('surveys')
  .select('id')
@@ -451,8 +451,8 @@
  .maybeSingle();
  
  if (error) {
- console.error('âŒ Erreur récupération sondage actif:', error);
- showError('Erreur lors de la récupération du sondage actif');
+ console.error('aÂÅ’ Erreur recuperation sondage actif:', error);
+ showError('Erreur lors de la recuperation du sondage actif');
  return null;
  }
  
@@ -462,11 +462,11 @@
  }
  
  surveyId = activeSurvey.id;
- console.log(' Sondage actif trouvé:', surveyId);
+ console.log(' Sondage actif trouve:', surveyId);
  
  } catch (error) {
- console.error('âŒ Erreur:', error);
- showError('Erreur lors de la récupération du sondage actif');
+ console.error('aÂÅ’ Erreur:', error);
+ showError('Erreur lors de la recuperation du sondage actif');
  return null;
  }
  }
@@ -480,8 +480,8 @@
  // ============================================
  async function initSupabase() {
  if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
- console.error('âŒ Configuration Supabase manquante dans config.js');
- showError('Configuration manquante. Veuillez vérifier config.js');
+ console.error('aÂÅ’ Configuration Supabase manquante dans config.js');
+ showError('Configuration manquante. Veuillez verifier config.js');
  return false;
  }
 
@@ -490,11 +490,11 @@
  window.SUPABASE_URL,
  window.SUPABASE_ANON_KEY
  );
- console.log(' Supabase initialisé');
+ console.log(' Supabase initialise');
  return true;
  } catch (error) {
- console.error('âŒ Erreur lors de l\'initialisation de Supabase:', error);
- showError('Erreur de connexion Ã  la base de données');
+ console.error('aÂÅ’ Erreur lors de l\'initialisation de Supabase:', error);
+ showError('Erreur de connexion  �Â  la base de donnees');
  return false;
  }
  }
@@ -512,9 +512,9 @@
  .single();
 
  bilingualModeEnabled = configData?.bilingual_mode || false;
- console.log(' Mode bilingue vérifié:', bilingualModeEnabled);
+ console.log(' Mode bilingue verifie:', bilingualModeEnabled);
  } catch (error) {
- console.error('Erreur vérification mode bilingue:', error);
+ console.error('Erreur verification mode bilingue:', error);
  }
  }
 
@@ -524,11 +524,11 @@
  async function loadResults() {
  try {
  if (!supabaseClient || !currentSurveyId) {
- console.error('âŒ Supabase non initialisé ou survey_id manquant');
+ console.error('aÂÅ’ Supabase non initialise ou survey_id manquant');
  return;
  }
 
- console.log(' Chargement des résultats pour le sondage:', currentSurveyId);
+ console.log(' Chargement des resultats pour le sondage:', currentSurveyId);
 
  // Charger les informations du sondage (titre et description)
  const { data: surveyData, error: surveyError } = await supabaseClient
@@ -540,7 +540,7 @@
  if (surveyError) throw surveyError;
 
  // Afficher le titre et la description FR
- document.getElementById('surveyTitle').textContent = surveyData.titre || 'Résultats';
+ document.getElementById('surveyTitle').textContent = surveyData.titre || 'Resultats';
  document.getElementById('surveyDescription').textContent = surveyData.description || 'Classement';
 
  // Si mode bilingue, charger les traductions NL
@@ -563,7 +563,7 @@
  }
  }
 
- // Récupérer les résultats déjÃ  calculés depuis la vue
+ // Recuperer les resultats dej �Â  calcules depuis la vue
  const { data: resultsData, error: resultsError } = await supabaseClient
  .from('v_survey_results')
  .select('*')
@@ -573,12 +573,12 @@
  if (resultsError) throw resultsError;
  
  if (!resultsData || resultsData.length === 0) {
- throw new Error('Aucun candidat trouvé pour ce sondage');
+ throw new Error('Aucun candidat trouve pour ce sondage');
  }
 
- console.log(' Résultats trouvés:', resultsData.length);
+ console.log(' Resultats trouves:', resultsData.length);
 
- // Charger les traductions NL des candidats SI mode bilingue activé
+ // Charger les traductions NL des candidats SI mode bilingue active
  let translationsMap = {};
  if (bilingualModeEnabled) {
  const playerIds = resultsData.map(r => r.player_id);
@@ -595,7 +595,7 @@
  }
  }
 
- // Mode bilingue actif SEULEMENT si le mode global est activé ET qu'il y a des traductions NL
+ // Mode bilingue actif SEULEMENT si le mode global est active ET qu'il y a des traductions NL
  isBilingualMode = bilingualModeEnabled && Object.keys(translationsMap).length > 0;
  console.log(' Affichage bilingue:', isBilingualMode);
 
@@ -606,7 +606,7 @@
  document.body.classList.remove('bilingual-mode');
  }
 
- // Ajouter les traductions NL aux résultats
+ // Ajouter les traductions NL aux resultats
  const results = resultsData.map(r => ({
  player_id: r.player_id,
  player_name: r.player_name,
@@ -614,7 +614,7 @@
  total_votes: r.total_votes || 0,
  votes_fr: r.votes_fr || 0,
  votes_nl: r.votes_nl || 0,
- percentage: 0 // Sera calculé dans displayResults
+ percentage: 0 // Sera calcule dans displayResults
  }));
 
  // Calculer le total des votes
@@ -622,20 +622,20 @@
  const totalVotesFr = results.reduce((sum, r) => sum + r.votes_fr, 0);
  const totalVotesNl = results.reduce((sum, r) => sum + r.votes_nl, 0);
 
- console.log(' Résultats préparés:', results);
+ console.log(' Resultats prepares:', results);
 
- // Afficher les résultats
+ // Afficher les resultats
  displayResults(results || [], totalVotes);
 
- // Masquer le loading et afficher les résultats
+ // Masquer le loading et afficher les resultats
  document.getElementById('loadingMessage').style.display = 'none';
  document.getElementById('resultsGrid').style.display = 'grid';
 
  const totalPlayers = results.length;
- console.log(` Résultats mis Ã  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
+ console.log(` Resultats mis  �Â  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
  } catch (error) {
- console.error('âŒ Erreur lors du chargement des résultats:', error);
+ console.error('aÂÅ’ Erreur lors du chargement des resultats:', error);
  console.error('Details:', {
  message: error.message,
  code: error.code,
@@ -643,7 +643,7 @@
  details: error.details
  });
  
- let errorMessage = 'Erreur lors du chargement des résultats';
+ let errorMessage = 'Erreur lors du chargement des resultats';
  
  if (error.message) {
  errorMessage += ': ' + error.message;
@@ -651,9 +651,9 @@
  
  // Afficher des conseils selon le type d'erreur
  if (error.message && error.message.includes('permission denied')) {
- errorMessage += '\n\nâš ï¸ Problème de permissions RLS. Exécutez le fichier SQL fourni dans Supabase.';
+ errorMessage += '\n\naÅ¡Â iÂ¸Â Probleme de permissions RLS. Executez le fichier SQL fourni dans Supabase.';
  } else if (error.message && error.message.includes('Aucun candidat')) {
- errorMessage += '\n\nâš ï¸ Ajoutez des candidats au sondage #' + currentSurveyId;
+ errorMessage += '\n\naÅ¡Â iÂ¸Â Ajoutez des candidats au sondage #' + currentSurveyId;
  }
  
  showError(errorMessage);
@@ -683,7 +683,7 @@
  }
  });
  } else {
- // Appels suivants: le zoom est déjÃ  appliqué, pas besoin de recalculer
+ // Appels suivants: le zoom est dej �Â  applique, pas besoin de recalculer
  // (le contenu ne change pas de taille, juste les pourcentages)
  container.style.zoom = currentZoom;
  }
@@ -702,10 +702,10 @@
 
  grid.innerHTML = '';
 
- // Limiter Ã  6 premiers résultats
+ // Limiter  �Â  6 premiers resultats
  const topResults = results.slice(0, 6);
 
- // Appliquer le layout selon le nombre de résultats (comme dans survey)
+ // Appliquer le layout selon le nombre de resultats (comme dans survey)
  const numResults = topResults.length;
  grid.classList.remove('layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6', 'layout-default');
  
@@ -734,7 +734,7 @@
  let displayNameNl = result.player_name_nl;
  
  if (isBilingualMode && displayNameNl) {
- // Enlever les emojis du nom NL (ils sont déjÃ  dans le FR)
+ // Enlever les emojis du nom NL (ils sont dej �Â  dans le FR)
  displayNameNl = removeEmojis(displayNameNl);
  }
 
@@ -766,7 +766,7 @@
  grid.appendChild(card);
  });
  
- // Ajuster l'échelle du container après l'affichage
+ // Ajuster l'echelle du container apres l'affichage
  adjustContainerScale();
  }
 
@@ -785,7 +785,7 @@
  .eq('active', true)
  .maybeSingle();
  
- // Si un nouveau sondage actif est détecté et différent du sondage actuel
+ // Si un nouveau sondage actif est detecte et different du sondage actuel
  if (activeSurvey && activeSurvey.id !== currentSurveyId) {
  console.log('Nouveau sondage actif detecte:', activeSurvey.id, '(ancien:', currentSurveyId, ')');
  window.location.reload();
@@ -796,15 +796,15 @@
  }
  
  function startAutoRefresh() {
- // Actualiser les résultats toutes les 3 secondes
+ // Actualiser les resultats toutes les 3 secondes
  refreshInterval = setInterval(() => {
  loadResults();
  }, 3000);
  
- // Vérifier si un nouveau sondage est actif toutes les 9 secondes
+ // Verifier si un nouveau sondage est actif toutes les 9 secondes
  surveyCheckInterval = setInterval(checkForNewSurvey, 9000);
  
- // Vérifier le mode bilingue toutes les 5 minutes (300 secondes)
+ // Verifier le mode bilingue toutes les 5 minutes (300 secondes)
  bilingualCheckInterval = setInterval(checkBilingualMode, 300000);
  }
 
@@ -852,13 +852,13 @@
 
  const initialized = await initSupabase();
  if (initialized) {
- await checkBilingualMode(); // Vérifier le mode bilingue au démarrage
+ await checkBilingualMode(); // Verifier le mode bilingue au demarrage
  await loadResults();
  startAutoRefresh();
  }
  })();
 
- // Arrêter le rafraÃ®chissement quand la page est masquée
+ // Arreter le rafra �Â®chissement quand la page est masquee
  document.addEventListener('visibilitychange', () => {
  if (document.hidden) {
  stopAutoRefresh();
@@ -866,6 +866,116 @@
  startAutoRefresh();
  }
  });
- </script>
+ 
+ // ============================================
+ // CHARGEMENT AUTOMATIQUE DU DESIGN
+ // ============================================
+ async function loadAndApplyDesign() {
+ try {
+ const { data, error } = await supabaseClient
+ .from('settings')
+ .select('*')
+ .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
+ 
+ if (error) {
+ console.log('Erreur chargement design:', error);
+ return;
+ }
+ 
+ const design = {};
+ if (data) {
+ data.forEach(item => {
+ design[item.key] = item.value;
+ });
+ }
+ 
+ const titleColor = design.design_title_color;
+ const textColor = design.design_text_color;
+ const fontFamily = design.design_font_family;
+ const bgColor = design.design_bg_color;
+ const borderColor = design.design_border_color;
+ 
+ if (titleColor || textColor || fontFamily || bgColor || borderColor) {
+ const style = document.createElement('style');
+ let css = '';
+ 
+ if (titleColor) {
+ css += `h1, h2, h3, .player-name { color: ${titleColor} !important; }\n`;
+ }
+ 
+ if (textColor) {
+ css += `body, p, span, div { color: ${textColor} !important; }\n`;
+ }
+ 
+ if (fontFamily) {
+ css += `body, * { font-family: ${fontFamily} !important; }\n`;
+ }
+ 
+ if (bgColor) {
+ css += `.player-card { background: ${bgColor} !important; }\n`;
+ }
+ 
+ if (borderColor) {
+ css += `.player-card { border-color: ${borderColor} !important; }\n`;
+ }
+ 
+ style.textContent = css;
+ document.head.appendChild(style);
+ console.log('Design personnalise applique');
+ }
+ 
+ } catch (error) {
+ console.error('Erreur application design:', error);
+ }
+ }
+
+ window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
+</script>
+
+ async function loadAndApplyDesign() {
+ try {
+ const { data, error } = await supabaseClient
+ .from('settings')
+ .select('*')
+ .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
+ 
+ if (error) return;
+ 
+ const design = {};
+ if (data) {
+ data.forEach(item => {
+ design[item.key] = item.value;
+ });
+ }
+ 
+ if (design.design_title_color || design.design_text_color || design.design_font_family || design.design_bg_color || design.design_border_color) {
+ const style = document.createElement('style');
+ let css = '';
+ 
+ if (design.design_title_color) {
+ css += 'h1, h2, h3, .player-name, .survey-title { color: ' + design.design_title_color + ' !important; }\n';
+ }
+ if (design.design_text_color) {
+ css += 'body, p, span, div, .stat-label { color: ' + design.design_text_color + ' !important; }\n';
+ }
+ if (design.design_font_family) {
+ css += 'body, * { font-family: ' + design.design_font_family + ' !important; }\n';
+ }
+ if (design.design_bg_color) {
+ css += '.player-card, .survey-card, .result-card { background: ' + design.design_bg_color + ' !important; }\n';
+ }
+ if (design.design_border_color) {
+ css += '.player-card, .survey-card, .result-card { border-color: ' + design.design_border_color + ' !important; }\n';
+ }
+ 
+ style.textContent = css;
+ document.head.appendChild(style);
+ }
+ } catch (error) {
+ console.error('Erreur chargement design:', error);
+ }
+ }
+
+ window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </body>
 </html>
