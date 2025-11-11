@@ -651,7 +651,7 @@
  <h1> Administration Multi-Sondages</h1>
  <div class="user-info-container">
  <span class="user-email" id="userEmail">Chargement...</span>
- <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
+ <button class="logout-btn" onclick="handleLogout()">šª Déconnexion</button>
  </div>
  </div>
 
@@ -1927,7 +1927,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  if (result.error) throw result.error;
 
- // Mettre à  jour toutes les traductions NL existantes
+ // Mettre Ã  jour toutes les traductions NL existantes
  await supabaseClient
  .from('survey_translations')
  .update({ active: isEnabled })
@@ -1935,7 +1935,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  alert(isEnabled ? 
  ' Mode bilingue activé ! Toutes les traductions NL sont maintenant actives.' : 
- ' Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
+ ' Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
  
  await loadSurveys(); // Rafraîchir l'affichage
  
