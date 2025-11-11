@@ -8,16 +8,16 @@
  <script src="config.js"></script>
  <style>
  /* Variables CSS pour le design personnalisable */
-        :root {
-            --background-color: var(--border-title-color);
-            --container-bg-color: var(--container-bg-color);
-            --text-color: var(--text-color);
-            --border-title-color: var(--border-title-color);
-            --button-color: #2196F3;
-            --button-gradient-start: #1a5490;
-            --button-gradient-end: #2196F3;
-            --button-style: gradient;
-        }
+ :root {
+ --background-color: var(--border-title-color);
+ --container-bg-color: var(--container-bg-color);
+ --text-color: var(--text-color);
+ --border-title-color: var(--border-title-color);
+ --button-color: #2196F3;
+ --button-gradient-start: #1a5490;
+ --button-gradient-end: #2196F3;
+ --button-style: gradient;
+ }
 
 
  * {
@@ -414,24 +414,24 @@
  }
  }
  
-        /* Boutons avec support des deux styles */
-        .vote-button,
-        .consent-btn-accept,
-        .consent-btn-decline,
-        button[type="submit"],
-        .refresh-btn {
-            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end)) !important;
-        }
+ /* Boutons avec support des deux styles */
+ .vote-button,
+ .consent-btn-accept,
+ .consent-btn-decline,
+ button[type="submit"],
+ .refresh-btn {
+ background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end)) !important;
+ }
 
-        .btn-solid-style .vote-button,
-        .btn-solid-style .consent-btn-accept,
-        .btn-solid-style .consent-btn-decline,
-        .btn-solid-style button[type="submit"],
-        .btn-solid-style .refresh-btn {
-            background: var(--button-color) !important;
-        }
+ .btn-solid-style .vote-button,
+ .btn-solid-style .consent-btn-accept,
+ .btn-solid-style .consent-btn-decline,
+ .btn-solid-style button[type="submit"],
+ .btn-solid-style .refresh-btn {
+ background: var(--button-color) !important;
+ }
 
-    </style>
+ </style>
 </head>
 <body>
  <div class="container">
@@ -446,7 +446,7 @@
  <div id="logoContainer" class="logo-container" style="display: none;"></div>
  
  <div id="loadingMessage" class="loading-message">
- ÃƒÂ¢Ã‚ÂÃ‚Â³ Chargement du sondage...
+  �Â¢ ��Â ��Â³ Chargement du sondage...
  </div>
 
  <div id="voteSection" style="display: none;">
@@ -456,7 +456,7 @@
  </div>
 
  <div id="thankYou" class="thank-you">
- <p id="thankYouText" class="thank-you-text">Votre vote a Ã©tÃ© enregistrÃ© avec succÃ¨s.</p>
+ <p id="thankYouText" class="thank-you-text">Votre vote a ete enregistre avec succes.</p>
  </div>
 
  <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -465,48 +465,48 @@
 
  <script>
 
-        // ============================================
-        // CHARGER LE DESIGN ACTIF DEPUIS SUPABASE
-        // ============================================
-        async function loadActiveDesign() {
-            try {
-                const { data: preset, error } = await supabaseClient
-                    .from('design_presets')
-                    .select('*')
-                    .eq('is_active', true)
-                    .maybeSingle();
+ // ============================================
+ // CHARGER LE DESIGN ACTIF DEPUIS SUPABASE
+ // ============================================
+ async function loadActiveDesign() {
+ try {
+ const { data: preset, error } = await supabaseClient
+ .from('design_presets')
+ .select('*')
+ .eq('is_active', true)
+ .maybeSingle();
 
-                if (error) {
-                    console.error('Erreur chargement design:', error);
-                    return;
-                }
+ if (error) {
+ console.error('Erreur chargement design:', error);
+ return;
+ }
 
-                if (!preset) {
-                    console.log('Aucun design actif');
-                    return;
-                }
+ if (!preset) {
+ console.log('Aucun design actif');
+ return;
+ }
 
-                const root = document.documentElement;
-                if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
-                if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
-                if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
-                if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
+ const root = document.documentElement;
+ if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
+ if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
+ if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
+ if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
 
-                // Boutons
-                if (preset.button_style === 'solid' && preset.button_color) {
-                    root.style.setProperty('--button-color', preset.button_color);
-                    document.body.classList.add('btn-solid-style');
-                } else if (preset.button_style === 'gradient') {
-                    if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
-                    if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
-                    document.body.classList.remove('btn-solid-style');
-                }
+ // Boutons
+ if (preset.button_style === 'solid' && preset.button_color) {
+ root.style.setProperty('--button-color', preset.button_color);
+ document.body.classList.add('btn-solid-style');
+ } else if (preset.button_style === 'gradient') {
+ if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
+ if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
+ document.body.classList.remove('btn-solid-style');
+ }
 
-                console.log('Design appliquÃ©:', preset.preset_name);
-            } catch (error) {
-                console.error('Erreur chargement design:', error);
-            }
-        }
+ console.log('Design applique:', preset.preset_name);
+ } catch (error) {
+ console.error('Erreur chargement design:', error);
+ }
+ }
 
  // ============================================
  // CONFIGURATION
@@ -515,7 +515,7 @@
 
  let supabaseClient = null;
  let currentSurveyId = null;
- let currentLanguage = 'fr'; // Toujours franÃ§ais
+ let currentLanguage = 'fr'; // Toujours francais
  let hasVoted = false;
  let currentZoom = 1; // Zoom actuel du container
  let selectedPlayerId = null;
@@ -587,7 +587,7 @@
  
  } catch (error) {
  console.error('Erreur lors de la detection du sondage actif:', error);
- document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section mÃªme en cas d'erreur
+ document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section meme en cas d'erreur
  showError('Erreur de connexion a la base de donnees.');
  return null;
  }
@@ -613,7 +613,7 @@
  window.SUPABASE_ANON_KEY
  );
 
- // Charger les donnÃ©es du sondage
+ // Charger les donnees du sondage
  const { data: survey, error: surveyError } = await supabaseClient
  .from('surveys')
  .select('*')
@@ -622,7 +622,7 @@
 
  if (surveyError) throw surveyError;
  if (!survey) {
- showError(` Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a Ã©tÃ© supprimÃ©.<br><br>Contactez l'administrateur.`);
+ showError(` Sondage #${currentSurveyId} introuvable.<br><br>Il n'existe pas ou a ete supprime.<br><br>Contactez l'administrateur.`);
  return;
  }
  if (!survey.active) {
@@ -632,7 +632,7 @@
  .select('end_message_fr, end_message_nl')
  .maybeSingle();
  
- let noActiveMessage = ' Aucun sondage actif pour le moment.<br><br>Veuillez rÃ©essayer plus tard.';
+ let noActiveMessage = ' Aucun sondage actif pour le moment.<br><br>Veuillez reessayer plus tard.';
  
  if (configMessages) {
  if (currentLanguage === 'nl' && configMessages.end_message_nl) {
@@ -644,14 +644,14 @@
  
  showError(noActiveMessage);
  
- // DESACTIVE : Polling automatique dÃ©sactivÃ© - tout est manuel
+ // DESACTIVE : Polling automatique desactive - tout est manuel
  // startPollingForActiveSurvey(currentSurveyId);
  return;
  }
 
- console.log('Sondage chargÃ©:', survey);
+ console.log('Sondage charge:', survey);
 
- // Charger les messages (FR par dÃ©faut, puis NL si sÃ©lectionnÃ©)
+ // Charger les messages (FR par defaut, puis NL si selectionne)
  let messages = {
  title: survey.titre || 'Sondage',
  invitation: survey.description || 'Votez pour votre choix !',
@@ -690,10 +690,10 @@
  document.getElementById('logoContainer').style.display = 'none';
  }
 
- // VÃ©rifier si l'utilisateur a dÃ©jÃƒÆ’Ã‚Â  votÃ©
+ // Verifier si l'utilisateur a dej �Æ’ ��Â  vote
  const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
  if (votedCookie === 'true') {
- console.log('Utilisateur a dÃ©jÃƒÆ’Ã‚Â  votÃ©');
+ console.log('Utilisateur a dej �Æ’ ��Â  vote');
  document.getElementById('loadingMessage').style.display = 'none';
  
  const thankYouDiv = document.getElementById('thankYou');
@@ -716,7 +716,7 @@
  return;
  }
 
- console.log(' Joueurs chargÃ©s:', players);
+ console.log(' Joueurs charges:', players);
  console.log(' Premier joueur:', players[0]);
  console.log(' Structure d\'un joueur:', Object.keys(players[0]));
 
@@ -921,7 +921,7 @@
  // Helper pour ajouter le bouton actualiser
  function addRefreshButton(targetDiv) {
  if (document.getElementById('refreshBtn')) {
- return; // Bouton dÃ©jÃƒÆ’Ã‚Â  prÃ©sent
+ return; // Bouton dej �Æ’ ��Â  present
  }
  
  const refreshContainer = document.createElement('div');
@@ -968,7 +968,7 @@
  session_id: sessionId
  });
 
- // InsÃ©rer le vote
+ // Inserer le vote
  const { data, error: insertError } = await supabaseClient
  .from('votes')
  .insert({
@@ -981,7 +981,7 @@
  .select();
  
  if (insertError) {
- console.error(' Erreur Supabase dÃ©taillÃ©e:', insertError);
+ console.error(' Erreur Supabase detaillee:', insertError);
  console.error('Code:', insertError.code);
  console.error('Message:', insertError.message);
  console.error('Details:', insertError.details);
@@ -989,9 +989,9 @@
  throw insertError;
  }
  
- console.log(' Vote enregistrÃ© avec succÃ¨s:', data);
+ console.log(' Vote enregistre avec succes:', data);
  
- // Set cookie pour empÃªcher les votes multiples
+ // Set cookie pour empecher les votes multiples
  setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
  
  hasVoted = true;
@@ -1004,17 +1004,17 @@
  }, 800);
  
  } catch (error) {
- console.error('Ã¢ÂÅ’ Erreur lors du vote:', error);
+ console.error('aÂÅ’ Erreur lors du vote:', error);
  
- // Message d'erreur plus dÃ©taillÃ©
+ // Message d'erreur plus detaille
  let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
  if (error.message) {
- errorMessage += '\n\nDÃ©tails: ' + error.message;
+ errorMessage += '\n\nDetails: ' + error.message;
  }
  if (error.hint) {
  errorMessage += '\n\nSuggestion: ' + error.hint;
  }
- errorMessage += '\n\nVeuillez contacter l\'administrateur ou vÃ©rifier la console (F12) pour plus de dÃ©tails.';
+ errorMessage += '\n\nVeuillez contacter l\'administrateur ou verifier la console (F12) pour plus de details.';
  
  alert(errorMessage);
  
@@ -1037,7 +1037,7 @@
  .select('end_message_fr, end_message_nl')
  .single();
  
- let messageFr = 'Le sondage est actuellement fermÃ©. Revenez bientot !';
+ let messageFr = 'Le sondage est actuellement ferme. Revenez bientot !';
  let messageNl = 'De enquete is momenteel gesloten. Kom snel terug!';
  
  if (data && !error) {
@@ -1063,7 +1063,7 @@
  `;
  
  endMessageDiv.innerHTML = `
- <div style="font-size: 4rem; margin-bottom: 30px;">ÃƒÂ¢Ã‚ÂÃ‚Â³</div>
+ <div style="font-size: 4rem; margin-bottom: 30px;"> �Â¢ ��Â ��Â³</div>
  <div style="color: ${currentLanguage === 'fr' ? '#ffffff' : '#f4d03f'}; font-size: 2rem; font-weight: bold; margin-bottom: 40px; line-height: 1.4;">
  ${escapeHtml(currentLanguage === 'fr' ? messageFr : messageNl)}
  </div>
@@ -1078,7 +1078,7 @@
  }
  }
  
- // Fonction d'actualisation avec compte ÃƒÂ Ã‚Â  rebours de 10 secondes
+ // Fonction d'actualisation avec compte  �Â  ��Â  rebours de 10 secondes
  const COOLDOWN_SECONDS = 10;
  let countdownInterval = null;
 
@@ -1086,11 +1086,11 @@
  const btn = document.getElementById('refreshBtn');
  const cooldownMsg = document.getElementById('cooldownMsg');
  
- // Sauvegarder l'ID du sondage actuel pour dÃ©tecter les changements
+ // Sauvegarder l'ID du sondage actuel pour detecter les changements
  const initialSurveyId = currentSurveyId;
  
  // Pas de nouveau sondage, appliquer le cooldown
- // DÃ©sactiver et cacher le bouton
+ // Desactiver et cacher le bouton
  btn.style.display = 'none';
  
  // Afficher le message de cooldown
@@ -1105,19 +1105,19 @@
  cooldownMsg.innerHTML = `Â Vernieuwing over <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconden...`;
  }
  
- // DÃ©marrer le compte ÃƒÂ  rebours
+ // Demarrer le compte  �Â  rebours
  countdownInterval = setInterval(async () => {
  remaining--;
  
  if (remaining > 0) {
- // Mettre ÃƒÂ  jour l'affichage
+ // Mettre  �Â  jour l'affichage
  if (currentLanguage === 'fr') {
  cooldownMsg.innerHTML = `Â Actualisation dans <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
  } else {
  cooldownMsg.innerHTML = `Â Vernieuwing over <span style="font-size: 2rem; color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
  }
  } else {
- // Temps Ã©coulÃ©, vÃ©rification finale UNIQUE
+ // Temps ecoule, verification finale UNIQUE
  clearInterval(countdownInterval);
  
  try {
@@ -1127,22 +1127,22 @@
  .eq('active', true)
  .maybeSingle();
  
- // VÃ©rifier si c'est un NOUVEAU sondage (ID diffÃ©rent)
+ // Verifier si c'est un NOUVEAU sondage (ID different)
  if (activeSurvey && activeSurvey.id !== initialSurveyId) {
- console.log('Nouveau sondage dÃ©tectÃ© aprÃ¨s cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafraÃƒÂ®chissement');
+ console.log('Nouveau sondage detecte apres cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafra �Â®chissement');
  window.location.reload();
  } else if (!activeSurvey) {
  // Plus aucun sondage actif
- console.log('Aucun sondage actif aprÃ¨s cooldown, rafraÃƒÂ®chissement');
+ console.log('Aucun sondage actif apres cooldown, rafra �Â®chissement');
  window.location.reload();
  } else {
- // MÃªme sondage toujours actif, rafraÃƒÂ®chir quand mÃªme pour voir les rÃ©sultats mis ÃƒÂ  jour
- console.log('MÃªme sondage toujours actif, rafraÃƒÂ®chissement');
+ // Meme sondage toujours actif, rafra �Â®chir quand meme pour voir les resultats mis  �Â  jour
+ console.log('Meme sondage toujours actif, rafra �Â®chissement');
  window.location.reload();
  }
  } catch (error) {
- console.error('Erreur lors de la vÃ©rification finale du sondage:', error);
- // En cas d'erreur, rafraÃƒÂ®chir quand mÃªme
+ console.error('Erreur lors de la verification finale du sondage:', error);
+ // En cas d'erreur, rafra �Â®chir quand meme
  window.location.reload();
  }
  }
@@ -1168,7 +1168,7 @@
  let pollingInterval = null;
  
  function startPollingForActiveSurvey(surveyId) {
- // VÃ©rifier toutes les 5 secondes si le sondage devient actif
+ // Verifier toutes les 5 secondes si le sondage devient actif
  pollingInterval = setInterval(async () => {
  try {
  const { data: survey } = await supabaseClient
@@ -1178,7 +1178,7 @@
  .maybeSingle();
  
  if (survey && survey.active) {
- // Le sondage est maintenant actif, rafraÃƒÂ®chir la page
+ // Le sondage est maintenant actif, rafra �Â®chir la page
  clearInterval(pollingInterval);
  window.location.reload();
  }
@@ -1206,14 +1206,14 @@
  );
  }
  
- // VÃ©rifier s'il y a un nouveau sondage actif
+ // Verifier s'il y a un nouveau sondage actif
  const { data: activeSurvey } = await supabaseClient
  .from('surveys')
  .select('id')
  .eq('active', true)
  .maybeSingle();
  
- // VÃ©rifier changement de sondage
+ // Verifier changement de sondage
  if (activeSurvey) {
  // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
  if (!currentSurveyId) {
@@ -1259,7 +1259,7 @@
  // Initialiser le sondage
  await initializeSurvey();
  }
- // Si pas de sondage actif, getUrlParams() a dÃ©jÃƒÂ  affichÃ© le message de fin
+ // Si pas de sondage actif, getUrlParams() a dej �Â  affiche le message de fin
  
  // ACTIVER le polling automatique toutes les 10 secondes
  startSurveyCheck();
@@ -1274,69 +1274,115 @@
  }, 250);
  });
  
-        // ============================================
-        // CHARGEMENT AUTOMATIQUE DU DESIGN
-        // ============================================
-        async function loadAndApplyDesign() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('settings')
-                    .select('*')
-                    .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
-                
-                if (error) {
-                    console.log('Erreur chargement design:', error);
-                    return;
-                }
-                
-                const design = {};
-                if (data) {
-                    data.forEach(item => {
-                        design[item.key] = item.value;
-                    });
-                }
-                
-                const titleColor = design.design_title_color;
-                const textColor = design.design_text_color;
-                const fontFamily = design.design_font_family;
-                const bgColor = design.design_bg_color;
-                const borderColor = design.design_border_color;
-                
-                if (titleColor || textColor || fontFamily || bgColor || borderColor) {
-                    const style = document.createElement('style');
-                    let css = '';
-                    
-                    if (titleColor) {
-                        css += `h1, h2, h3, .player-name { color: ${titleColor} !important; }\n`;
-                    }
-                    
-                    if (textColor) {
-                        css += `body, p, span, div { color: ${textColor} !important; }\n`;
-                    }
-                    
-                    if (fontFamily) {
-                        css += `body, * { font-family: ${fontFamily} !important; }\n`;
-                    }
-                    
-                    if (bgColor) {
-                        css += `.player-card { background: ${bgColor} !important; }\n`;
-                    }
-                    
-                    if (borderColor) {
-                        css += `.player-card { border-color: ${borderColor} !important; }\n`;
-                    }
-                    
-                    style.textContent = css;
-                    document.head.appendChild(style);
-                    console.log('Design personnalise applique');
-                }
-                
-            } catch (error) {
-                console.error('Erreur application design:', error);
-            }
-        }
+ // ============================================
+ // CHARGEMENT AUTOMATIQUE DU DESIGN
+ // ============================================
+ async function loadAndApplyDesign() {
+ try {
+ const { data, error } = await supabaseClient
+ .from('settings')
+ .select('*')
+ .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
+ 
+ if (error) {
+ console.log('Erreur chargement design:', error);
+ return;
+ }
+ 
+ const design = {};
+ if (data) {
+ data.forEach(item => {
+ design[item.key] = item.value;
+ });
+ }
+ 
+ const titleColor = design.design_title_color;
+ const textColor = design.design_text_color;
+ const fontFamily = design.design_font_family;
+ const bgColor = design.design_bg_color;
+ const borderColor = design.design_border_color;
+ 
+ if (titleColor || textColor || fontFamily || bgColor || borderColor) {
+ const style = document.createElement('style');
+ let css = '';
+ 
+ if (titleColor) {
+ css += `h1, h2, h3, .player-name { color: ${titleColor} !important; }\n`;
+ }
+ 
+ if (textColor) {
+ css += `body, p, span, div { color: ${textColor} !important; }\n`;
+ }
+ 
+ if (fontFamily) {
+ css += `body, * { font-family: ${fontFamily} !important; }\n`;
+ }
+ 
+ if (bgColor) {
+ css += `.player-card { background: ${bgColor} !important; }\n`;
+ }
+ 
+ if (borderColor) {
+ css += `.player-card { border-color: ${borderColor} !important; }\n`;
+ }
+ 
+ style.textContent = css;
+ document.head.appendChild(style);
+ console.log('Design personnalise applique');
+ }
+ 
+ } catch (error) {
+ console.error('Erreur application design:', error);
+ }
+ }
 
-        window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
+ window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </script>
+
+ async function loadAndApplyDesign() {
+ try {
+ const { data, error } = await supabaseClient
+ .from('settings')
+ .select('*')
+ .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
+ 
+ if (error) return;
+ 
+ const design = {};
+ if (data) {
+ data.forEach(item => {
+ design[item.key] = item.value;
+ });
+ }
+ 
+ if (design.design_title_color || design.design_text_color || design.design_font_family || design.design_bg_color || design.design_border_color) {
+ const style = document.createElement('style');
+ let css = '';
+ 
+ if (design.design_title_color) {
+ css += 'h1, h2, h3, .player-name, .survey-title { color: ' + design.design_title_color + ' !important; }\n';
+ }
+ if (design.design_text_color) {
+ css += 'body, p, span, div, .stat-label { color: ' + design.design_text_color + ' !important; }\n';
+ }
+ if (design.design_font_family) {
+ css += 'body, * { font-family: ' + design.design_font_family + ' !important; }\n';
+ }
+ if (design.design_bg_color) {
+ css += '.player-card, .survey-card, .result-card { background: ' + design.design_bg_color + ' !important; }\n';
+ }
+ if (design.design_border_color) {
+ css += '.player-card, .survey-card, .result-card { border-color: ' + design.design_border_color + ' !important; }\n';
+ }
+ 
+ style.textContent = css;
+ document.head.appendChild(style);
+ }
+ } catch (error) {
+ console.error('Erreur chargement design:', error);
+ }
+ }
+
+ window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </body>
 </html>
