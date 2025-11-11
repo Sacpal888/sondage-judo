@@ -285,7 +285,7 @@
     <div id="authLoading">
         <div style="text-align: center;">
             <div class="spinner"></div>
-            <div>VÃ©rification de l'authentification...</div>
+            <div>Vérification de l'authentification...</div>
         </div>
     </div>
 
@@ -329,15 +329,15 @@
             </div>
         </div>
         
-        <!-- Section Police GÃ©nÃ©rale -->
+        <!-- Section Police Générale -->
         <div class="section">
-            <h2>ðŸ”¤ Police GÃ©nÃ©rale</h2>
+            <h2>ðŸ”¤ Police Générale</h2>
             <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                Choisissez la police de caractÃ¨res pour tout le site
+                Choisissez la police de caractères pour tout le site
             </p>
             
             <div class="font-select-group">
-                <label for="fontFamily">Police de caractÃ¨res :</label>
+                <label for="fontFamily">Police de caractères :</label>
                 <select id="fontFamily">
                     <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI (défaut)</option>
                     <option value="Arial, Helvetica, sans-serif">Arial</option>
@@ -380,14 +380,14 @@
             </div>
         </div>
         
-        <!-- Section AperÃ§u -->
+        <!-- Section Aperçu -->
         <div class="section">
-            <h2>ðŸ‘ï¸ AperÃ§u en direct</h2>
+            <h2>ðŸ‘ï¸ Aperçu en direct</h2>
             <div class="preview-section">
                 <div class="preview-box" id="previewBox">
                     <div class="preview-title" id="previewTitle">Titre de la page</div>
                     <div class="preview-text" id="previewText">
-                        Ceci est un exemple de texte normal. Vous pouvez voir comment vos couleurs et votre police s'affichent ici en temps rÃ©el.
+                        Ceci est un exemple de texte normal. Vous pouvez voir comment vos couleurs et votre police s'affichent ici en temps réel.
                     </div>
                 </div>
             </div>
@@ -396,16 +396,16 @@
         <!-- Boutons d'action -->
         <div style="display: flex; gap: 10px; justify-content: center;">
             <button class="save-btn" onclick="saveDesign()">ðŸ’¾ Enregistrer le design</button>
-            <button class="reset-btn" onclick="resetDesign()">ðŸ”„ RÃ©initialiser</button>
+            <button class="reset-btn" onclick="resetDesign()">ðŸ”„ Réinitialiser</button>
         </div>
         
         <div class="info-box">
-            <strong>ðŸ’¡ Comment Ã§a marche :</strong><br>
-            â€¢ Utilisez les sÃ©lecteurs de couleur (pipette) ou entrez directement un code couleur hexadÃ©cimal<br>
-            â€¢ L'aperÃ§u se met Ã  jour en temps rÃ©el<br>
-            â€¢ Cliquez sur "Enregistrer" pour appliquer les modifications sur toutes les pages<br>
-            â€¢ Les changements sont appliquÃ©s instantanÃ©ment sur sondage.html et resultats.html<br>
-            â€¢ Vous pouvez toujours revenir aux couleurs par défaut avec "RÃ©initialiser"
+            <strong>ðŸ’¡ Comment ça marche :</strong><br>
+            - Utilisez les sélecteurs de couleur (pipette) ou entrez directement un code couleur hexadécimal<br>
+            - L'aperçu se met Ã  jour en temps réel<br>
+            - Cliquez sur "Enregistrer" pour appliquer les modifications sur toutes les pages<br>
+            - Les changements sont appliqués instantanément sur sondage.html et resultats.html<br>
+            - Vous pouvez toujours revenir aux couleurs par défaut avec "Réinitialiser"
         </div>
     </div>
 
@@ -445,7 +445,7 @@
                 }
                 
                 currentUser = session.user;
-                console.log('Utilisateur connectÃ©:', currentUser.email);
+                console.log('Utilisateur connecté:', currentUser.email);
                 
                 document.getElementById('authLoading').classList.add('hidden');
                 document.getElementById('mainContainer').style.display = 'block';
@@ -503,7 +503,7 @@
         }
         
         // ============================================
-        // CHARGEMENT DES DONNÃ‰ES
+        // CHARGEMENT DES DONNEES
         // ============================================
         
         async function loadDesign() {
@@ -598,7 +598,7 @@
         }
         
         // ============================================
-        // RÃ‰INITIALISATION
+        // REINITIALISATION
         // ============================================
         
         async function resetDesign() {
@@ -632,17 +632,162 @@
                 
                 updatePreview();
                 
-                showStatus(' Design rÃ©initialisÃ© aux valeurs par défaut', 'success');
+                showStatus(' Design réinitialisé aux valeurs par défaut', 'success');
                 
             } catch (error) {
-                console.error('Erreur rÃ©initialisation:', error);
-                showStatus('âŒ Erreur lors de la rÃ©initialisation', 'error');
+                console.error('Erreur réinitialisation:', error);
+                showStatus('âŒ Erreur lors de la réinitialisation', 'error');
             }
         }
         
         // ============================================
         // UTILITAIRES
         // ============================================
+        
+        // ============================================
+        // GESTION DES PRESETS
+        // ============================================
+        
+        async function loadPresetsList() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('design_presets')
+                    .select('*')
+                    .order('name');
+                
+                if (error) throw error;
+                
+                const select = document.getElementById('presetsList');
+                select.innerHTML = '<option value="">-- Choisir un preset --</option>';
+                
+                if (data && data.length > 0) {
+                    data.forEach(preset => {
+                        const option = document.createElement('option');
+                        option.value = preset.id;
+                        option.textContent = preset.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur chargement presets:', error);
+            }
+        }
+        
+        async function saveAsPreset() {
+            const presetName = document.getElementById('presetName').value.trim();
+            
+            if (!presetName) {
+                showStatus('Veuillez entrer un nom pour le preset', 'error');
+                return;
+            }
+            
+            if (!currentUser) {
+                showStatus('Non authentifie', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('Sauvegarde du preset en cours...', 'loading');
+                
+                const presetData = {
+                    name: presetName,
+                    title_color: document.getElementById('titleColor').value,
+                    text_color: document.getElementById('textColor').value,
+                    font_family: document.getElementById('fontFamily').value,
+                    bg_color: document.getElementById('bgColor').value,
+                    border_color: document.getElementById('borderColor').value
+                };
+                
+                const { error } = await supabaseClient
+                    .from('design_presets')
+                    .insert(presetData);
+                
+                if (error) throw error;
+                
+                showStatus('Preset sauvegarde avec succes !', 'success');
+                document.getElementById('presetName').value = '';
+                await loadPresetsList();
+                
+            } catch (error) {
+                console.error('Erreur sauvegarde preset:', error);
+                showStatus('Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadPreset() {
+            const presetId = document.getElementById('presetsList').value;
+            
+            if (!presetId) {
+                showStatus('Veuillez selectionner un preset', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('Chargement du preset...', 'loading');
+                
+                const { data, error } = await supabaseClient
+                    .from('design_presets')
+                    .select('*')
+                    .eq('id', presetId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Appliquer les valeurs du preset
+                document.getElementById('titleColor').value = data.title_color;
+                document.getElementById('titleColorHex').value = data.title_color;
+                
+                document.getElementById('textColor').value = data.text_color;
+                document.getElementById('textColorHex').value = data.text_color;
+                
+                document.getElementById('fontFamily').value = data.font_family;
+                
+                document.getElementById('bgColor').value = data.bg_color;
+                document.getElementById('bgColorHex').value = data.bg_color;
+                
+                document.getElementById('borderColor').value = data.border_color;
+                document.getElementById('borderColorHex').value = data.border_color;
+                
+                updatePreview();
+                
+                showStatus('Preset charge avec succes !', 'success');
+                
+            } catch (error) {
+                console.error('Erreur chargement preset:', error);
+                showStatus('Erreur: ' + error.message, 'error');
+            }
+        }
+        
+        async function deletePreset() {
+            const presetId = document.getElementById('presetsList').value;
+            
+            if (!presetId) {
+                showStatus('Veuillez selectionner un preset', 'error');
+                return;
+            }
+            
+            if (!confirm('Supprimer ce preset ?')) {
+                return;
+            }
+            
+            try {
+                showStatus('Suppression en cours...', 'loading');
+                
+                const { error } = await supabaseClient
+                    .from('design_presets')
+                    .delete()
+                    .eq('id', presetId);
+                
+                if (error) throw error;
+                
+                showStatus('Preset supprime avec succes !', 'success');
+                await loadPresetsList();
+                
+            } catch (error) {
+                console.error('Erreur suppression preset:', error);
+                showStatus('Erreur: ' + error.message, 'error');
+            }
+        }
         
         function showStatus(message, type = 'loading') {
             const status = document.getElementById('statusMessage');
@@ -671,11 +816,12 @@
                 syncColorInputs('bgColor', 'bgColorHex');
                 syncColorInputs('borderColor', 'borderColorHex');
                 
-                // Ã‰couter les changements de police
+                // Ecouter les changements de police
                 document.getElementById('fontFamily').addEventListener('change', updatePreview);
                 
                 // Charger les paramètres
                 await loadDesign();
+                await loadPresetsList();
             }
         });
     </script>
