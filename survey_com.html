@@ -1255,6 +1255,17 @@
  // INITIALIZATION
  // ============================================
  window.addEventListener('DOMContentLoaded', async () => {
+ // Initialiser Supabase en premier
+ if (!supabaseClient) {
+ if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+ supabaseClient = supabase.createClient(
+ window.SUPABASE_URL,
+ window.SUPABASE_ANON_KEY
+ );
+ console.log('Supabase initialise');
+ }
+ }
+ 
  await loadActiveDesign();
  // Afficher directement la section du sondage
  document.getElementById('surveySection').classList.remove('hidden');
