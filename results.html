@@ -12,6 +12,8 @@
  /* Valeurs par defaut - seront ecrasees par loadActiveDesign */
  --container-bg-color: rgba(13, 39, 68, 0.95);
  --text-color: #ffffff;
+ --title-color: #d4af37;
+ --description-color: #f0f0f0;
  --border-color: #d4af37;
  --percentage-color: #d4af37;
  --cases-bg-color: rgba(26, 47, 74, 0.8);
@@ -75,7 +77,7 @@
  }
  
  h1 .title-fr {
- color: var(--text-color);
+ color: var(--title-color);
  }
  
  h1 .title-nl {
@@ -114,7 +116,7 @@
  }
  
  .subtitle .subtitle-fr {
- color: var(--text-color);
+ color: var(--description-color);
  }
  
  .subtitle .subtitle-nl {
@@ -389,6 +391,8 @@
  // Charger les couleurs depuis design_presets
  if (preset.color_container) root.style.setProperty('--container-bg-color', preset.color_container);
  if (preset.text_color_fr) root.style.setProperty('--text-color', preset.text_color_fr);
+ if (preset.title_color_fr) root.style.setProperty('--title-color', preset.title_color_fr);
+ if (preset.description_color_fr) root.style.setProperty('--description-color', preset.description_color_fr);
  if (preset.border_color) root.style.setProperty('--border-color', preset.border_color);
  if (preset.percentage_color) root.style.setProperty('--percentage-color', preset.percentage_color);
  if (preset.color_cases) root.style.setProperty('--cases-bg-color', preset.color_cases);
