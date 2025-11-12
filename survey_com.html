@@ -11,6 +11,7 @@
  :root {
  /* Valeurs par defaut - seront ecrasees par loadActiveDesign */
  /* PAS de background pour survey_com (transparent) */
+ --container-bg-color: rgba(13, 39, 68, 0.95); /* Valeur par defaut */
  --text-color: #ffffff;
  --title-color: #d4af37;
  --description-color: #f0f0f0;
@@ -492,7 +493,8 @@
  const root = document.documentElement;
  
  // PAS de background general pour survey_com (reste transparent)
- // MAIS appliquer la couleur des cases
+ // MAIS appliquer la couleur du container et des cases
+ if (preset.color_container) root.style.setProperty('--container-bg-color', preset.color_container);
  if (preset.color_cases) root.style.setProperty('--cases-bg-color', preset.color_cases);
  
  // Couleurs de texte selon la langue
