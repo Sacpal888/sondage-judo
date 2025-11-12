@@ -1,856 +1,856 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Personnalisation Design</title>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
- <script src="config.js"></script>
- <style>
- * {
- margin: 0;
- padding: 0;
- box-sizing: border-box;
- }
- 
- body {
- font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
- min-height: 100vh;
- padding: 20px;
- }
- 
- /* Overlay de chargement */
- #authLoading {
- position: fixed;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
- display: flex;
- justify-content: center;
- align-items: center;
- z-index: 9999;
- color: white;
- font-size: 1.2em;
- }
- 
- #authLoading.hidden {
- display: none;
- }
- 
- .spinner {
- width: 50px;
- height: 50px;
- border: 5px solid rgba(255,255,255,0.3);
- border-top-color: white;
- border-radius: 50%;
- animation: spin 1s linear infinite;
- margin: 0 auto 20px;
- }
- 
- @keyframes spin {
- to { transform: rotate(360deg); }
- }
- 
- .container {
- max-width: 900px;
- margin: 0 auto;
- background: white;
- padding: 30px;
- border-radius: 15px;
- box-shadow: 0 10px 40px rgba(0,0,0,0.2);
- }
- 
- .header {
- display: flex;
- justify-content: space-between;
- align-items: center;
- margin-bottom: 30px;
- padding-bottom: 20px;
- border-bottom: 2px solid #eee;
- }
- 
- .header h1 {
- color: #333;
- margin: 0;
- }
- 
- .back-btn {
- background: #6c757d;
- color: white;
- border: none;
- padding: 10px 20px;
- border-radius: 8px;
- cursor: pointer;
- font-size: 14px;
- font-weight: 600;
- transition: all 0.3s;
- text-decoration: none;
- display: inline-block;
- }
- 
- .back-btn:hover {
- background: #5a6268;
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
- }
- 
- .section {
- margin-bottom: 30px;
- padding: 20px;
- background: #f8f9fa;
- border-radius: 10px;
- }
- 
- .section h2 {
- color: #555;
- margin-bottom: 15px;
- font-size: 1.3em;
- }
- 
- .color-group {
- display: flex;
- gap: 15px;
- align-items: center;
- margin-bottom: 15px;
- padding: 15px;
- background: white;
- border-radius: 8px;
- }
- 
- .color-group label {
- flex: 1;
- font-weight: 600;
- color: #555;
- }
- 
- .color-input-wrapper {
- display: flex;
- gap: 10px;
- align-items: center;
- }
- 
- input[type="color"] {
- width: 60px;
- height: 40px;
- border: 2px solid #ddd;
- border-radius: 8px;
- cursor: pointer;
- }
- 
- input[type="text"] {
- width: 120px;
- padding: 8px;
- border: 2px solid #ddd;
- border-radius: 8px;
- font-size: 14px;
- font-family: 'Courier New', monospace;
- }
- 
- select {
- width: 200px;
- padding: 12px;
- border: 2px solid #ddd;
- border-radius: 8px;
- font-size: 16px;
- font-family: inherit;
- cursor: pointer;
- }
- 
- button {
- background: #667eea;
- color: white;
- border: none;
- padding: 12px 25px;
- border-radius: 8px;
- cursor: pointer;
- font-size: 16px;
- font-weight: 600;
- transition: all 0.3s;
- margin-right: 10px;
- }
- 
- button:hover {
- background: #5568d3;
- transform: translateY(-2px);
- box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
- }
- 
- button:disabled {
- background: #ccc;
- cursor: not-allowed;
- transform: none;
- }
- 
- .save-btn {
- background: #28a745;
- margin-top: 20px;
- }
- 
- .save-btn:hover {
- background: #218838;
- }
- 
- .reset-btn {
- background: #dc3545;
- margin-top: 20px;
- }
- 
- .reset-btn:hover {
- background: #c82333;
- }
- 
- #statusMessage {
- margin-top: 20px;
- padding: 15px;
- border-radius: 8px;
- display: none;
- font-weight: 600;
- }
- 
- #statusMessage.success {
- display: block;
- background: #d4edda;
- color: #155724;
- }
- 
- #statusMessage.error {
- display: block;
- background: #f8d7da;
- color: #721c24;
- }
- 
- #statusMessage.loading {
- display: block;
- background: #fff3cd;
- color: #856404;
- }
- 
- .preview-section {
- background: white;
- padding: 20px;
- border-radius: 8px;
- margin-top: 15px;
- }
- 
- .preview-box {
- border: 2px solid #ddd;
- border-radius: 8px;
- padding: 20px;
- margin-top: 10px;
- }
- 
- .preview-title {
- font-size: 1.8em;
- font-weight: bold;
- margin-bottom: 10px;
- }
- 
- .preview-text {
- font-size: 1.1em;
- line-height: 1.6;
- }
- 
- .info-box {
- background: #e7f3ff;
- border-left: 4px solid #2196F3;
- padding: 15px;
- margin-top: 15px;
- border-radius: 4px;
- font-size: 14px;
- line-height: 1.6;
- }
- 
- .font-select-group {
- display: flex;
- gap: 15px;
- align-items: center;
- margin-bottom: 15px;
- padding: 15px;
- background: white;
- border-radius: 8px;
- }
- 
- .font-select-group label {
- flex: 1;
- font-weight: 600;
- color: #555;
- }
- </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personnalisation Design</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        #authLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2em;
+        }
+        
+        #authLoading.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+        
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        
+        .color-group {
+            margin-bottom: 20px;
+        }
+        
+        .color-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        
+        .bilingual-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .lang-label {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .lang-label.fr {
+            background: #0055A4;
+            color: white;
+        }
+        
+        .lang-label.nl {
+            background: #FF6600;
+            color: white;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .save-btn, .reset-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .save-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .reset-btn {
+            background: #ccc;
+        }
+        
+        .reset-btn:hover {
+            background: #999;
+        }
+        
+        .success-btn {
+            background: #28a745 !important;
+        }
+        
+        .success-btn:hover {
+            background: #218838 !important;
+        }
+        
+        .danger-btn {
+            background: #dc3545 !important;
+        }
+        
+        .danger-btn:hover {
+            background: #c82333 !important;
+        }
+        
+        .info-btn {
+            background: #17a2b8 !important;
+        }
+        
+        .info-btn:hover {
+            background: #138496 !important;
+        }
+        
+        #statusMessage {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        #statusMessage.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        #statusMessage.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #statusMessage.info {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .preset-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preset-item.active {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .preset-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .preset-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .preset-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+    </style>
 </head>
 <body>
- <!-- Overlay de chargement de l'authentification -->
- <div id="authLoading">
- <div style="text-align: center;">
- <div class="spinner"></div>
- <div>Verification de l'authentification...</div>
- </div>
- </div>
+    <div id="authLoading">
+        <div style="text-align: center;">
+            <div class="spinner"></div>
+            <div>Vérification de l'authentification...</div>
+        </div>
+    </div>
 
- <div class="container" id="mainContainer" style="display: none;">
- <div class="header">
- <h1>�¨ Personnalisation Design</h1>
- <a href="admin.html" class="back-btn">â† Retour Admin</a>
- </div>
- 
- <div id="statusMessage"></div>
- 
-            <h2>Couleurs des Titres</h2>
- <div class="section">
-            <h2>Couleurs des Titres</h2>
- <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
- Personnalisez les couleurs des titres principaux (h1)
- </p>
- 
- <div class="color-group">
- <label for="titleColor">Couleur des titres principaux :</label>
- <div class="color-input-wrapper">
- <input type="color" id="titleColor" value="#d4af37">
- <input type="text" id="titleColorHex" value="#d4af37" placeholder="#d4af37" maxlength="7">
- </div>
- </div>
- </div>
- 
- <!-- Section Couleurs du Texte -->
- <div class="section">
-            <h2>Couleurs du Texte</h2>
- <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
- Personnalisez les couleurs du texte normal
- </p>
- 
- <div class="color-group">
- <label for="textColor">Couleur du texte principal :</label>
- <div class="color-input-wrapper">
- <input type="color" id="textColor" value="#ffffff">
- <input type="text" id="textColorHex" value="#ffffff" placeholder="#ffffff" maxlength="7">
- </div>
- </div>
- </div>
- 
- <!-- Section Police Generale -->
- <div class="section">
- <h2>Police Generale</h2>
- <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
- Choisissez la police de caracteres pour tout le site
- </p>
- 
- <div class="font-select-group">
- <label for="fontFamily">Police de caracteres :</label>
- <select id="fontFamily">
- <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI (défaut)</option>
- <option value="Arial, Helvetica, sans-serif">Arial</option>
- <option value="'Times New Roman', Times, serif">Times New Roman</option>
- <option value="Georgia, serif">Georgia</option>
- <option value="'Courier New', Courier, monospace">Courier New</option>
- <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
- <option value="Impact, Charcoal, sans-serif">Impact</option>
- <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
- <option value="Verdana, Geneva, sans-serif">Verdana</option>
- <option value="'Roboto', sans-serif">Roboto</option>
- <option value="'Open Sans', sans-serif">Open Sans</option>
- <option value="'Lato', sans-serif">Lato</option>
- <option value="'Montserrat', sans-serif">Montserrat</option>
- </select>
- </div>
- </div>
- 
-            <h2>Couleurs des Cadres</h2>
- <div class="section">
-            <h2>Couleurs des Cadres</h2>
- <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
- Personnalisez l'apparence des cadres et conteneurs
- </p>
- 
- <div class="color-group">
- <label for="bgColor">Couleur de fond des cadres :</label>
- <div class="color-input-wrapper">
- <input type="color" id="bgColor" value="#0d2744">
- <input type="text" id="bgColorHex" value="#0d2744" placeholder="#0d2744" maxlength="7">
- </div>
- </div>
- 
- <div class="color-group">
- <label for="borderColor">Couleur de bordure :</label>
- <div class="color-input-wrapper">
- <input type="color" id="borderColor" value="#d4af37">
- <input type="text" id="borderColorHex" value="#d4af37" placeholder="#d4af37" maxlength="7">
- </div>
- </div>
- </div>
- 
- <!-- Section Apercu -->
- <div class="section">
-            <h2>Apercu en direct</h2>
- <div class="preview-section">
- <div class="preview-box" id="previewBox">
- <div class="preview-title" id="previewTitle">Titre de la page</div>
- <div class="preview-text" id="previewText">
- Ceci est un exemple de texte normal. Vous pouvez voir comment vos couleurs et votre police s'affichent ici en temps reel.
- </div>
- </div>
- </div>
- </div>
- 
+    <div class="container" id="mainContainer" style="display: none;">
+        <div class="header">
+            <h1>🎨 Personnalisation Design</h1>
+            <a href="index.html" class="back-btn">← Retour</a>
+        </div>
         
-        <!-- Section Presets -->
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #dee2e6;">
-            <h3 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #dee2e6; padding-bottom: 10px;">Gestion des Presets</h3>
+        <div id="statusMessage"></div>
+        
+        <!-- Section Texte Français/Néerlandais -->
+        <div class="section">
+            <h2>📝 Couleurs du Texte (Bilingue)</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les couleurs du texte principal pour chaque langue
+            </p>
             
-            <div class="form-group">
-                <label class="form-label">Nom du preset</label>
-                <input type="text" id="presetName" class="form-input" placeholder="Ex: Judo Gold, Tractebel Blue, Corporate Green..." style="margin-bottom: 10px;">
+            <div class="bilingual-group">
+                <div class="color-group">
+                    <label for="textColorFr">Texte principal <span class="lang-label fr">FR</span></label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="textColorFr" value="#ffffff">
+                        <input type="text" id="textColorFrHex" value="#ffffff" placeholder="#ffffff" maxlength="7">
+                    </div>
+                </div>
+                
+                <div class="color-group">
+                    <label for="textColorNl">Tekst hoofdtekst <span class="lang-label nl">NL</span></label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="textColorNl" value="#ffffff">
+                        <input type="text" id="textColorNlHex" value="#ffffff" placeholder="#ffffff" maxlength="7">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Titres Français/Néerlandais -->
+        <div class="section">
+            <h2>📌 Couleurs des Titres (Bilingue)</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les couleurs des titres pour chaque langue
+            </p>
+            
+            <div class="bilingual-group">
+                <div class="color-group">
+                    <label for="titleColorFr">Titre principal <span class="lang-label fr">FR</span></label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="titleColorFr" value="#d4af37">
+                        <input type="text" id="titleColorFrHex" value="#d4af37" placeholder="#d4af37" maxlength="7">
+                    </div>
+                </div>
+                
+                <div class="color-group">
+                    <label for="titleColorNl">Hoofdtitel <span class="lang-label nl">NL</span></label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="titleColorNl" value="#d4af37">
+                        <input type="text" id="titleColorNlHex" value="#d4af37" placeholder="#d4af37" maxlength="7">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Descriptions Français/Néerlandais -->
+        <div class="section">
+            <h2>💬 Couleurs des Descriptions (Bilingue)</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les couleurs des descriptions/sous-titres pour chaque langue
+            </p>
+            
+            <div class="bilingual-group">
+                <div class="color-group">
+                    <label for="descColorFr">Description <span class="lang-label fr">FR</span></label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="descColorFr" value="#f0f0f0">
+                        <input type="text" id="descColorFrHex" value="#f0f0f0" placeholder="#f0f0f0" maxlength="7">
+                    </div>
+                </div>
+                
+                <div class="color-group">
+                    <label for="descColorNl">Beschrijving <span class="lang-label nl">NL</span></label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="descColorNl" value="#f0f0f0">
+                        <input type="text" id="descColorNlHex" value="#f0f0f0" placeholder="#f0f0f0" maxlength="7">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Couleurs de Fond -->
+        <div class="section">
+            <h2>🎨 Couleurs de Fond et Containers</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les couleurs de fond des différents éléments
+            </p>
+            
+            <div class="color-group">
+                <label for="bgColor">Couleur de fond générale</label>
+                <div class="color-input-wrapper">
+                    <input type="color" id="bgColor" value="#0d2744">
+                    <input type="text" id="bgColorHex" value="#0d2744" placeholder="#0d2744" maxlength="7">
+                </div>
+            </div>
+            
+            <div class="color-group">
+                <label for="containerColor">Couleur des containers</label>
+                <div class="color-input-wrapper">
+                    <input type="color" id="containerColor" value="#1a3a5a">
+                    <input type="text" id="containerColorHex" value="#1a3a5a" placeholder="#1a3a5a" maxlength="7">
+                </div>
+            </div>
+            
+            <div class="color-group">
+                <label for="casesColor">Couleur des cases de choix</label>
+                <div class="color-input-wrapper">
+                    <input type="color" id="casesColor" value="#2a4a6a">
+                    <input type="text" id="casesColorHex" value="#2a4a6a" placeholder="#2a4a6a" maxlength="7">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Bordures et Pourcentages -->
+        <div class="section">
+            <h2>🖌️ Bordures et Pourcentages</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Personnalisez les couleurs des bordures et des éléments de progression
+            </p>
+            
+            <div class="color-group">
+                <label for="borderColor">Couleur des bordures (cases, containers)</label>
+                <div class="color-input-wrapper">
+                    <input type="color" id="borderColor" value="#d4af37">
+                    <input type="text" id="borderColorHex" value="#d4af37" placeholder="#d4af37" maxlength="7">
+                </div>
+            </div>
+            
+            <div class="color-group">
+                <label for="percentageColor">Couleur des pourcentages et barres de progression</label>
+                <div class="color-input-wrapper">
+                    <input type="color" id="percentageColor" value="#d4af37">
+                    <input type="text" id="percentageColorHex" value="#d4af37" placeholder="#d4af37" maxlength="7">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section Gestion des Presets -->
+        <div class="section">
+            <h2>💾 Gestion des Presets</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                Sauvegardez et gérez vos combinaisons de couleurs
+            </p>
+            
+            <div class="color-group">
+                <label for="presetName">Nom du preset</label>
+                <input type="text" id="presetName" class="form-input" placeholder="Ex: Judo Or, Tractebel Bleu, Corporate Vert...">
             </div>
             
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="save-btn" onclick="saveAsPreset()" style="flex: 1; background: #28a745;">Sauvegarder comme preset</button>
+                <button class="save-btn success-btn" onclick="saveAsPreset()" style="flex: 1;">💾 Sauvegarder comme preset</button>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">Charger un preset existant</label>
-                <select id="presetsList" class="form-input" style="margin-bottom: 10px;">
-                    <option value="">-- Choisir un preset --</option>
-                </select>
-            </div>
-            
-            <div style="display: flex; gap: 10px;">
-                <button class="save-btn" onclick="loadPreset()" style="flex: 1; background: #17a2b8;">Charger le preset selectionne</button>
-                <button class="save-btn" onclick="deletePreset()" style="flex: 1; background: #dc3545;">Supprimer le preset</button>
+            <div id="presetsList" style="margin-top: 20px;">
+                <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                    <strong>Presets disponibles :</strong>
+                </p>
+                <div id="presetsContainer"></div>
             </div>
         </div>
+        
+        <!-- Boutons d'action -->
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 30px;">
+            <button class="save-btn" onclick="applyPreset()">✓ Appliquer le design</button>
+            <button class="reset-btn" onclick="resetToDefaults()">↺ Réinitialiser</button>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #ffeaa7;">
+            <strong>ℹ️ Comment ça marche :</strong><br>
+            - Utilisez les sélecteurs de couleur ou entrez directement un code hexadécimal<br>
+            - Sauvegardez vos combinaisons en tant que presets pour les réutiliser<br>
+            - Le preset marqué comme "Actif" sera utilisé sur toutes les pages<br>
+            - Cliquez sur "Activer" pour définir un preset comme actif
+        </div>
+    </div>
 
- <!-- Boutons d'action -->
- <div style="display: flex; gap: 10px; justify-content: center;">
- <button class="save-btn" onclick="saveDesign()">Enregistrer le design</button>
- <button class="reset-btn" onclick="resetDesign()">Reinitialiser</button>
- </div>
- 
- <div class="info-box">
-                <strong>Comment ca marche :</strong><br>
- - Utilisez les selecteurs de couleur (pipette) ou entrez directement un code couleur hexadecimal<br>
- - L'apercu se met Ã  jour en temps reel<br>
- - Cliquez sur "Enregistrer" pour appliquer les modifications sur toutes les pages<br>
- - Les changements sont appliques instantanement sur sondage.html et resultats.html<br>
- - Vous pouvez toujours revenir aux couleurs par défaut avec "Reinitialiser"
- </div>
- </div>
-
- <script>
- let supabaseClient;
- let currentUser = null;
- 
- // Valeurs par défaut
- const DEFAULT_DESIGN = {
- titleColor: '#d4af37',
- textColor: '#ffffff',
- fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
- bgColor: '#0d2744',
- borderColor: '#d4af37'
- };
- 
- // ============================================
- // AUTHENTIFICATION
- // ============================================
- 
- async function checkAuth() {
- try {
- if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
- console.error('Configuration Supabase manquante');
- window.location.href = 'login.html';
- return false;
- }
- 
- supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
- 
- const { data: { session }, error } = await supabaseClient.auth.getSession();
- 
- if (error || !session) {
- console.log('Pas de session active');
- window.location.href = 'login.html';
- return false;
- }
- 
- currentUser = session.user;
- console.log('Utilisateur connecte:', currentUser.email);
- 
- document.getElementById('authLoading').classList.add('hidden');
- document.getElementById('mainContainer').style.display = 'block';
- 
- return true;
- 
- } catch (error) {
- console.error('Erreur authentification:', error);
- window.location.href = 'login.html';
- return false;
- }
- }
- 
- // ============================================
- // GESTION DES COULEURS
- // ============================================
- 
- function syncColorInputs(colorInputId, hexInputId) {
- const colorInput = document.getElementById(colorInputId);
- const hexInput = document.getElementById(hexInputId);
- 
- colorInput.addEventListener('input', () => {
- hexInput.value = colorInput.value;
- updatePreview();
- });
- 
- hexInput.addEventListener('input', () => {
- if (/^#[0-9A-F]{6}$/i.test(hexInput.value)) {
- colorInput.value = hexInput.value;
- updatePreview();
- }
- });
- }
- 
- function updatePreview() {
- const previewBox = document.getElementById('previewBox');
- const previewTitle = document.getElementById('previewTitle');
- const previewText = document.getElementById('previewText');
- 
- const titleColor = document.getElementById('titleColor').value;
- const textColor = document.getElementById('textColor').value;
- const fontFamily = document.getElementById('fontFamily').value;
- const bgColor = document.getElementById('bgColor').value;
- const borderColor = document.getElementById('borderColor').value;
- 
- previewBox.style.backgroundColor = bgColor;
- previewBox.style.borderColor = borderColor;
- previewBox.style.fontFamily = fontFamily;
- 
- previewTitle.style.color = titleColor;
- previewTitle.style.fontFamily = fontFamily;
- 
- previewText.style.color = textColor;
- previewText.style.fontFamily = fontFamily;
- }
- 
- // ============================================
- // CHARGEMENT DES DONNEES
- // ============================================
- 
- async function loadDesign() {
- try {
- showStatus('â³ Chargement des paramètres...', 'loading');
- 
- const { data, error } = await supabaseClient
- .from('settings')
- .select('*')
- .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
- 
- if (error) throw error;
- 
- const design = {};
- if (data) {
- data.forEach(item => {
- design[item.key] = item.value;
- });
- }
- 
- // Appliquer les valeurs
- document.getElementById('titleColor').value = design.design_title_color || DEFAULT_DESIGN.titleColor;
- document.getElementById('titleColorHex').value = design.design_title_color || DEFAULT_DESIGN.titleColor;
- 
- document.getElementById('textColor').value = design.design_text_color || DEFAULT_DESIGN.textColor;
- document.getElementById('textColorHex').value = design.design_text_color || DEFAULT_DESIGN.textColor;
- 
- document.getElementById('fontFamily').value = design.design_font_family || DEFAULT_DESIGN.fontFamily;
- 
- document.getElementById('bgColor').value = design.design_bg_color || DEFAULT_DESIGN.bgColor;
- document.getElementById('bgColorHex').value = design.design_bg_color || DEFAULT_DESIGN.bgColor;
- 
- document.getElementById('borderColor').value = design.design_border_color || DEFAULT_DESIGN.borderColor;
- document.getElementById('borderColorHex').value = design.design_border_color || DEFAULT_DESIGN.borderColor;
- 
- updatePreview();
- 
- showStatus(' Paramètres chargés', 'success');
- 
- } catch (error) {
- console.error('Erreur chargement design:', error);
- showStatus('âŒ Erreur de chargement', 'error');
- }
- }
- 
- // ============================================
- // SAUVEGARDE
- // ============================================
- 
- async function saveDesign() {
- if (!currentUser) {
- showStatus('âŒ Non authentifié', 'error');
- return;
- }
- 
- try {
- showStatus('â³ Enregistrement en cours...', 'loading');
- 
- const settings = [
- { key: 'design_title_color', value: document.getElementById('titleColor').value },
- { key: 'design_text_color', value: document.getElementById('textColor').value },
- { key: 'design_font_family', value: document.getElementById('fontFamily').value },
- { key: 'design_bg_color', value: document.getElementById('bgColor').value },
- { key: 'design_border_color', value: document.getElementById('borderColor').value }
- ];
- 
- for (const setting of settings) {
- const { data: existing } = await supabaseClient
- .from('settings')
- .select('*')
- .eq('key', setting.key)
- .single();
- 
- if (existing) {
- await supabaseClient
- .from('settings')
- .update({ value: setting.value })
- .eq('key', setting.key);
- } else {
- await supabaseClient
- .from('settings')
- .insert({ key: setting.key, value: setting.value });
- }
- }
- 
- showStatus(' Design enregistré avec succès ! Les modifications sont appliquées sur toutes les pages.', 'success');
- 
- } catch (error) {
- console.error('Erreur sauvegarde:', error);
- showStatus('âŒ Erreur lors de l\'enregistrement: ' + error.message, 'error');
- }
- }
- 
- // ============================================
- // REINITIALISATION
- // ============================================
- 
- async function resetDesign() {
- if (!confirm('Revenir aux couleurs et polices par défaut ?')) {
- return;
- }
- 
- try {
- showStatus('â³ Réinitialisation...', 'loading');
- 
- // Supprimer tous les paramètres de design
- await supabaseClient
- .from('settings')
- .delete()
- .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
- 
- // Recharger les valeurs par défaut
- document.getElementById('titleColor').value = DEFAULT_DESIGN.titleColor;
- document.getElementById('titleColorHex').value = DEFAULT_DESIGN.titleColor;
- 
- document.getElementById('textColor').value = DEFAULT_DESIGN.textColor;
- document.getElementById('textColorHex').value = DEFAULT_DESIGN.textColor;
- 
- document.getElementById('fontFamily').value = DEFAULT_DESIGN.fontFamily;
- 
- document.getElementById('bgColor').value = DEFAULT_DESIGN.bgColor;
- document.getElementById('bgColorHex').value = DEFAULT_DESIGN.bgColor;
- 
- document.getElementById('borderColor').value = DEFAULT_DESIGN.borderColor;
- document.getElementById('borderColorHex').value = DEFAULT_DESIGN.borderColor;
- 
- updatePreview();
- 
- showStatus(' Design reinitialise aux valeurs par défaut', 'success');
- 
- } catch (error) {
- console.error('Erreur reinitialisation:', error);
- showStatus('âŒ Erreur lors de la reinitialisation', 'error');
- }
- }
- 
- // ============================================
- // UTILITAIRES
- // ============================================
- 
- // ============================================
- // GESTION DES PRESETS
- // ============================================
- 
- async function loadPresetsList() {
- try {
- const { data, error } = await supabaseClient
- .from('design_presets')
- .select('*')
- .order('name');
- 
- if (error) throw error;
- 
- const select = document.getElementById('presetsList');
- select.innerHTML = '<option value="">-- Choisir un preset --</option>';
- 
- if (data && data.length > 0) {
- data.forEach(preset => {
- const option = document.createElement('option');
- option.value = preset.id;
- option.textContent = preset.name;
- select.appendChild(option);
- });
- }
- } catch (error) {
- console.error('Erreur chargement presets:', error);
- }
- }
- 
- async function saveAsPreset() {
- const presetName = document.getElementById('presetName').value.trim();
- 
- if (!presetName) {
- showStatus('Veuillez entrer un nom pour le preset', 'error');
- return;
- }
- 
- if (!currentUser) {
- showStatus('Non authentifie', 'error');
- return;
- }
- 
- try {
- showStatus('Sauvegarde du preset en cours...', 'loading');
- 
- const presetData = {
- name: presetName,
- title_color: document.getElementById('titleColor').value,
- text_color: document.getElementById('textColor').value,
- font_family: document.getElementById('fontFamily').value,
- bg_color: document.getElementById('bgColor').value,
- border_color: document.getElementById('borderColor').value
- };
- 
- const { error } = await supabaseClient
- .from('design_presets')
- .insert(presetData);
- 
- if (error) throw error;
- 
- showStatus('Preset sauvegarde avec succes !', 'success');
- document.getElementById('presetName').value = '';
- await loadPresetsList();
- 
- } catch (error) {
- console.error('Erreur sauvegarde preset:', error);
- showStatus('Erreur: ' + error.message, 'error');
- }
- }
- 
- async function loadPreset() {
- const presetId = document.getElementById('presetsList').value;
- 
- if (!presetId) {
- showStatus('Veuillez selectionner un preset', 'error');
- return;
- }
- 
- try {
- showStatus('Chargement du preset...', 'loading');
- 
- const { data, error } = await supabaseClient
- .from('design_presets')
- .select('*')
- .eq('id', presetId)
- .single();
- 
- if (error) throw error;
- 
- // Appliquer les valeurs du preset
- document.getElementById('titleColor').value = data.title_color;
- document.getElementById('titleColorHex').value = data.title_color;
- 
- document.getElementById('textColor').value = data.text_color;
- document.getElementById('textColorHex').value = data.text_color;
- 
- document.getElementById('fontFamily').value = data.font_family;
- 
- document.getElementById('bgColor').value = data.bg_color;
- document.getElementById('bgColorHex').value = data.bg_color;
- 
- document.getElementById('borderColor').value = data.border_color;
- document.getElementById('borderColorHex').value = data.border_color;
- 
- updatePreview();
- 
- showStatus('Preset charge avec succes !', 'success');
- 
- } catch (error) {
- console.error('Erreur chargement preset:', error);
- showStatus('Erreur: ' + error.message, 'error');
- }
- }
- 
- async function deletePreset() {
- const presetId = document.getElementById('presetsList').value;
- 
- if (!presetId) {
- showStatus('Veuillez selectionner un preset', 'error');
- return;
- }
- 
- if (!confirm('Supprimer ce preset ?')) {
- return;
- }
- 
- try {
- showStatus('Suppression en cours...', 'loading');
- 
- const { error } = await supabaseClient
- .from('design_presets')
- .delete()
- .eq('id', presetId);
- 
- if (error) throw error;
- 
- showStatus('Preset supprime avec succes !', 'success');
- await loadPresetsList();
- 
- } catch (error) {
- console.error('Erreur suppression preset:', error);
- showStatus('Erreur: ' + error.message, 'error');
- }
- }
- 
- function showStatus(message, type = 'loading') {
- const status = document.getElementById('statusMessage');
- status.className = type;
- status.textContent = message;
- status.style.display = 'block';
- 
- if (type === 'success' || type === 'error') {
- setTimeout(() => {
- status.style.display = 'none';
- }, 5000);
- }
- }
- 
- // ============================================
- // INITIALISATION
- // ============================================
- 
- window.addEventListener('DOMContentLoaded', async () => {
- const authenticated = await checkAuth();
- 
- if (authenticated) {
- // Synchroniser les inputs couleur et hex
- syncColorInputs('titleColor', 'titleColorHex');
- syncColorInputs('textColor', 'textColorHex');
- syncColorInputs('bgColor', 'bgColorHex');
- syncColorInputs('borderColor', 'borderColorHex');
- 
- // Ecouter les changements de police
- document.getElementById('fontFamily').addEventListener('change', updatePreview);
- 
- // Charger les paramètres
- await loadDesign();
- await loadPresetsList();
- }
- });
- </script>
+    <script>
+        let supabaseClient;
+        let currentUser = null;
+        
+        // ============================================
+        // AUTHENTIFICATION
+        // ============================================
+        
+        async function checkAuth() {
+            try {
+                if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                    console.error('Configuration Supabase manquante');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+                
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                
+                if (error || !session) {
+                    console.log('Pas de session active');
+                    window.location.href = 'login.html';
+                    return false;
+                }
+                
+                currentUser = session.user;
+                console.log('Utilisateur connecté:', currentUser.email);
+                
+                document.getElementById('authLoading').classList.add('hidden');
+                document.getElementById('mainContainer').style.display = 'block';
+                
+                loadPresets();
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Erreur authentification:', error);
+                window.location.href = 'login.html';
+                return false;
+            }
+        }
+        
+        // ============================================
+        // SYNCHRONISATION DES INPUTS
+        // ============================================
+        
+        function syncColorInputs(colorId, hexId) {
+            const colorInput = document.getElementById(colorId);
+            const hexInput = document.getElementById(hexId);
+            
+            colorInput.addEventListener('input', () => {
+                hexInput.value = colorInput.value;
+            });
+            
+            hexInput.addEventListener('input', () => {
+                if (/^#[0-9A-F]{6}$/i.test(hexInput.value)) {
+                    colorInput.value = hexInput.value;
+                }
+            });
+        }
+        
+        // Initialiser la synchronisation pour tous les inputs
+        function initColorSync() {
+            syncColorInputs('textColorFr', 'textColorFrHex');
+            syncColorInputs('textColorNl', 'textColorNlHex');
+            syncColorInputs('titleColorFr', 'titleColorFrHex');
+            syncColorInputs('titleColorNl', 'titleColorNlHex');
+            syncColorInputs('descColorFr', 'descColorFrHex');
+            syncColorInputs('descColorNl', 'descColorNlHex');
+            syncColorInputs('bgColor', 'bgColorHex');
+            syncColorInputs('containerColor', 'containerColorHex');
+            syncColorInputs('casesColor', 'casesColorHex');
+            syncColorInputs('borderColor', 'borderColorHex');
+            syncColorInputs('percentageColor', 'percentageColorHex');
+        }
+        
+        // ============================================
+        // AFFICHAGE DE MESSAGES
+        // ============================================
+        
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // ============================================
+        // GESTION DES PRESETS
+        // ============================================
+        
+        async function loadPresets() {
+            try {
+                const { data: presets, error } = await supabaseClient
+                    .from('design_presets')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Erreur chargement presets:', error);
+                    return;
+                }
+                
+                const container = document.getElementById('presetsContainer');
+                container.innerHTML = '';
+                
+                if (!presets || presets.length === 0) {
+                    container.innerHTML = '<p style="color: #999; font-style: italic;">Aucun preset disponible</p>';
+                    return;
+                }
+                
+                presets.forEach(preset => {
+                    const item = document.createElement('div');
+                    item.className = 'preset-item' + (preset.is_active ? ' active' : '');
+                    
+                    item.innerHTML = `
+                        <div>
+                            <span class="preset-name">${preset.name}</span>
+                            ${preset.is_active ? ' <span style="color: #28a745; font-weight: bold;">● Actif</span>' : ''}
+                        </div>
+                        <div class="preset-actions">
+                            <button class="info-btn" onclick="loadPresetData(${preset.id})">Charger</button>
+                            <button class="success-btn" onclick="activatePreset(${preset.id})">Activer</button>
+                            <button class="danger-btn" onclick="deletePreset(${preset.id})">Supprimer</button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(item);
+                });
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors du chargement des presets', 'error');
+            }
+        }
+        
+        async function loadPresetData(presetId) {
+            try {
+                const { data: preset, error } = await supabaseClient
+                    .from('design_presets')
+                    .select('*')
+                    .eq('id', presetId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Charger les valeurs dans les inputs
+                document.getElementById('textColorFr').value = preset.text_color_fr || '#ffffff';
+                document.getElementById('textColorFrHex').value = preset.text_color_fr || '#ffffff';
+                document.getElementById('textColorNl').value = preset.text_color_nl || '#ffffff';
+                document.getElementById('textColorNlHex').value = preset.text_color_nl || '#ffffff';
+                
+                document.getElementById('titleColorFr').value = preset.title_color_fr || '#d4af37';
+                document.getElementById('titleColorFrHex').value = preset.title_color_fr || '#d4af37';
+                document.getElementById('titleColorNl').value = preset.title_color_nl || '#d4af37';
+                document.getElementById('titleColorNlHex').value = preset.title_color_nl || '#d4af37';
+                
+                document.getElementById('descColorFr').value = preset.description_color_fr || '#f0f0f0';
+                document.getElementById('descColorFrHex').value = preset.description_color_fr || '#f0f0f0';
+                document.getElementById('descColorNl').value = preset.description_color_nl || '#f0f0f0';
+                document.getElementById('descColorNlHex').value = preset.description_color_nl || '#f0f0f0';
+                
+                document.getElementById('bgColor').value = preset.bg_color || '#0d2744';
+                document.getElementById('bgColorHex').value = preset.bg_color || '#0d2744';
+                document.getElementById('containerColor').value = preset.color_container || '#1a3a5a';
+                document.getElementById('containerColorHex').value = preset.color_container || '#1a3a5a';
+                document.getElementById('casesColor').value = preset.color_cases || '#2a4a6a';
+                document.getElementById('casesColorHex').value = preset.color_cases || '#2a4a6a';
+                
+                document.getElementById('borderColor').value = preset.border_color || '#d4af37';
+                document.getElementById('borderColorHex').value = preset.border_color || '#d4af37';
+                document.getElementById('percentageColor').value = preset.percentage_color || '#d4af37';
+                document.getElementById('percentageColorHex').value = preset.percentage_color || '#d4af37';
+                
+                showStatus(`Preset "${preset.name}" chargé`, 'success');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors du chargement du preset', 'error');
+            }
+        }
+        
+        async function saveAsPreset() {
+            const presetName = document.getElementById('presetName').value.trim();
+            
+            if (!presetName) {
+                showStatus('Veuillez entrer un nom pour le preset', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('design_presets')
+                    .insert([{
+                        name: presetName,
+                        text_color_fr: document.getElementById('textColorFr').value,
+                        text_color_nl: document.getElementById('textColorNl').value,
+                        title_color_fr: document.getElementById('titleColorFr').value,
+                        title_color_nl: document.getElementById('titleColorNl').value,
+                        description_color_fr: document.getElementById('descColorFr').value,
+                        description_color_nl: document.getElementById('descColorNl').value,
+                        bg_color: document.getElementById('bgColor').value,
+                        color_container: document.getElementById('containerColor').value,
+                        color_cases: document.getElementById('casesColor').value,
+                        border_color: document.getElementById('borderColor').value,
+                        percentage_color: document.getElementById('percentageColor').value,
+                        is_active: false
+                    }])
+                    .select();
+                
+                if (error) throw error;
+                
+                document.getElementById('presetName').value = '';
+                showStatus(`Preset "${presetName}" sauvegardé avec succès`, 'success');
+                loadPresets();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors de la sauvegarde du preset', 'error');
+            }
+        }
+        
+        async function activatePreset(presetId) {
+            try {
+                // Désactiver tous les presets
+                await supabaseClient
+                    .from('design_presets')
+                    .update({ is_active: false })
+                    .neq('id', 0);
+                
+                // Activer le preset sélectionné
+                const { error } = await supabaseClient
+                    .from('design_presets')
+                    .update({ is_active: true })
+                    .eq('id', presetId);
+                
+                if (error) throw error;
+                
+                showStatus('Preset activé avec succès', 'success');
+                loadPresets();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors de l'activation du preset', 'error');
+            }
+        }
+        
+        async function deletePreset(presetId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce preset ?')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('design_presets')
+                    .delete()
+                    .eq('id', presetId);
+                
+                if (error) throw error;
+                
+                showStatus('Preset supprimé avec succès', 'success');
+                loadPresets();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors de la suppression du preset', 'error');
+            }
+        }
+        
+        async function applyPreset() {
+            if (!confirm('Appliquer ce design ? Le preset actif sera mis à jour.')) {
+                return;
+            }
+            
+            try {
+                // Trouver le preset actif
+                const { data: activePreset, error: fetchError } = await supabaseClient
+                    .from('design_presets')
+                    .select('id')
+                    .eq('is_active', true)
+                    .single();
+                
+                if (fetchError || !activePreset) {
+                    showStatus('Aucun preset actif trouvé. Veuillez activer un preset d'abord.', 'error');
+                    return;
+                }
+                
+                // Mettre à jour le preset actif avec les valeurs actuelles
+                const { error: updateError } = await supabaseClient
+                    .from('design_presets')
+                    .update({
+                        text_color_fr: document.getElementById('textColorFr').value,
+                        text_color_nl: document.getElementById('textColorNl').value,
+                        title_color_fr: document.getElementById('titleColorFr').value,
+                        title_color_nl: document.getElementById('titleColorNl').value,
+                        description_color_fr: document.getElementById('descColorFr').value,
+                        description_color_nl: document.getElementById('descColorNl').value,
+                        bg_color: document.getElementById('bgColor').value,
+                        color_container: document.getElementById('containerColor').value,
+                        color_cases: document.getElementById('casesColor').value,
+                        border_color: document.getElementById('borderColor').value,
+                        percentage_color: document.getElementById('percentageColor').value
+                    })
+                    .eq('id', activePreset.id);
+                
+                if (updateError) throw updateError;
+                
+                showStatus('Design appliqué avec succès ! Les modifications sont visibles sur toutes les pages.', 'success');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus('Erreur lors de l'application du design', 'error');
+            }
+        }
+        
+        function resetToDefaults() {
+            if (!confirm('Réinitialiser toutes les couleurs aux valeurs par défaut ?')) {
+                return;
+            }
+            
+            document.getElementById('textColorFr').value = '#ffffff';
+            document.getElementById('textColorFrHex').value = '#ffffff';
+            document.getElementById('textColorNl').value = '#ffffff';
+            document.getElementById('textColorNlHex').value = '#ffffff';
+            
+            document.getElementById('titleColorFr').value = '#d4af37';
+            document.getElementById('titleColorFrHex').value = '#d4af37';
+            document.getElementById('titleColorNl').value = '#d4af37';
+            document.getElementById('titleColorNlHex').value = '#d4af37';
+            
+            document.getElementById('descColorFr').value = '#f0f0f0';
+            document.getElementById('descColorFrHex').value = '#f0f0f0';
+            document.getElementById('descColorNl').value = '#f0f0f0';
+            document.getElementById('descColorNlHex').value = '#f0f0f0';
+            
+            document.getElementById('bgColor').value = '#0d2744';
+            document.getElementById('bgColorHex').value = '#0d2744';
+            document.getElementById('containerColor').value = '#1a3a5a';
+            document.getElementById('containerColorHex').value = '#1a3a5a';
+            document.getElementById('casesColor').value = '#2a4a6a';
+            document.getElementById('casesColorHex').value = '#2a4a6a';
+            
+            document.getElementById('borderColor').value = '#d4af37';
+            document.getElementById('borderColorHex').value = '#d4af37';
+            document.getElementById('percentageColor').value = '#d4af37';
+            document.getElementById('percentageColorHex').value = '#d4af37';
+            
+            showStatus('Valeurs réinitialisées aux paramètres par défaut', 'info');
+        }
+        
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        
+        window.addEventListener('DOMContentLoaded', async () => {
+            const authenticated = await checkAuth();
+            if (authenticated) {
+                initColorSync();
+            }
+        });
+    </script>
 </body>
 </html>
