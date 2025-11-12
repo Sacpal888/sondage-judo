@@ -2013,6 +2013,17 @@
  // INITIALIZATION
  // ============================================
  window.addEventListener('DOMContentLoaded', async () => {
+ // Initialiser Supabase en premier
+ if (!supabaseClient) {
+ if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+ supabaseClient = supabase.createClient(
+ window.SUPABASE_URL,
+ window.SUPABASE_ANON_KEY
+ );
+ console.log('Supabase initialise');
+ }
+ }
+ 
  // Charger le design actif depuis design_presets
  await loadActiveDesign();
  
