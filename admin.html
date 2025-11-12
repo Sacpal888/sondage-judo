@@ -819,7 +819,7 @@
  try {
  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
- const { data: { user }error } = await supabaseClient.auth.getUser();
+ const { data: { user }, error } = await supabaseClient.auth.getUser();
  
  if (error || !user) {
  window.location.href = 'login.html';
@@ -834,7 +834,7 @@
  
  return true;
  } catch (error) {
- console.error('Erreur auth:'error);
+ console.error('Erreur auth:', error);
  window.location.href = 'login.html';
  return false;
  }
@@ -878,18 +878,18 @@
  }
 
  // Afficher les sondages
- displaySurveys(allSurveysstatsMap);
+ displaySurveys(allSurveys, statsMap);
  
  // Mettre à jour les stats globales
  document.getElementById('totalSurveysCount').textContent = allSurveys.length;
 
  } catch (error) {
- console.error('Erreur chargement sondages:'error);
+ console.error('Erreur chargement sondages:', error);
  alert(' Erreur: ' + error.message);
  }
  }
 
- function displaySurveys(surveysstatsMap) {
+ function displaySurveys(surveys, statsMap) {
  const grid = document.getElementById('surveysGrid');
  
  if (!surveys || surveys.length === 0) {
@@ -921,7 +921,7 @@
  <div class=language-badges>
  <span class=lang-badge fr> Français</span>
  <span class=lang-badge nl ${nlActive ? '' : 'inactive'}>
- Nederlands ${nlActive ? 'œ"' : 'œ'}
+ Nederlands ${nlActive ? '' : ''}
  </span>
  </div>
 
@@ -947,31 +947,31 @@
  <div class=survey-actions>
  <div style=display: flex; gap: 8px; width: 100%; align-items: center;>
  <div style=display: flex; flex-direction: column; gap: 4px;>
- <button class=btn onclick=moveSurvey(${survey.id}'up') 
+ <button class=btn onclick=moveSurvey(${survey.id}, 'up') 
  style=padding: 5px 10px; font-size: 0.8rem; min-width: auto; ${index === 0 ? 'opacity: 0.3; cursor: not-allowed;' : ''}
  ${index === 0 ? 'disabled' : ''}>
-                                    UP
+ UP
  </button>
- <button class=btn onclick=moveSurvey(${survey.id}'down') 
+ <button class=btn onclick=moveSurvey(${survey.id}, 'down') 
  style=padding: 5px 10px; font-size: 0.8rem; min-width: auto; ${index === surveys.length - 1 ? 'opacity: 0.3; cursor: not-allowed;' : ''}
  ${index === surveys.length - 1 ? 'disabled' : ''}>
-                                    DOWN
+ DOWN
  </button>
  </div>
  <button class=btn ${survey.active ? 'btn-warning' : 'btn-success'} 
- onclick=toggleActive(${survey.id}${survey.active})
+ onclick=toggleActive(${survey.id}, ${survey.active})
  style=flex: 1; ${survey.ever_activated && !survey.active ? 'opacity: 0.5; cursor: not-allowed;' : ''}
  ${survey.ever_activated && !survey.active ? 'disabled' : ''}>
- ${survey.active ? 'ï Désactiver' : 'ï Activer'}
+ ${survey.active ? ' Désactiver' : ' Activer'}
  </button>
  <button class=btn btn-done ${survey.ever_activated ? 'active' : ''} 
- onclick=toggleEverActivated(${survey.id}${survey.ever_activated})
+ onclick=toggleEverActivated(${survey.id}, ${survey.ever_activated})
  style=flex: 1;>
- ${survey.ever_activated ? 'œ Déjà fait' : 'œ Déjà fait'}
+ ${survey.ever_activated ? ' Déjà fait' : ' Déjà fait'}
  </button>
  </div>
  <div style=display: flex; gap: 8px; width: 100%;>
- <button class=btn btn-info onclick=editSurvey(${survey.id}) style=flex: 1;>œï Modifier</button>
+ <button class=btn btn-info onclick=editSurvey(${survey.id}) style=flex: 1;> Modifier</button>
  <button class=btn btn-warning onclick=resetVotes(${survey.id}) style=flex: 1;> Reset votes</button>
  </div>
  <button class=btn btn-danger onclick=deleteSurvey(${survey.id}) style=width: 100%;> Supprimer</button>
@@ -984,7 +984,7 @@
  // ============================================
  // ACTIVER/DÉSACTIVER SONDAGE
  // ============================================
- async function toggleActive(surveyIdcurrentActive) {
+ async function toggleActive(surveyId, currentActive) {
  try {
  if (!currentActive) {
  // Désactiver tous les autres sondages de l'utilisateur
@@ -996,7 +996,7 @@
  .neq('id'surveyId);
  
  if (deactivateError) {
- console.error('Erreur désactivation:'deactivateError);
+ console.error('Erreur désactivation:', deactivateError);
  }
  }
 
@@ -1017,11 +1017,11 @@
 
  if (error) throw error;
 
- alert(currentActive ? 'ï Sondage désactivé' : 'œ Sondage activé (vos autres sondages ont été désactivés)');
+ alert(currentActive ? ' Sondage désactivé' : ' Sondage activé (vos autres sondages ont été désactivés)');
  await loadSurveys();
 
  } catch (error) {
- console.error(' Erreur toggleActive:'error);
+ console.error('Erreur toggleActive:', error);
  alert(' Erreur: ' + error.message);
  }
  }
@@ -1029,7 +1029,7 @@
  // ============================================
  // DÉPLACER SONDAGE
  // ============================================
- async function moveSurvey(surveyIddirection) {
+ async function moveSurvey(surveyId, direction) {
  try {
  // Trouver l'index du sondage actuel
  const currentIndex = allSurveys.findIndex(s => s.id === surveyId);
@@ -1065,7 +1065,7 @@
  await loadSurveys();
  
  } catch (error) {
- console.error(' Erreur moveSurvey:'error);
+ console.error('Erreur moveSurvey:', error);
  alert(' Erreur: ' + error.message);
  }
  }
@@ -1096,11 +1096,11 @@
  currentLogoBase64 = event.target.result;
  document.getElementById('logoPreviewImg').src = currentLogoBase64;
  document.getElementById('logoPreview').style.display = 'block';
- console.log('œ Logo chargé');
+ console.log(' Logo chargé');
  };
  reader.readAsDataURL(file);
  } catch (error) {
- console.error('Erreur upload logo:'error);
+ console.error('Erreur upload logo:', error);
  alert(' Erreur lors du chargement du logo');
  }
  });
@@ -1166,7 +1166,7 @@
  })).filter(p => p.text);
 
  if (!titleFR && !descriptionFR && !thankyouFR && playersFR.length === 0) {
- alert(' ï Veuillez remplir au moins un champ FR à traduire.');
+ alert(' Veuillez remplir au moins un champ FR à traduire.');
  return;
  }
 
@@ -1197,7 +1197,7 @@
  window.open('https://www.deepl.com/translator#fr/nl/''_blank');
  
  // Afficher les instructions
- alert('œ Texte copié dans le presse-papiers !\n\n' +
+ alert(' Texte copié dans le presse-papiers !\n\n' +
  ' Prochaines étapes :\n' +
  '1. DeepL s\'ouvre dans un nouvel onglet\n' +
  '2. Collez (Ctrl+V ou Cmd+V) dans le champ de gauche\n' +
@@ -1207,7 +1207,7 @@
  ' Gardez les séparateurs ---TITRE------CANDIDAT1--- etc. pour vous repérer !');
  }).catch(err => {
  // Si le presse-papiers ne fonctionne pasafficher le texte à copier manuellement
- console.error('Erreur copie presse-papiers:'err);
+ console.error('Erreur copie presse-papiers:', err);
  
  // Créer une zone de texte temporaire pour afficher le texte
  const textarea = document.createElement('textarea');
@@ -1238,7 +1238,7 @@
  });
 
  } catch (error) {
- console.error(' Erreur:'error);
+ console.error(' Erreur:', error);
  alert(' Erreur:\n' + error.message);
  }
  }
@@ -1353,7 +1353,7 @@
  item.className = 'player-item';
  item.innerHTML = `
  <input type=text class=form-input placeholder=Nom du candidat/question value=${escapeHtml(value)} required>
- <button type=button class=btn-remove onclick=removePlayerField(this)>œ</button>
+ <button type=button class=btn-remove onclick=removePlayerField(this)></button>
  `;
  editor.appendChild(item);
  
@@ -1573,7 +1573,7 @@
  .eq('language_code''nl');
  }
 
- alert('œ Sondage mis à jour !');
+ alert(' Sondage mis à jour !');
 
  } else {
  // ===== CREATE =====
@@ -1650,20 +1650,20 @@
  // Afficher les URLs
  showUrls(newSurvey.id);
  
- alert('œ Sondage créé !');
+ alert(' Sondage créé !');
  }
 
  closeModal();
  await loadSurveys();
 
  } catch (error) {
- console.error('Erreur:'error);
+ console.error('Erreur:', error);
  showError('Erreur: ' + (error.message || 'Erreur inconnue'));
  }
  });
 
  function showError(message) {
- document.getElementById('errorContainer').innerHTML = `<div class=error-message> ï ${message}</div>`;
+ document.getElementById('errorContainer').innerHTML = `<div class=error-message> ${message}</div>`;
  }
 
  function showUrls(surveyId) {
@@ -1713,11 +1713,11 @@ ${baseUrl}results.html?id=${surveyId}
 
  if (error) throw error;
 
- alert('œ Tous les votes ont été réinitialisés !');
+ alert(' Tous les votes ont été réinitialisés !');
  await loadSurveys();
 
  } catch (error) {
- console.error('Erreur:'error);
+ console.error('Erreur:', error);
  alert(' Erreur: ' + error.message);
  }
  }
@@ -1746,11 +1746,11 @@ ${baseUrl}results.html?id=${surveyId}
 
  if (error) throw error;
 
- alert('œ Sondage supprimé');
+ alert(' Sondage supprimé');
  await loadSurveys();
 
  } catch (error) {
- console.error('Erreur:'error);
+ console.error('Erreur:', error);
  alert(' Erreur: ' + error.message);
  }
  }
@@ -1758,7 +1758,7 @@ ${baseUrl}results.html?id=${surveyId}
  // ============================================
  // RESET DÉJÀ ACTIVÉ
  // ============================================
- async function toggleEverActivated(surveyIdcurrentValue) {
+ async function toggleEverActivated(surveyId, currentValue) {
  const newValue = !currentValue;
 
  try {
@@ -1773,7 +1773,7 @@ ${baseUrl}results.html?id=${surveyId}
  await loadSurveys();
 
  } catch (error) {
- console.error('Erreur:'error);
+ console.error('Erreur:', error);
  alert(' Erreur: ' + error.message);
  }
  }
@@ -1801,7 +1801,7 @@ ${baseUrl}results.html?id=${surveyId}
  .single();
  
  if (error && error.code !== 'PGRST116') {
- console.error('Erreur chargement messages globaux:'error);
+ console.error('Erreur chargement messages globaux:', error);
  return;
  }
  
@@ -1810,7 +1810,7 @@ ${baseUrl}results.html?id=${surveyId}
  document.getElementById('globalMessageNl').value = data.end_message_nl || '';
  }
  } catch (error) {
- console.error('Erreur chargement messages globaux:'error);
+ console.error('Erreur chargement messages globaux:', error);
  }
  }
 
@@ -1854,7 +1854,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  alert('Messages globaux enregistres avec succes !');
  } catch (error) {
- console.error('Erreur sauvegarde messages globaux:'error);
+ console.error('Erreur sauvegarde messages globaux:', error);
  alert('Erreur lors de l\'enregistrement: ' + error.message);
  }
  }
@@ -1874,7 +1874,7 @@ ${baseUrl}results.html?id=${surveyId}
  .maybeSingle();
  
  if (error && error.code !== 'PGRST116') {
- console.error('Erreur chargement mode bilingue:'error);
+ console.error('Erreur chargement mode bilingue:', error);
  return;
  }
  
@@ -1882,7 +1882,7 @@ ${baseUrl}results.html?id=${surveyId}
  document.getElementById('globalBilingualMode').checked = globalBilingualMode;
  
  } catch (error) {
- console.error('Erreur chargement mode bilingue:'error);
+ console.error('Erreur chargement mode bilingue:', error);
  }
  }
 
@@ -1920,13 +1920,13 @@ ${baseUrl}results.html?id=${surveyId}
  .eq('language_code''nl');
 
  alert(isEnabled ? 
- 'œ Mode bilingue activé ! Toutes les traductions NL sont maintenant actives.' : 
- 'ï Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
+ ' Mode bilingue activé ! Toutes les traductions NL sont maintenant actives.' : 
+ ' Mode bilingue désactivé ! Les traductions NL restent sauvegardées mais ne sont plus actives.');
  
  await loadSurveys(); // Rafraîchir l'affichage
  
  } catch (error) {
- console.error('Erreur toggle mode bilingue:'error);
+ console.error('Erreur toggle mode bilingue:', error);
  alert(' Erreur: ' + error.message);
  // Revenir à l'état précédent
  document.getElementById('globalBilingualMode').checked = !isEnabled;
