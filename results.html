@@ -10,12 +10,15 @@
  /* Variables CSS pour le design personnalisable */
  :root {
  /* Valeurs par defaut - seront ecrasees par loadActiveDesign */
- /* PAS de background pour results (transparent) */
+ --container-bg-color: rgba(13, 39, 68, 0.95);
  --text-color: #ffffff;
- --title-color: #d4af37;
- --description-color: #f0f0f0;
  --border-color: #d4af37;
  --percentage-color: #d4af37;
+ --cases-bg-color: rgba(26, 47, 74, 0.8);
+ --button-color: #2196F3;
+ --button-gradient-start: #1a5490;
+ --button-gradient-end: #2196F3;
+ --button-style: gradient;
  }
 
 
@@ -43,7 +46,7 @@
  min-height: auto;
  max-height: none;
  height: auto;
- background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+ background: var(--container-bg-color);
  border: 3px solid var(--border-color);
  border-radius: 20px;
  padding: 30px 40px;
@@ -213,9 +216,7 @@
  background: rgba(255, 215, 0, 0.1);
  }
  
- .player-result.first-place .rank-badge {
- background: linear-gradient(135deg, #FFD700, #FFA500);
- }
+
  
  .player-header {
  display: flex;
@@ -233,8 +234,8 @@
  }
  
  .rank-badge {
- background: linear-gradient(135deg, var(--background-color), #f0d46f);
- color: #0a1828;
+ background: var(--percentage-color);
+ color: var(--cases-bg-color);
  width: 55px;
  height: 55px;
  border-radius: 50%;
@@ -292,15 +293,13 @@
  
  .progress-bar {
  height: 100%;
- background: linear-gradient(90deg, var(--background-color), #f0d46f);
+ background: linear-gradient(90deg, var(--border-color), var(--percentage-color));
  border-radius: 8px;
  transition: width 0.8s ease;
  box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
  }
  
- .progress-bar.first-place {
- background: linear-gradient(90deg, #FFD700, #FFA500);
- }
+
  
  .no-votes {
  text-align: center;
@@ -385,29 +384,26 @@
  return;
  }
 
- // Determiner la langue active
- const lang = currentLanguage || 'fr';
- 
- // Appliquer les variables CSS selon la langue
  const root = document.documentElement;
  
- // PAS de background pour results (reste transparent)
- 
- // Couleurs de texte selon la langue
- const textColor = lang === 'nl' ? preset.text_color_nl : preset.text_color_fr;
- const titleColor = lang === 'nl' ? preset.title_color_nl : preset.title_color_fr;
- const descColor = lang === 'nl' ? preset.description_color_nl : preset.description_color_fr;
- 
- if (textColor) root.style.setProperty('--text-color', textColor);
- if (titleColor) root.style.setProperty('--title-color', titleColor);
- if (descColor) root.style.setProperty('--description-color', descColor);
- 
- // Bordures et pourcentages
+ // Charger les couleurs depuis design_presets
+ if (preset.color_container) root.style.setProperty('--container-bg-color', preset.color_container);
+ if (preset.text_color_fr) root.style.setProperty('--text-color', preset.text_color_fr);
  if (preset.border_color) root.style.setProperty('--border-color', preset.border_color);
  if (preset.percentage_color) root.style.setProperty('--percentage-color', preset.percentage_color);
+ if (preset.color_cases) root.style.setProperty('--cases-bg-color', preset.color_cases);
 
- console.log('Design applique');
+ // Boutons
+ if (preset.button_style === 'solid' && preset.button_color) {
+ root.style.setProperty('--button-color', preset.button_color);
+ document.body.classList.add('btn-solid-style');
+ } else if (preset.button_style === 'gradient') {
+ if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
+ if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
+ document.body.classList.remove('btn-solid-style');
+ }
 
+ console.log('Design applique:', preset.preset_name);
  } catch (error) {
  console.error('Erreur chargement design:', error);
  }
@@ -857,14 +853,14 @@
 
  const initialized = await initSupabase();
  if (initialized) {
- await loadActiveDesign(); // Charger le design
+ await loadActiveDesign(); // Charger le design depuis Supabase
  await checkBilingualMode(); // Verifier le mode bilingue au demarrage
  await loadResults();
  startAutoRefresh();
  }
  })();
 
- // Arreter le rafraichissement quand la page est masquee
+ // Arreter le rafra �Â®chissement quand la page est masquee
  document.addEventListener('visibilitychange', () => {
  if (document.hidden) {
  stopAutoRefresh();
@@ -872,11 +868,3 @@
  startAutoRefresh();
  }
  });
- 
- // ============================================
- // CHARGEMENT AUTOMATIQUE DU DESIGN
- // ============================================
- 
-</script>
-</body>
-</html>
