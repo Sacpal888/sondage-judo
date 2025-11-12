@@ -132,7 +132,7 @@
  align-items: flex-start;
  }
 
- /* Layout pour 2 resultats : c �Â´te  �Â  c �Â´te centres */
+ /* Layout pour 2 resultats : cote a cote centres */
  .results-grid.layout-2 {
  display: grid;
  grid-template-columns: repeat(2, 1fr);
@@ -141,7 +141,7 @@
  margin: 0 auto;
  }
 
- /* Layout pour 3 resultats : c �Â´te  �Â  c �Â´te centres */
+ /* Layout pour 3 resultats : cote a cote centres */
  .results-grid.layout-3 {
  display: grid;
  grid-template-columns: repeat(3, 1fr);
@@ -368,6 +368,12 @@
  // ============================================
  async function loadActiveDesign() {
  try {
+ // Verifier que Supabase est initialise
+ if (!supabaseClient) {
+ console.log('Supabase non initialise, skip design loading');
+ return;
+ }
+ 
  const { data: preset, error } = await supabaseClient
  .from('design_presets')
  .select('*')
@@ -495,7 +501,7 @@
  return true;
  } catch (error) {
  console.error('aÂÅ’ Erreur lors de l\'initialisation de Supabase:', error);
- showError('Erreur de connexion  �Â  la base de donnees');
+ showError('Erreur de connexion a la base de donnees');
  return false;
  }
  }
@@ -564,7 +570,7 @@
  }
  }
 
- // Recuperer les resultats dej �Â  calcules depuis la vue
+ // Recuperer les resultats deja calcules depuis la vue
  const { data: resultsData, error: resultsError } = await supabaseClient
  .from('v_survey_results')
  .select('*')
@@ -633,7 +639,7 @@
  document.getElementById('resultsGrid').style.display = 'grid';
 
  const totalPlayers = results.length;
- console.log(` Resultats mis  �Â  jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
+ console.log(` Resultats mis a jour : ${totalVotes} votes (${totalVotesFr} FR, ${totalVotesNl} NL), ${totalPlayers} candidats`);
 
  } catch (error) {
  console.error('aÂÅ’ Erreur lors du chargement des resultats:', error);
@@ -684,7 +690,7 @@
  }
  });
  } else {
- // Appels suivants: le zoom est dej �Â  applique, pas besoin de recalculer
+ // Appels suivants: le zoom est deja applique, pas besoin de recalculer
  // (le contenu ne change pas de taille, juste les pourcentages)
  container.style.zoom = currentZoom;
  }
@@ -703,7 +709,7 @@
 
  grid.innerHTML = '';
 
- // Limiter  �Â  6 premiers resultats
+ // Limiter a 6 premiers resultats
  const topResults = results.slice(0, 6);
 
  // Appliquer le layout selon le nombre de resultats (comme dans survey)
@@ -735,7 +741,7 @@
  let displayNameNl = result.player_name_nl;
  
  if (isBilingualMode && displayNameNl) {
- // Enlever les emojis du nom NL (ils sont dej �Â  dans le FR)
+ // Enlever les emojis du nom NL (ils sont deja dans le FR)
  displayNameNl = removeEmojis(displayNameNl);
  }
 
@@ -848,19 +854,36 @@
  // INITIALIZATION
  // ============================================
  (async function init() {
+ console.log('=== Initialisation de la page Results ===');
+ 
  currentSurveyId = await getUrlParams();
- if (!currentSurveyId) return;
+ console.log('Survey ID:', currentSurveyId);
+ if (!currentSurveyId) {
+ console.error('Aucun survey ID trouve');
+ return;
+ }
 
  const initialized = await initSupabase();
+ console.log('Supabase initialise:', initialized);
  if (initialized) {
- await loadActiveDesign(); // Charger le design depuis Supabase
- await checkBilingualMode(); // Verifier le mode bilingue au demarrage
+ console.log('Chargement du design...');
+ await loadActiveDesign();
+ console.log('Design charge');
+ 
+ console.log('Verification mode bilingue...');
+ await checkBilingualMode();
+ console.log('Mode bilingue verifie');
+ 
+ console.log('Chargement des resultats...');
  await loadResults();
+ console.log('Resultats charges');
+ 
  startAutoRefresh();
+ console.log('Auto-refresh demarre');
  }
  })();
 
- // Arreter le rafra �Â®chissement quand la page est masquee
+ // Arreter le rafraichissement quand la page est masquee
  document.addEventListener('visibilitychange', () => {
  if (document.hidden) {
  stopAutoRefresh();
@@ -868,3 +891,7 @@
  startAutoRefresh();
  }
  });
+ 
+</script>
+</body>
+</html>
