@@ -9,14 +9,13 @@
  <style>
  /* Variables CSS pour le design personnalisable */
  :root {
- --background-color: var(--border-title-color);
- --container-bg-color: var(--container-bg-color);
- --text-color: var(--text-color);
- --border-title-color: var(--border-title-color);
- --button-color: #2196F3;
- --button-gradient-start: #1a5490;
- --button-gradient-end: #2196F3;
- --button-style: gradient;
+ /* Valeurs par defaut - seront ecrasees par loadActiveDesign */
+ /* PAS de background pour results (transparent) */
+ --text-color: #ffffff;
+ --title-color: #d4af37;
+ --description-color: #f0f0f0;
+ --border-color: #d4af37;
+ --percentage-color: #d4af37;
  }
 
 
@@ -45,7 +44,7 @@
  max-height: none;
  height: auto;
  background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
- border: 3px solid var(--border-title-color);
+ border: 3px solid var(--border-color);
  border-radius: 20px;
  padding: 30px 40px;
  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
@@ -193,7 +192,7 @@
  
  .player-result {
  background: rgba(26, 47, 74, 0.6);
- border: 2px solid var(--border-title-color);
+ border: 2px solid var(--border-color);
  border-radius: 12px;
  padding: 20px;
  transition: all 0.3s;
@@ -313,7 +312,7 @@
  
  .loading {
  text-align: center;
- color: var(--border-title-color);
+ color: var(--border-color);
  font-size: 1.5em;
  padding: 40px;
  }
