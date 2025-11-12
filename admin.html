@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang=fr>
+<html lang="fr">
 <head>
- <meta charset=UTF-8>
- <meta name=viewport content=width=device-widthinitial-scale=1.0>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Administration - Système de Vote Multi-Sondages</title>
- <script src=https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2></script>
- <script src=config.js></script>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <script src="config.js"></script>
  <style>
  * {
  margin: 0;
@@ -859,7 +859,7 @@
  survey_translations(language_codeactive),
  survey_players(id)
  `)
- .order('ordre'{ ascending: true });
+ .order('ordre', { ascending: true });
 
  if (error) throw error;
 
@@ -1423,7 +1423,7 @@
  .from('survey_players')
  .select('*')
  .eq('survey_id'editingSurveyId)
- .order('ordre'{ ascending: true });
+ .order('ordre', { ascending: true });
 
  if (fetchError) throw fetchError;
 
