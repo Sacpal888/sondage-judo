@@ -734,7 +734,7 @@
                 
             } catch (error) {
                 console.error('Erreur:', error);
-                showStatus('Erreur lors de l'activation du preset', 'error');
+                showStatus('Erreur lors de l\'activation du preset', 'error');
             }
         }
         
@@ -774,7 +774,7 @@
                     .single();
                 
                 if (fetchError || !activePreset) {
-                    showStatus('Aucun preset actif trouvé. Veuillez activer un preset d'abord.', 'error');
+                    showStatus('Aucun preset actif trouvé. Veuillez activer un preset d\'abord.', 'error');
                     return;
                 }
                 
@@ -802,7 +802,7 @@
                 
             } catch (error) {
                 console.error('Erreur:', error);
-                showStatus('Erreur lors de l'application du design', 'error');
+                showStatus('Erreur lors de l\'application du design', 'error');
             }
         }
         
