@@ -195,7 +195,7 @@
  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
  }
 
- /* Bouton N �Æ’ ��' �"š ��Â©erlandais (jaune) */
+ /* Bouton N’éerlandais (jaune) */
  .btn-accept-nl {
  background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
  color: #1a2f4a;
@@ -932,7 +932,7 @@
  <p>Deze enquete gebruikt strikt noodzakelijke technische cookies om:</p>
  <ul>
  <li>Uw toestemming voor cookies te registreren</li>
- <li>Ervoor te zorgen dat een persoon slechts  �Æ’ ��' �"š ��Â© �Æ’ ��' �"š ��Â©n keer kan stemmen</li>
+ <li>Ervoor te zorgen dat een persoon slechts ’é’én keer kan stemmen</li>
  <li>De integriteit en geldigheid van de enqueteresultaten te waarborgen</li>
  </ul>
  <p><strong>Bewaartermijn:</strong> Cookies verlopen na 1 dag.</p>
@@ -1154,7 +1154,7 @@
  
  } catch (error) {
  console.error('Erreur lors de la detection du sondage actif:', error);
- document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section m �Æ’ ��' �"š ��Âªme en cas d'erreur
+ document.getElementById('surveySection').classList.remove('hidden'); // Afficher la section m’éme en cas d'erreur
  showError('Erreur de connexion a la base de donnees.');
  return null;
  }
@@ -1266,7 +1266,7 @@
  const consent = getCookie(COOKIE_CONSENT_NAME);
  
  if (consent === 'accepted') {
- // V �Æ’ ��' �"š ��Â©rifier la langue pr �Æ’ ��' �"š ��Â©f �Æ’ ��' �"š ��Â©r �Æ’ ��' �"š ��Â©e sauvegard �Æ’ ��' �"š ��Â©e
+ // V’érifier la langue pr’éf’ér’ée sauvegard’ée
  const savedLang = getCookie(COOKIE_LANG_NAME);
  if (savedLang) {
  currentLanguage = savedLang;
@@ -1277,10 +1277,10 @@
  document.getElementById('surveySection').classList.remove('hidden');
  initializeSurvey();
  } else {
- // Afficher l' �Æ’ ��' �"š ��Â©cran de consentement bilingue
+ // Afficher l'’écran de consentement bilingue
  document.getElementById('cookieConsent').classList.remove('hidden');
  document.getElementById('surveySection').classList.add('hidden');
- // Appliquer l'ajustement du mode bilingue apr �Æ’ ��' �"š ��Â¨s l'affichage du modal
+ // Appliquer l'ajustement du mode bilingue apr’és l'affichage du modal
  adjustConsentDisplay();
  }
  }
@@ -1302,7 +1302,7 @@
  // Charger le sondage actif AVANT d'initialiser
  const urlParams = await getUrlParams();
  if (!urlParams) {
- // Pas de sondage actif, getUrlParams() a dej �Â  affiche le message
+ // Pas de sondage actif, getUrlParams() a dejà affiche le message
  return;
  }
  
@@ -1350,7 +1350,7 @@
  window.SUPABASE_ANON_KEY
  );
 
- // Charger les donn �Æ’ ��' �"š ��Â©es du sondage
+ // Charger les donn’ées du sondage
  const { data: survey, error: surveyError } = await supabaseClient
  .from('surveys')
  .select('*')
@@ -1381,7 +1381,7 @@
  
  showError(noActiveMessage);
  
- // D �"°SACTIV �"° : Polling automatique desactive - tout est manuel
+ // DSACTIV: Polling automatique desactive - tout est manuel
  // startPollingForActiveSurvey(currentSurveyId);
  return;
  }
@@ -1427,10 +1427,10 @@
  document.getElementById('logoContainer').style.display = 'none';
  }
 
- // Verifier si l'utilisateur a dej �Â  vote
+ // Verifier si l'utilisateur a dejà vote
  const votedCookie = getCookie(COOKIE_VOTED_PREFIX + currentSurveyId);
  if (votedCookie === 'true') {
- console.log('Utilisateur a dej �Â  vote');
+ console.log('Utilisateur a dejà vote');
  document.getElementById('loadingMessage').style.display = 'none';
  
  const thankYouDiv = document.getElementById('thankYou');
@@ -1627,7 +1627,7 @@
  }
  });
  } else {
- // Appels suivants: le zoom est dej �Â  applique
+ // Appels suivants: le zoom est dejà applique
  container.style.zoom = currentZoom;
  }
  }
@@ -1661,7 +1661,7 @@
  // Helper pour ajouter le bouton actualiser
  function addRefreshButton(targetDiv) {
  if (document.getElementById('refreshBtn')) {
- return; // Bouton d �Æ’ ��' �"š ��Â©j �Æ’ ��' �"š ��Â  pr �Æ’ ��' �"š ��Â©sent
+ return; // Bouton d’éj’éà pr’ésent
  }
  
  const refreshContainer = document.createElement('div');
@@ -1729,7 +1729,7 @@
  throw insertError;
  }
  
- console.log(' �Â¢ ��"aâ‚¬Â¦ Vote enregistre avec succes:', data);
+                        console.log('✓ Vote enregistré avec succès:', data);
  
  // Set cookie pour empecher les votes multiples
  setCookie(COOKIE_VOTED_PREFIX + currentSurveyId, 'true', 1);
@@ -1744,7 +1744,7 @@
  }, 800);
  
  } catch (error) {
- console.error(' �Â¢ ��Â ��' Erreur lors du vote:', error);
+                    console.error('❌ Erreur lors du vote:', error);
  
  // Message d'erreur plus detaille
  let errorMessage = 'Erreur lors de l\'enregistrement de votre vote.';
@@ -1818,7 +1818,7 @@
  }
  }
  
- // Fonction d'actualisation avec compte  �Â   �"š ��Â  rebours de 10 secondes
+ // Fonction d'actualisation avec compte à rebours de 10 secondes
  const COOLDOWN_SECONDS = 10;
  let countdownInterval = null;
 
@@ -1840,21 +1840,21 @@
  
  // Afficher le compte initial
  if (currentLanguage === 'fr') {
- cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> secondes...`;
+ cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> secondes...`;
  } else {
- cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconden...`;
+ cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconden...`;
  }
  
- // Demarrer le compte  �Â  rebours
+ // Demarrer le compte à rebours
  countdownInterval = setInterval(async () => {
  remaining--;
  
  if (remaining > 0) {
- // Mettre  �Â  jour l'affichage
+ // Mettre à jour l'affichage
  if (currentLanguage === 'fr') {
- cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
+ cooldownMsg.innerHTML = `⏱️ Actualisation dans <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 's' : ''}...`;
  } else {
- cooldownMsg.innerHTML = ` �Â¢ ��Â ��Â± �Â¯ ��Â¸ ��Â Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
+ cooldownMsg.innerHTML = `⏱️ Vernieuwing over <span style="font-size: clamp(1.2rem, 4vw, 2rem); color: #d4af37;">${remaining}</span> seconde${remaining > 1 ? 'n' : ''}...`;
  }
  } else {
  // Temps ecoule, verification finale UNIQUE
@@ -1869,20 +1869,20 @@
  
  // Verifier si c'est un NOUVEAU sondage (ID different)
  if (activeSurvey && activeSurvey.id !== initialSurveyId) {
- console.log('Nouveau sondage detecte apres cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafra �Â®chissement');
+ console.log('Nouveau sondage detecte apres cooldown (ID:', activeSurvey.id, 'vs', initialSurveyId, '), rafra®chissement');
  window.location.reload();
  } else if (!activeSurvey) {
  // Plus aucun sondage actif
- console.log('Aucun sondage actif apres cooldown, rafra �Â®chissement');
+ console.log('Aucun sondage actif apres cooldown, rafra®chissement');
  window.location.reload();
  } else {
- // Meme sondage toujours actif, rafra �Â®chir quand meme pour voir les resultats mis  �Â  jour
- console.log('Meme sondage toujours actif, rafra �Â®chissement');
+ // Meme sondage toujours actif, rafra®chir quand meme pour voir les resultats mis à jour
+ console.log('Meme sondage toujours actif, rafra®chissement');
  window.location.reload();
  }
  } catch (error) {
  console.error('Erreur lors de la verification finale du sondage:', error);
- // En cas d'erreur, rafra �Â®chir quand meme
+ // En cas d'erreur, rafra®chir quand meme
  window.location.reload();
  }
  }
@@ -1918,7 +1918,7 @@
  .maybeSingle();
  
  if (survey && survey.active) {
- // Le sondage est maintenant actif, rafra �Â®chir la page
+ // Le sondage est maintenant actif, rafra®chir la page
  clearInterval(pollingInterval);
  window.location.reload();
  }
@@ -1946,7 +1946,7 @@
  );
  }
  
- // Optimisation : faire les 2 requ �Æ’ ��' �"š ��Âªtes en parall �Æ’ ��' �"š ��Â¨le pour r �Æ’ ��' �"š ��Â©duire le nombre d'appels
+ // Optimisation : faire les 2 requ’étes en parall’éle pour r’éduire le nombre d'appels
  const [surveyResult, configResult] = await Promise.all([
  supabaseClient
  .from('surveys')
@@ -1962,7 +1962,7 @@
  const activeSurvey = surveyResult.data;
  const configData = configResult.data;
  
- // V �Æ’ ��' �"š ��Â©rifier changement de sondage
+ // V’érifier changement de sondage
  if (activeSurvey) {
  // Cas 1: Aucun sondage n'etait actif, maintenant il y en a un
  if (!currentSurveyId) {
@@ -1981,7 +1981,7 @@
  // Verifier changement du mode bilingue
  const newBilingualMode = configData?.bilingual_mode || false;
  if (newBilingualMode !== isBilingualMode) {
- console.log('Changement du mode bilingue detecte:', isBilingualMode, ' �Â¢aâ‚¬Â aâ‚¬â„¢', newBilingualMode);
+ console.log('Changement du mode bilingue detecte:', isBilingualMode, 'aâ‚¬Â aâ‚¬â„¢', newBilingualMode);
  window.location.reload();
  }
  
@@ -1991,7 +1991,7 @@
  }
  
  function startSurveyCheck() {
- // Verifier toutes les 5 secondes (au lieu de 2) pour r �Æ’ ��' �"š ��Â©duire la charge sur Supabase
+ // Verifier toutes les 5 secondes (au lieu de 2) pour r’éduire la charge sur Supabase
  surveyCheckInterval = setInterval(checkForNewSurvey, 5000);
  }
  
@@ -2006,6 +2006,9 @@
  // INITIALIZATION
  // ============================================
  window.addEventListener('DOMContentLoaded', async () => {
+ // Charger le design actif depuis design_presets
+ await loadActiveDesign();
+ 
  // TOUJOURS verifier le consentement d'abord
  const consent = getCookie(COOKIE_CONSENT_NAME);
  
@@ -2015,7 +2018,7 @@
  if (urlParams) {
  checkCookieConsent();
  }
- // Si pas de sondage actif, getUrlParams() a dej �Â  affiche le message de fin
+ // Si pas de sondage actif, getUrlParams() a dejà affiche le message de fin
  } else if (consent === 'declined') {
  // Consentement refuse : ATTENDRE le chargement du mode avant d'afficher
  await loadSurveyBilingualMode();
@@ -2038,7 +2041,7 @@
  if (document.hidden) {
  stopSurveyCheck();
  } else {
- // D �"°SACTIV �"° : Polling automatique desactive
+ // DSACTIV: Polling automatique desactive
  // startSurveyCheck();
  }
  });
@@ -2052,118 +2055,7 @@
  }, 250);
  });
  
- // ============================================
- // CHARGEMENT AUTOMATIQUE DU DESIGN
- // ============================================
- async function loadAndApplyDesign() {
- try {
- const { data, error } = await supabaseClient
- .from('settings')
- .select('*')
- .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
- 
- if (error) {
- console.log('Erreur chargement design:', error);
- return;
- }
- 
- const design = {};
- if (data) {
- data.forEach(item => {
- design[item.key] = item.value;
- });
- }
- 
- // Appliquer les couleurs et polices
- const titleColor = design.design_title_color;
- const textColor = design.design_text_color;
- const fontFamily = design.design_font_family;
- const bgColor = design.design_bg_color;
- const borderColor = design.design_border_color;
- 
- if (titleColor || textColor || fontFamily || bgColor || borderColor) {
- const style = document.createElement('style');
- let css = '';
- 
- if (titleColor) {
- css += `h1, h2, h3, .player-name, .survey-title { color: ${titleColor} !important; }\n`;
- }
- 
- if (textColor) {
- css += `body, p, span, div, .stat-label { color: ${textColor} !important; }\n`;
- }
- 
- if (fontFamily) {
- css += `body, * { font-family: ${fontFamily} !important; }\n`;
- }
- 
- if (bgColor) {
- css += `.player-card { background: ${bgColor} !important; }\n`;
- }
- 
- if (borderColor) {
- css += `.player-card { border-color: ${borderColor} !important; }\n`;
- }
- 
- style.textContent = css;
- document.head.appendChild(style);
- 
- console.log('Design personnalise applique');
- }
- 
- } catch (error) {
- console.error('Erreur application design:', error);
- }
- }
 
- // Charger le design au chargement
- window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </script>
-
- async function loadAndApplyDesign() {
- try {
- const { data, error } = await supabaseClient
- .from('settings')
- .select('*')
- .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
- 
- if (error) return;
- 
- const design = {};
- if (data) {
- data.forEach(item => {
- design[item.key] = item.value;
- });
- }
- 
- if (design.design_title_color || design.design_text_color || design.design_font_family || design.design_bg_color || design.design_border_color) {
- const style = document.createElement('style');
- let css = '';
- 
- if (design.design_title_color) {
- css += 'h1, h2, h3, .player-name, .survey-title { color: ' + design.design_title_color + ' !important; }\n';
- }
- if (design.design_text_color) {
- css += 'body, p, span, div, .stat-label { color: ' + design.design_text_color + ' !important; }\n';
- }
- if (design.design_font_family) {
- css += 'body, * { font-family: ' + design.design_font_family + ' !important; }\n';
- }
- if (design.design_bg_color) {
- css += '.player-card, .survey-card, .result-card { background: ' + design.design_bg_color + ' !important; }\n';
- }
- if (design.design_border_color) {
- css += '.player-card, .survey-card, .result-card { border-color: ' + design.design_border_color + ' !important; }\n';
- }
- 
- style.textContent = css;
- document.head.appendChild(style);
- }
- } catch (error) {
- console.error('Erreur chargement design:', error);
- }
- }
-
- window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </body>
 </html>
