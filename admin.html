@@ -899,8 +899,8 @@
 
  grid.innerHTML = '';
 
- surveys.forEach((surveyindex) => {
- const stats = statsMap[survey.id] || { total_players: 0total_votes: 0votes_fr: 0votes_nl: 0 };
+ surveys.forEach((survey, index) => {
+ const stats = statsMap[survey.id] || { total_players: 0, total_votes: 0, votes_fr: 0, votes_nl: 0 };
  const hasNL = survey.survey_translations && survey.survey_translations.length > 0;
  const nlActive = hasNL && survey.survey_translations[0].active;
 
@@ -1160,7 +1160,7 @@
  
  // Récupérer les candidats FR
  const playerInputsFR = document.querySelectorAll('#playersEditor .player-item input');
- const playersFR = Array.from(playerInputsFR).map((inputindex) => ({
+ const playersFR = Array.from(playerInputsFR).map((input, index) => ({
  index: index + 1,
  text: input.value.trim()
  })).filter(p => p.text);
@@ -1333,7 +1333,7 @@
  // Remplir les champs NL
  syncNLFields();
  const nlInputs = document.querySelectorAll('#playersEditorNL .player-item input');
- players.forEach((playerindex) => {
+ players.forEach((player, index) => {
  if (nlInputs[index] && translationMap[player.id]) {
  nlInputs[index].value = translationMap[player.id];
  }
@@ -1595,7 +1595,7 @@
  if (!newSurvey) throw new Error('Échec de création du sondage');
 
  // Insérer les candidats
- const playersData = players.map((nomindex) => ({
+ const playersData = players.map((nom, index) => ({
  survey_id: newSurvey.id,
  nom,
  ordre: index + 1
@@ -1630,7 +1630,7 @@
  
  // Insérer les traductions des candidats
  const playerTranslations = [];
- insertedPlayers.forEach((playerindex) => {
+ insertedPlayers.forEach((player, index) => {
  if (playersNL[index] && playersNL[index].trim()) {
  playerTranslations.push({
  player_id: player.id,
