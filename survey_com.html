@@ -140,7 +140,7 @@
  }
 
  .player-card {
- background: linear-gradient(135deg, #1a2f4a 0%, #0d2744 100%);
+ background: var(--cases-bg-color);
  border: 3px solid var(--border-color);
  border-radius: 15px;
  padding: 35px 25px;
@@ -193,7 +193,7 @@
 
  .vote-button {
  background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
- color: #0a1828;
+ color: var(--text-color);
  border: 2px solid var(--border-color);
  padding: 20px 25px;
  border-radius: 10px;
@@ -217,7 +217,7 @@
 
  .player-card.selected .vote-button {
  background: #0a1828;
- color: #f4d03f;
+ color: var(--text-color);
  border-color: var(--border-color);
  }
 
@@ -491,7 +491,9 @@
  // Appliquer les variables CSS selon la langue
  const root = document.documentElement;
  
- // PAS de background pour survey_com (reste transparent)
+ // PAS de background general pour survey_com (reste transparent)
+ // MAIS appliquer la couleur des cases
+ if (preset.color_cases) root.style.setProperty('--cases-bg-color', preset.color_cases);
  
  // Couleurs de texte selon la langue
  const textColor = lang === 'nl' ? preset.text_color_nl : preset.text_color_fr;
