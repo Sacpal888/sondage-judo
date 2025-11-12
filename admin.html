@@ -852,7 +852,7 @@
  // ============================================
  async function loadSurveys() {
  try {
- const { data: surveyserror } = await supabaseClient
+ const { data: surveys, error } = await supabaseClient
  .from('surveys')
  .select(`
  *,
@@ -866,7 +866,7 @@
  allSurveys = surveys || [];
  
  // Charger les statistiques
- const { data: statserror: statsError } = await supabaseClient
+ const { data: stats, error: statsError } = await supabaseClient
  .from('v_survey_stats')
  .select('*');
 
@@ -1419,7 +1419,7 @@
 
  // NOUVELLE LOGIQUE :Mise à jour intelligente des candidats pour préserver les votes
  // Récupérer les candidats existants
- const { data: existingPlayerserror: fetchError } = await supabaseClient
+ const { data: existingPlayers, error: fetchError } = await supabaseClient
  .from('survey_players')
  .select('*')
  .eq('survey_id'editingSurveyId)
@@ -1450,7 +1450,7 @@
  insertedPlayers.push(existingPlayers[i]);
  } else {
  // Insérer un nouveau candidat
- const { data: newPlayererror: insertPlayerError } = await supabaseClient
+ const { data: newPlayer, error: insertPlayerError } = await supabaseClient
  .from('survey_players')
  .insert({
  survey_id: editingSurveyId,
@@ -1577,7 +1577,7 @@
 
  } else {
  // ===== CREATE =====
- const { data: newSurveyerror: createError } = await supabaseClient
+ const { data: newSurvey, error: createError } = await supabaseClient
  .from('surveys')
  .insert({
  titre,
@@ -1601,7 +1601,7 @@
  ordre: index + 1
  }));
  
- const { data: insertedPlayerserror: playersError } = await supabaseClient
+ const { data: insertedPlayers, error: playersError } = await supabaseClient
  .from('survey_players')
  .insert(playersData)
  .select();
@@ -1825,7 +1825,7 @@ ${baseUrl}results.html?id=${surveyId}
 
  try {
  // Verifier si une ligne existe deja
- const { data: existingerror: selectError } = await supabaseClient
+ const { data: existing, error: selectError } = await supabaseClient
  .from('config_messages')
  .select('id')
  .single();
@@ -1892,7 +1892,7 @@ ${baseUrl}results.html?id=${surveyId}
  
  try {
  // Vérifier si une ligne existe déjà 
- const { data: existingerror: selectError } = await supabaseClient
+ const { data: existing, error: selectError } = await supabaseClient
  .from('config_messages')
  .select('id')
  .maybeSingle();
