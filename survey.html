@@ -199,7 +199,7 @@
  .btn-accept-nl {
  background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
  color: #1a2f4a;
- border-color: #f4d03f;
+ border-color: var(--border-color);
  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
  }
 
@@ -499,13 +499,13 @@
  }
 
  .player-card.selected .player-name {
- color: #0a1828;
+ color: var(--text-color);
  }
 
  .vote-button {
  background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
- color: #0a1828;
- border: 2px solid #f4d03f;
+ color: var(--text-color);
+ border: 2px solid var(--border-color);
  padding: 20px 25px;
  border-radius: 10px;
  font-size: clamp(1.2rem, 3.5vw, 2rem);
@@ -529,7 +529,7 @@
  .player-card.selected .vote-button {
  background: #0a1828;
  color: #f4d03f;
- border-color: #f4d03f;
+ border-color: var(--border-color);
  }
 
  /* ========================================
@@ -1038,7 +1038,7 @@
 
  if (error) {
  console.error('Erreur chargement design:', error);
- return; // Garder le design par defaut
+ return;
  }
 
  if (!preset) {
@@ -1046,25 +1046,31 @@
  return;
  }
 
- // Appliquer les variables CSS
+ // Determiner la langue active
+ const lang = currentLanguage || 'fr';
+ 
+ // Appliquer les variables CSS selon la langue
  const root = document.documentElement;
- if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
- if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
- if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
- if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
+ 
+ // Couleurs de fond
+ if (preset.bg_color) root.style.setProperty('--background-color', preset.bg_color);
+ if (preset.color_container) root.style.setProperty('--container-bg-color', preset.color_container);
+ if (preset.color_cases) root.style.setProperty('--cases-bg-color', preset.color_cases);
+ 
+ // Couleurs de texte selon la langue
+ const textColor = lang === 'nl' ? preset.text_color_nl : preset.text_color_fr;
+ const titleColor = lang === 'nl' ? preset.title_color_nl : preset.title_color_fr;
+ const descColor = lang === 'nl' ? preset.description_color_nl : preset.description_color_fr;
+ 
+ if (textColor) root.style.setProperty('--text-color', textColor);
+ if (titleColor) root.style.setProperty('--title-color', titleColor);
+ if (descColor) root.style.setProperty('--description-color', descColor);
+ 
+ // Bordures et pourcentages
+ if (preset.border_color) root.style.setProperty('--border-color', preset.border_color);
+ if (preset.percentage_color) root.style.setProperty('--percentage-color', preset.percentage_color);
 
- // Boutons
- // Boutons
- if (preset.button_style === 'solid' && preset.button_color) {
- root.style.setProperty('--button-color', preset.button_color);
- document.body.classList.add('btn-solid-style');
- } else if (preset.button_style === 'gradient') {
- if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
- if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
- document.body.classList.remove('btn-solid-style');
- }
-
- console.log('Design "' + preset.preset_name + '" applique');
+ console.log('Design applique');
 
  } catch (error) {
  console.error('Erreur lors du chargement du design:', error);
@@ -1672,7 +1678,7 @@
  refreshBtn.id = 'refreshBtn';
  refreshBtn.style.cssText = `
  background: linear-gradient(135deg, #d4af37, #f0d46f);
- color: #0a1828;
+ color: var(--text-color);
  border: none;
  padding: clamp(15px, 3vw, 20px) clamp(30px, 8vw, 50px);
  font-size: clamp(1.2rem, 3vw, 1.8rem);
