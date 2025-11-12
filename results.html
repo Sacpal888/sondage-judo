@@ -14,6 +14,9 @@
  --text-color: #ffffff;
  --title-color: #d4af37;
  --description-color: #f0f0f0;
+ --text-color-nl: #ffffff;
+ --title-color-nl: #d4af37;
+ --description-color-nl: #f0f0f0;
  --border-color: #d4af37;
  --percentage-color: #d4af37;
  --cases-bg-color: rgba(26, 47, 74, 0.8);
@@ -81,7 +84,7 @@
  }
  
  h1 .title-nl {
- color: var(--title-color);
+ color: var(--text-color-nl);
  }
 
  /* Masquer les elements NL si mode bilingue desactive */
@@ -120,7 +123,7 @@
  }
  
  .subtitle .subtitle-nl {
- color: var(--description-color);
+ color: var(--description-color-nl);
  }
  
  /* Grille des resultats - adapte selon le nombre de resultats */
@@ -258,7 +261,7 @@
  }
  
  .player-name-nl {
- color: var(--text-color);
+ color: var(--title-color-nl);
  font-size: 1.8rem;
  font-weight: bold;
  word-break: break-word;
@@ -388,7 +391,7 @@
 
  const root = document.documentElement;
  
- // Charger les couleurs depuis design_presets
+ // Charger les couleurs FR depuis design_presets
  if (preset.color_container) root.style.setProperty('--container-bg-color', preset.color_container);
  if (preset.text_color_fr) root.style.setProperty('--text-color', preset.text_color_fr);
  if (preset.title_color_fr) root.style.setProperty('--title-color', preset.title_color_fr);
@@ -396,6 +399,11 @@
  if (preset.border_color) root.style.setProperty('--border-color', preset.border_color);
  if (preset.percentage_color) root.style.setProperty('--percentage-color', preset.percentage_color);
  if (preset.color_cases) root.style.setProperty('--cases-bg-color', preset.color_cases);
+
+ // Charger les couleurs NL depuis design_presets
+ if (preset.text_color_nl) root.style.setProperty('--text-color-nl', preset.text_color_nl);
+ if (preset.title_color_nl) root.style.setProperty('--title-color-nl', preset.title_color_nl);
+ if (preset.description_color_nl) root.style.setProperty('--description-color-nl', preset.description_color_nl);
 
  // Boutons
  if (preset.button_style === 'solid' && preset.button_color) {
