@@ -9,14 +9,13 @@
  <style>
  /* Variables CSS pour le design personnalisable */
  :root {
- --background-color: var(--border-title-color);
- --container-bg-color: var(--container-bg-color);
- --text-color: var(--text-color);
- --border-title-color: var(--border-title-color);
- --button-color: #2196F3;
- --button-gradient-start: #1a5490;
- --button-gradient-end: #2196F3;
- --button-style: gradient;
+ /* Valeurs par defaut - seront ecrasees par loadActiveDesign */
+ /* PAS de background pour survey_com (transparent) */
+ --text-color: #ffffff;
+ --title-color: #d4af37;
+ --description-color: #f0f0f0;
+ --border-color: #d4af37;
+ --percentage-color: #d4af37;
  }
 
 
@@ -42,7 +41,7 @@
  min-width: min(500px, 90vw);
  max-width: 95%;
  background: var(--container-bg-color);
- border: 3px solid var(--border-title-color);
+ border: 3px solid var(--border-color);
  border-radius: 20px;
  padding: 30px 40px;
  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -63,7 +62,7 @@
  font-size: 4rem;
  font-weight: bold;
  text-align: center;
- color: var(--border-title-color);
+ color: var(--border-color);
  margin-bottom: 20px;
  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
  line-height: 1.2;
@@ -142,7 +141,7 @@
 
  .player-card {
  background: linear-gradient(135deg, #1a2f4a 0%, #0d2744 100%);
- border: 3px solid rgba(212, 175, 55, 0.5);
+ border: 3px solid var(--border-color);
  border-radius: 15px;
  padding: 35px 25px;
  text-align: center;
@@ -157,7 +156,7 @@
 
  .player-card:hover {
  transform: translateY(-5px);
- border-color: var(--border-title-color);
+ border-color: var(--border-color);
  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
  }
 
@@ -230,7 +229,7 @@
  text-align: center;
  padding: 60px 40px;
  background: rgba(26, 47, 74, 0.8);
- border: 3px solid var(--border-title-color);
+ border: 3px solid var(--border-color);
  border-radius: 20px;
  transition: all 0.5s ease;
  }
@@ -266,7 +265,7 @@
  .thank-you-title {
  font-size: 4.5rem;
  font-weight: bold;
- color: var(--border-title-color);
+ color: var(--border-color);
  margin-bottom: 25px;
  }
 
@@ -282,7 +281,7 @@
  .loading-message {
  text-align: center;
  font-size: 3rem;
- color: var(--border-title-color);
+ color: var(--border-color);
  padding: 50px;
  }
 
