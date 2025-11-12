@@ -9,14 +9,15 @@
  <style>
  /* Variables CSS pour le design personnalisable */
  :root {
- --background-color: var(--border-title-color);
- --container-bg-color: var(--container-bg-color);
- --text-color: var(--text-color);
- --border-title-color: var(--border-title-color);
- --button-color: #2196F3;
- --button-gradient-start: #1a5490;
- --button-gradient-end: #2196F3;
- --button-style: gradient; /* 'solid' ou 'gradient' */
+ /* Valeurs par defaut - seront ecrasees par loadActiveDesign */
+ --background-color: #0d2744;
+ --container-bg-color: #1a3a5a;
+ --cases-bg-color: #2a4a6a;
+ --text-color: #ffffff;
+ --title-color: #d4af37;
+ --description-color: #f0f0f0;
+ --border-color: #d4af37;
+ --percentage-color: #d4af37;
  }
 
 
@@ -28,7 +29,7 @@
  
  body {
  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
- background: linear-gradient(135deg, #0a1828 0%, #1a2f4a 50%, #0d2744 100%);
+ background: var(--background-color);
  min-height: 100vh;
  display: flex;
  justify-content: center;
@@ -42,7 +43,7 @@
  min-width: min(500px, 90vw);
  max-width: 95%;
  background: var(--container-bg-color);
- border: 3px solid var(--border-title-color);
+ border: 3px solid var(--border-color);
  border-radius: 20px;
  padding: 30px 40px;
  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -67,7 +68,7 @@
  .consent-content {
  padding: 40px 30px;
  background: rgba(26, 47, 74, 0.8);
- border: 2px solid rgba(212, 175, 55, 0.5);
+ border: 2px solid var(--border-color);
  border-radius: 15px;
  }
 
@@ -136,7 +137,7 @@
  }
 
  .privacy-link:hover {
- color: var(--border-title-color);
+ color: var(--border-color);
  }
 
  /* Boutons linguistiques */
@@ -273,14 +274,14 @@
  .privacy-title {
  font-size: clamp(1.3rem, 3.5vw, 1.8rem);
  font-weight: bold;
- color: var(--border-title-color);
+ color: var(--border-color);
  margin-bottom: 25px;
  text-align: center;
  }
 
  .privacy-section {
  background: rgba(26, 47, 74, 0.6);
- border: 2px solid rgba(212, 175, 55, 0.3);
+ border: 2px solid var(--border-color);
  border-radius: 12px;
  padding: 20px;
  margin-bottom: 15px;
@@ -327,7 +328,7 @@
  .declined-content {
  padding: 40px 30px;
  background: rgba(26, 47, 74, 0.8);
- border: 2px solid rgba(212, 175, 55, 0.5);
+ border: 2px solid var(--border-color);
  border-radius: 15px;
  }
 
@@ -340,7 +341,7 @@
  .declined-title {
  font-size: clamp(1.3rem, 3.5vw, 1.7rem);
  font-weight: bold;
- color: var(--border-title-color);
+ color: var(--border-color);
  margin-bottom: 20px;
  }
 
@@ -373,7 +374,7 @@
  font-size: clamp(2rem, 8vw, 4rem);
  font-weight: bold;
  text-align: center;
- color: var(--border-title-color);
+ color: var(--border-color);
  margin-bottom: 20px;
  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
  line-height: 1.2;
@@ -451,8 +452,8 @@
  }
 
  .player-card {
- background: linear-gradient(135deg, #1a2f4a 0%, #0d2744 100%);
- border: 3px solid rgba(212, 175, 55, 0.5);
+ background: var(--cases-bg-color);
+ border: 3px solid var(--border-color);
  border-radius: 15px;
  padding: 35px 25px;
  text-align: center;
@@ -467,7 +468,7 @@
 
  .player-card:hover {
  transform: translateY(-5px);
- border-color: var(--border-title-color);
+ border-color: var(--border-color);
  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
  }
 
@@ -540,7 +541,7 @@
  text-align: center;
  padding: 60px 40px;
  background: rgba(26, 47, 74, 0.8);
- border: 3px solid var(--border-title-color);
+ border: 3px solid var(--border-color);
  border-radius: 20px;
  transition: all 0.5s ease;
  }
@@ -576,7 +577,7 @@
  .thank-you-title {
  font-size: clamp(2rem, 8vw, 4.5rem);
  font-weight: bold;
- color: var(--border-title-color);
+ color: var(--border-color);
  margin-bottom: 25px;
  }
 
@@ -592,7 +593,7 @@
  .loading-message {
  text-align: center;
  font-size: clamp(1.5rem, 5vw, 3rem);
- color: var(--border-title-color);
+ color: var(--border-color);
  padding: 50px;
  }
 
