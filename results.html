@@ -277,7 +277,7 @@
  }
  
  .percentage {
- color: var(--border-title-color);
+ color: var(--percentage-color);
  font-size: 2.2em;
  font-weight: bold;
  }
@@ -386,23 +386,29 @@
  return;
  }
 
+ // Determiner la langue active
+ const lang = currentLanguage || 'fr';
+ 
+ // Appliquer les variables CSS selon la langue
  const root = document.documentElement;
- if (preset.background_color) root.style.setProperty('--background-color', preset.background_color);
- if (preset.container_bg_color) root.style.setProperty('--container-bg-color', preset.container_bg_color);
- if (preset.text_color) root.style.setProperty('--text-color', preset.text_color);
- if (preset.border_title_color) root.style.setProperty('--border-title-color', preset.border_title_color);
+ 
+ // PAS de background pour results (reste transparent)
+ 
+ // Couleurs de texte selon la langue
+ const textColor = lang === 'nl' ? preset.text_color_nl : preset.text_color_fr;
+ const titleColor = lang === 'nl' ? preset.title_color_nl : preset.title_color_fr;
+ const descColor = lang === 'nl' ? preset.description_color_nl : preset.description_color_fr;
+ 
+ if (textColor) root.style.setProperty('--text-color', textColor);
+ if (titleColor) root.style.setProperty('--title-color', titleColor);
+ if (descColor) root.style.setProperty('--description-color', descColor);
+ 
+ // Bordures et pourcentages
+ if (preset.border_color) root.style.setProperty('--border-color', preset.border_color);
+ if (preset.percentage_color) root.style.setProperty('--percentage-color', preset.percentage_color);
 
- // Boutons
- if (preset.button_style === 'solid' && preset.button_color) {
- root.style.setProperty('--button-color', preset.button_color);
- document.body.classList.add('btn-solid-style');
- } else if (preset.button_style === 'gradient') {
- if (preset.button_gradient_start) root.style.setProperty('--button-gradient-start', preset.button_gradient_start);
- if (preset.button_gradient_end) root.style.setProperty('--button-gradient-end', preset.button_gradient_end);
- document.body.classList.remove('btn-solid-style');
- }
+ console.log('Design applique');
 
- console.log('Design applique:', preset.preset_name);
  } catch (error) {
  console.error('Erreur chargement design:', error);
  }
@@ -852,13 +858,14 @@
 
  const initialized = await initSupabase();
  if (initialized) {
+ await loadActiveDesign(); // Charger le design
  await checkBilingualMode(); // Verifier le mode bilingue au demarrage
  await loadResults();
  startAutoRefresh();
  }
  })();
 
- // Arreter le rafra �Â®chissement quand la page est masquee
+ // Arreter le rafraichissement quand la page est masquee
  document.addEventListener('visibilitychange', () => {
  if (document.hidden) {
  stopAutoRefresh();
@@ -870,112 +877,7 @@
  // ============================================
  // CHARGEMENT AUTOMATIQUE DU DESIGN
  // ============================================
- async function loadAndApplyDesign() {
- try {
- const { data, error } = await supabaseClient
- .from('settings')
- .select('*')
- .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
  
- if (error) {
- console.log('Erreur chargement design:', error);
- return;
- }
- 
- const design = {};
- if (data) {
- data.forEach(item => {
- design[item.key] = item.value;
- });
- }
- 
- const titleColor = design.design_title_color;
- const textColor = design.design_text_color;
- const fontFamily = design.design_font_family;
- const bgColor = design.design_bg_color;
- const borderColor = design.design_border_color;
- 
- if (titleColor || textColor || fontFamily || bgColor || borderColor) {
- const style = document.createElement('style');
- let css = '';
- 
- if (titleColor) {
- css += `h1, h2, h3, .player-name { color: ${titleColor} !important; }\n`;
- }
- 
- if (textColor) {
- css += `body, p, span, div { color: ${textColor} !important; }\n`;
- }
- 
- if (fontFamily) {
- css += `body, * { font-family: ${fontFamily} !important; }\n`;
- }
- 
- if (bgColor) {
- css += `.player-card { background: ${bgColor} !important; }\n`;
- }
- 
- if (borderColor) {
- css += `.player-card { border-color: ${borderColor} !important; }\n`;
- }
- 
- style.textContent = css;
- document.head.appendChild(style);
- console.log('Design personnalise applique');
- }
- 
- } catch (error) {
- console.error('Erreur application design:', error);
- }
- }
-
- window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </script>
-
- async function loadAndApplyDesign() {
- try {
- const { data, error } = await supabaseClient
- .from('settings')
- .select('*')
- .in('key', ['design_title_color', 'design_text_color', 'design_font_family', 'design_bg_color', 'design_border_color']);
- 
- if (error) return;
- 
- const design = {};
- if (data) {
- data.forEach(item => {
- design[item.key] = item.value;
- });
- }
- 
- if (design.design_title_color || design.design_text_color || design.design_font_family || design.design_bg_color || design.design_border_color) {
- const style = document.createElement('style');
- let css = '';
- 
- if (design.design_title_color) {
- css += 'h1, h2, h3, .player-name, .survey-title { color: ' + design.design_title_color + ' !important; }\n';
- }
- if (design.design_text_color) {
- css += 'body, p, span, div, .stat-label { color: ' + design.design_text_color + ' !important; }\n';
- }
- if (design.design_font_family) {
- css += 'body, * { font-family: ' + design.design_font_family + ' !important; }\n';
- }
- if (design.design_bg_color) {
- css += '.player-card, .survey-card, .result-card { background: ' + design.design_bg_color + ' !important; }\n';
- }
- if (design.design_border_color) {
- css += '.player-card, .survey-card, .result-card { border-color: ' + design.design_border_color + ' !important; }\n';
- }
- 
- style.textContent = css;
- document.head.appendChild(style);
- }
- } catch (error) {
- console.error('Erreur chargement design:', error);
- }
- }
-
- window.addEventListener('DOMContentLoaded', loadAndApplyDesign);
 </body>
 </html>
